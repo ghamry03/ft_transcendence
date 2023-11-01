@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkft_transcendence"]=self["webpackChunkft_transcendence"]||[]).push([[443],{5920:function(n,e,t){t.r(e),t.d(e,{default:function(){return d}});var a=t(3396);const c={class:"about"},r=(0,a._)("h1",null,"This is an about page",-1),s=[r];function u(n,e){return(0,a.wg)(),(0,a.iD)("div",c,s)}var f=t(89);const i={},o=(0,f.Z)(i,[["render",u]]);var d=o}}]);
-//# sourceMappingURL=about.f34a4627.js.map
