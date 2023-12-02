@@ -1,8 +1,8 @@
 NAME			=	ft_transcendence
 
-DOCKER_CMD		=	docker compose -p $(NAME)
+DOCKER_CMD		=	docker compose -f $(COMPOSE_PATH) -p $(NAME)
 
-COMPOSE_PATH	=	./docker-compose.yml
+COMPOSE_PATH	=	./srcs/docker-compose.yml
 
 $(NAME)			:	build up
 
