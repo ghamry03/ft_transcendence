@@ -1,0 +1,44 @@
+version: "2"
+services:
+    nginx:
+        build: ./nginx
+        restart: always
+        ports:
+            - "80:80"
+        depends_on:
+            - django
+            - postgres
+    django:
+        build: ./django
+        restart: always
+        volumes:
+            - django_files:/var
+        depends_on:
+            - postgres
+    postgres:
+        build: ./postgres
+        restart: always
+        volumes:
+            - django_files:/var
+
+volumes:
+    frontend:
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: frontend/srcs/
+
+    django_files:
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: /tmp
+
+    postgresdata:
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: postgres/data/
