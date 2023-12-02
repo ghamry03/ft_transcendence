@@ -1,44 +1,55 @@
-version: "2"
+version: "3"
 services:
-    nginx:
-        build: ./nginx
+    server:
+        build: ./server
         restart: always
         ports:
             - "80:80"
         depends_on:
-            - django
+            - main_app
             - postgres
-    django:
-        build: ./django
+
+    main_app:
+        build: ./main_app
         restart: always
         volumes:
-            - django_files:/var
+            - main_app_data:/var
         depends_on:
             - postgres
+            - auth_app
+
+    auth_app:
+        build: ./auth_app
+        restart: always
+        volumes:
+            - auth_app_data:/var
+        depends_on:
+            - postgres
+
     postgres:
         build: ./postgres
         restart: always
         volumes:
-            - django_files:/var
+            - postgres_data:/var/lib/postgresql/data
 
 volumes:
-    frontend:
+    main_app_data:
         driver: local
         driver_opts:
             o: bind
             type: none
-            device: frontend/srcs/
+            device: ../srcs/main_app
 
-    django_files:
+    auth_app_data:
         driver: local
         driver_opts:
             o: bind
             type: none
-            device: /tmp
+            device: ../srcs/main_app/auth_app/
 
-    postgresdata:
+    postgres_data:
         driver: local
         driver_opts:
             o: bind
             type: none
-            device: postgres/data/
+            device: ../srcs/postgres/data

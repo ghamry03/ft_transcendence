@@ -2,7 +2,7 @@ NAME			=	ft_transcendence
 
 DOCKER_CMD		=	docker compose -f $(COMPOSE_PATH) -p $(NAME)
 
-COMPOSE_PATH	=	./srcs/docker-compose.yml
+COMPOSE_PATH	=	./docker_srcs/docker-compose.yml
 
 $(NAME)			:	build up
 
@@ -17,34 +17,43 @@ up				:
 down			:
 					$(DOCKER_CMD) down
 
-nginx			:
-					$(DOCKER_CMD) up -d --no-deps --build nginx
+server			:
+					$(DOCKER_CMD) up -d --no-deps --build server
 
-django			:
-					$(DOCKER_CMD) up -d --no-deps --build django
+main			:
+					$(DOCKER_CMD) up -d --no-deps --build main_app
+
+auth			:
+					$(DOCKER_CMD) up -d --no-deps --build auth_app
 
 postgres		:
 					$(DOCKER_CMD) up -d --no-deps --build postgres
 
-nginx-sh		:
-					$(DOCKER_CMD) exec -it nginx /bin/bash
+server-sh		:
+					$(DOCKER_CMD) exec -it server /bin/bash
 
-django-sh		:
-					$(DOCKER_CMD) exec -it django /bin/bash
+main-sh		:
+					$(DOCKER_CMD) exec -it main_app /bin/bash
+
+auth-sh		:
+					$(DOCKER_CMD) exec -it auth_app /bin/bash
 
 postgres-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
 
 ps				:
+					$(DOCKER_CMD) ps
 
 logs			:
+					$(DOCKER_CMD) logs
 
-cache-clear		:
-
-clean			:
+clean			:	down
 
 fclean			:
+					$(DOCKER_CMD) down -v --rmi all
 
-re				:
+re				: fclean all
 
-.PHONY			:	$(NAME) all backend database server clean fclean re
+.PHONY			:	$(NAME) all build up down clean fclean re	\
+					server main_app auth_app postgres			\
+					server-sh main-sh auth-sh postgres-sh
