@@ -2,7 +2,7 @@ FROM python:3.12.0-bullseye
 
 
 # RUN mkdir -p /home/ft_transcendence
-WORKDIR /home
+WORKDIR /home/main_app
 
 
 COPY requirements.txt ./

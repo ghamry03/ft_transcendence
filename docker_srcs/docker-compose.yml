@@ -2,7 +2,7 @@ version: "3"
 services:
     server:
         build: ./server
-        restart: always
+        restart: on-failure
         ports:
             - "80:80"
         depends_on:
@@ -11,9 +11,7 @@ services:
 
     main_app:
         build: ./main_app
-        restart: always
-        ports:
-        - "8000:8000"
+        restart: on-failure
         volumes:
             - main_app_data:/home/main_app
         depends_on:
@@ -22,15 +20,15 @@ services:
 
     auth_app:
         build: ./auth_app
-        restart: always
+        restart: on-failure
         volumes:
-            - auth_app_data:/var
+            - auth_app_data:/home/auth_app
         depends_on:
             - postgres
 
     postgres:
         build: ./postgres
-        restart: always
+        restart: on-failure
         volumes:
             - postgres_data:/var/lib/postgresql/data
 
@@ -40,14 +38,14 @@ volumes:
         driver_opts:
             o: bind
             type: none
-            device: ../srcs/main_app/main_app
+            device: ../srcs/main_app/
 
     auth_app_data:
         driver: local
         driver_opts:
             o: bind
             type: none
-            device: ../srcs/main_app/auth_app/
+            device: ../srcs/auth_app/
 
     postgres_data:
         driver: local
