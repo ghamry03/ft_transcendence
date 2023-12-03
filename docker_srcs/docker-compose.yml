@@ -12,8 +12,10 @@ services:
     main_app:
         build: ./main_app
         restart: always
+        ports:
+        - "8000:8000"
         volumes:
-            - main_app_data:/var
+            - main_app_data:/home/main_app
         depends_on:
             - postgres
             - auth_app
@@ -38,7 +40,7 @@ volumes:
         driver_opts:
             o: bind
             type: none
-            device: ../srcs/main_app
+            device: ../srcs/main_app/main_app
 
     auth_app_data:
         driver: local
