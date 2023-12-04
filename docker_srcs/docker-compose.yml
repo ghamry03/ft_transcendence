@@ -12,6 +12,8 @@ services:
     main_app:
         build: ./main_app
         restart: on-failure
+        ports:
+            - "8000:8000"
         volumes:
             - main_app_data:/home/main_app
         depends_on:
