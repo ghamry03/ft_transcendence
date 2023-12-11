@@ -9,6 +9,7 @@ $(NAME)			:	build up
 all				:	$(NAME)
 
 build			:
+					mkdir -p ./srcs/postgres/data
 					$(DOCKER_CMD) build
 
 up				:
@@ -38,7 +39,7 @@ main-sh		:
 auth-sh		:
 					$(DOCKER_CMD) exec -it auth_app /bin/bash
 
-postgres-sh		:
+db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
 
 ps				:
