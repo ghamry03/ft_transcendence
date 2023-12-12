@@ -12,25 +12,50 @@ services:
     main_app:
         build: ./main_app
         restart: on-failure
+        ports:
+            - "8000:8000"
+        # command:
+        # - sh
+        # - -c
+        # - |
+        #   python manage.py makemigrations
+        #   python manage.py migrate --noinput
+        #   python manage.py runserver 0.0.0.0:8000
         volumes:
             - main_app_data:/home/main_app
         depends_on:
-            - postgres
-            - auth_app
+            auth_app:
+                condition: service_started
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
 
     auth_app:
         build: ./auth_app
         restart: on-failure
+        ports:
+            - "5000:5000"
         volumes:
             - auth_app_data:/home/auth_app
         depends_on:
-            - postgres
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
 
     postgres:
         build: ./postgres
         restart: on-failure
         volumes:
             - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: pg_isready -U postgres
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        env_file:
+            - ./.env
 
 volumes:
     main_app_data:

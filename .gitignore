@@ -1,2 +1,5 @@
 **/.env
 **/__pycache__
+**/tenv
+docker_srcs/.env
+srcs/postgres/data
