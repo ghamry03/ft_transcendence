@@ -1,31 +1,44 @@
 version: "3"
 services:
+    server:
+        build: ./server
+        image: nginx
+        container_name: nginx
+        restart: on-failure
+        volumes:
+            - ./server/conf.d:/etc/nginx/conf.d
+        ports:
+            - "80:80"
+        depends_on:
+            - main_app
+            - auth_app
+
     main_app:
-        build: ./main_app
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/main_app/Dockerfile.prod
         image: main_app
         container_name: main_app
         restart: on-failure
-        ports:
-            - "8000:8000"
-        volumes:
-            - main_app_data:/home/main_app
+        expose:
+          - 8000
+        command: gunicorn main_app.wsgi:application --bind 0.0.0.0:8000
         depends_on:
-            auth_app:
-                condition: service_started
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
 
     auth_app:
-        build: ./auth_app
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/auth_app/Dockerfile.prod
         image: auth_app
         container_name: auth_app
         restart: on-failure
-        ports:
-            - "5000:5000"
-        volumes:
-            - auth_app_data:/home/auth_app
+        expose:
+          - 5000
+        command: gunicorn auth_app.wsgi:application --bind 0.0.0.0:5000
         depends_on:
             postgres:
                 condition: service_healthy
@@ -48,20 +61,6 @@ services:
             - ./.env
 
 volumes:
-    main_app_data:
-        driver: local
-        driver_opts:
-            o: bind
-            type: none
-            device: ../srcs/main_app/
-
-    auth_app_data:
-        driver: local
-        driver_opts:
-            o: bind
-            type: none
-            device: ../srcs/auth_app/
-
     postgres_data:
         driver: local
         driver_opts:

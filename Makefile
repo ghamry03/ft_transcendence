@@ -2,7 +2,13 @@ NAME			=	ft_transcendence
 
 DOCKER_CMD		=	docker compose -f $(COMPOSE_PATH) -p $(NAME)
 
-COMPOSE_PATH	=	./docker_srcs/docker-compose.yml
+prod			=	0
+
+ifeq ($(prod), 1)
+	COMPOSE_PATH	=	./docker_srcs/docker-compose.prod.yml
+else
+	COMPOSE_PATH	=	./docker_srcs/docker-compose.yml
+endif
 
 $(NAME)			:	build up
 

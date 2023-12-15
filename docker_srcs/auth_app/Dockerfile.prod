@@ -1,0 +1,23 @@
+FROM python:3.12.0-bullseye
+
+RUN addgroup --system app && adduser --system --group app
+
+ENV HOME=/home/auth_app
+RUN mkdir -p $HOME
+WORKDIR $HOME
+COPY docker_srcs/auth_app/requirements.txt ./
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY docker_srcs/auth_app/entrypoint.sh /
+RUN chmod a+x /entrypoint.sh
+
+COPY ./srcs/auth_app .
+RUN chown -R app:app $HOME
+USER app
+EXPOSE 5000
+
+ENTRYPOINT [ "/entrypoint.sh"]
