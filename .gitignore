@@ -4,3 +4,4 @@
 docker_srcs/.env
 srcs/postgres/data
 docker_srcs/server/old.conf
+notes
