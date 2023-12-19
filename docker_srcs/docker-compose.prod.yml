@@ -11,7 +11,9 @@ services:
             - "80:80"
         depends_on:
             - main_app
-            - auth_app
+            - user_app
+        networks:
+            - user_app_network
 
     main_app:
         build: 
@@ -28,22 +30,42 @@ services:
                 condition: service_healthy
         env_file:
             - ./.env
+        networks:
+            - user_app_network
 
-    auth_app:
-        build: 
+    # auth_app:
+    #     build: 
+    #       context: ../
+    #       dockerfile: ./docker_srcs/auth_app/Dockerfile.prod
+    #     image: auth_app
+    #     container_name: auth_app
+    #     restart: on-failure
+    #     expose:
+    #       - 5000
+    #     command: gunicorn auth_app.wsgi:application --bind 0.0.0.0:5000
+    #     depends_on:
+    #         postgres:
+    #             condition: service_healthy
+    #     env_file:
+    #         - ./.env
+
+    user_app:
+        build:
           context: ../
-          dockerfile: ./docker_srcs/auth_app/Dockerfile.prod
-        image: auth_app
-        container_name: auth_app
+          dockerfile: ./docker_srcs/user_app/Dockerfile.prod
+        image: user_app
+        container_name: user_app
         restart: on-failure
         expose:
-          - 5000
-        command: gunicorn auth_app.wsgi:application --bind 0.0.0.0:5000
+          - 3000
+        command: gunicorn user_app.wsgi:application --bind 0.0.0.0:3000
         depends_on:
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
+        networks:
+            - user_app_network
 
     postgres:
         build: ./postgres
@@ -51,7 +73,8 @@ services:
         container_name: postgres
         restart: on-failure
         volumes:
-            - postgres_data:/var/lib/postgresql/data
+            - ../srcs/postgres/data:/var/lib/postgresql/data
+            # - postgres_data:/var/lib/postgresql/data
         healthcheck:
             test: pg_isready -U postgres
             interval: 5s
@@ -59,11 +82,17 @@ services:
             retries: 5
         env_file:
             - ./.env
+        networks:
+            - user_app_network
 
-volumes:
-    postgres_data:
-        driver: local
-        driver_opts:
-            o: bind
-            type: none
-            device: ../srcs/postgres/data
+# volumes:
+#     postgres_data:
+#         driver: local
+#         driver_opts:
+#             o: bind
+#             type: none
+#             device: ../srcs/postgres/data
+
+networks:
+    user_app_network:
+        driver: bridge

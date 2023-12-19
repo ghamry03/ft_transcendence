@@ -11,28 +11,29 @@ services:
             - ../srcs/main_app/:/home/main_app
             # - main_app_data:/home/main_app
         depends_on:
-            auth_app:
+            user_app:
                 condition: service_started
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
 
-    auth_app:
-        build: ./auth_app
-        image: auth_app
-        container_name: auth_app
+    user_app:
+        build: ./user_app
+        image: user_app
+        container_name: user_app
         restart: on-failure
         ports:
-            - "5000:5000"
+            - "3000:3000"
         volumes:
-            - ../srcs/auth_app/:/home/auth_app
-            # - auth_app_data:/home/auth_app
+            - ../srcs/user_app/:/home/user_app
         depends_on:
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
+        networks:
+            - user_app_network
 
     postgres:
         build: ./postgres
@@ -49,6 +50,8 @@ services:
             retries: 5
         env_file:
             - ./.env
+        networks:
+            - user_app_network
 
 # volumes:
 #     main_app_data:
@@ -58,16 +61,20 @@ services:
 #             type: none
 #             device: ../srcs/main_app/
 
-#     auth_app_data:
+#     user_app_data:
 #         driver: local
 #         driver_opts:
 #             o: bind
 #             type: none
-#             device: ../srcs/auth_app/
+#             device: ../srcs/user_app/
 
-#     postgres_data:
-#         driver: local
-#         driver_opts:
-#             o: bind
-#             type: none
-#             device: ../srcs/postgres/data
+    # postgres_data:
+    #     driver: local
+    #     driver_opts:
+    #         o: bind
+    #         type: none
+    #         device: ../srcs/postgres/data
+
+networks:
+    user_app_network:
+        driver: bridge
