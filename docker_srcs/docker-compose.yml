@@ -17,6 +17,26 @@ services:
                 condition: service_healthy
         env_file:
             - ./.env
+        networks:
+            - user_app_network
+    
+    game_app:
+        build: ./game_app
+        image: game_app
+        container_name: game_app
+        restart: on-failure
+        ports:
+            - "2000:2000"
+        volumes:
+            - ../srcs/game_app/:/home/game_app
+            # - game_app_data:/home/game_app
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
 
     user_app:
         build: ./user_app

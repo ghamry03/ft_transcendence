@@ -32,6 +32,24 @@ services:
             - ./.env
         networks:
             - user_app_network
+    
+    game_app:
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/game_app/Dockerfile.prod
+        image: game_app
+        container_name: game_app
+        restart: on-failure
+        expose:
+          - 2000
+        command: gunicorn game_app.wsgi:application --bind 0.0.0.0:2000
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
 
     # auth_app:
     #     build: 
