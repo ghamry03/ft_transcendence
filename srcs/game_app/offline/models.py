@@ -28,6 +28,7 @@ class Game(models.Model):
         """Returns the url to access a particular game instance."""
         return reverse('game-detail', args=[str(self.gid)])
 
+# represents the com 
 class PlayerMatch(models.Model):
     matchId = models.AutoField(primary_key=True)
     gid = models.ForeignKey(Game, on_delete=models.CASCADE, null=True)

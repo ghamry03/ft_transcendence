@@ -172,3 +172,4 @@ notes
 .DS_Store
 docker_srcs/.DS_Store
 docker_srcs/user_app/.DS_Store
+srcs/game_app/offline/static/images
