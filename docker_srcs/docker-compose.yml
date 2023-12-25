@@ -31,7 +31,7 @@ services:
             - ../srcs/game_app/:/home/game_app
             # - game_app_data:/home/game_app
         depends_on:
-            postgres:
+            user_app:
                 condition: service_healthy
         env_file:
             - ./.env
@@ -54,6 +54,11 @@ services:
             - ./.env
         networks:
             - user_app_network
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:3000/user/health"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
 
     postgres:
         build: ./postgres

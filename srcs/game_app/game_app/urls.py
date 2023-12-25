@@ -24,7 +24,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('offline_game/', include('offline_game.urls')),
+	path('offline/', include('offline.urls')),
     path('', RedirectView.as_view(url='offline/', permanent=True)),
 ]
 

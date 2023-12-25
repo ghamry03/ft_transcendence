@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'offline_game' # if this doesnt work try offline_game.apps.Offline_gameConfig
+	'offline' # if this doesnt work try offline.apps.Offline_gameConfig
 ]
 
 MIDDLEWARE = [

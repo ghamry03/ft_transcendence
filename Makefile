@@ -45,8 +45,14 @@ main-sh		:
 user-sh		:
 					$(DOCKER_CMD) exec -it user_app /bin/bash
 
+game-sh		:
+					$(DOCKER_CMD) exec -it game_app /bin/bash
+
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
+
+psql		:
+					$(DOCKER_CMD) exec postgres psql --username=postgres --dbname=usermanagement
 
 ps				:
 					$(DOCKER_CMD) ps
