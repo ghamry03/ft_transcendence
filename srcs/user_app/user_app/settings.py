@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'user_app.wsgi.application'
 DATABASES = {
         'default': {
             'ENGINE': getenv('SQL_ENGINE'),
-            'NAME': getenv('POSTGRES_NAME'),
+            'NAME': getenv('POSTGRES_DB'),
             'USER': getenv('POSTGRES_USER'),
             'PASSWORD': getenv('POSTGRES_PASSWORD'),
             'HOST': getenv('SQL_HOST'),
@@ -128,3 +128,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'user_app.authentication.api_auth',
+        # 'my_app.authentication.ExampleAuthentication',
+    ),
+}
