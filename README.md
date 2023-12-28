@@ -21,11 +21,6 @@ This documentation provides an overview of the front-end structure, templates, a
 │   │   └── views.py # Where the logic for the rendered page goes
 │   ├── main_app
 │   │   ├── __init__.py
-│   │   ├── __pycache__
-│   │   │   ├── __init__.cpython-312.pyc
-│   │   │   ├── settings.cpython-312.pyc
-│   │   │   ├── urls.cpython-312.pyc
-│   │   │   └── wsgi.cpython-312.pyc
 │   │   ├── asgi.py
 │   │   ├── settings.py # We must add our sub-apps to the "Installed apps" section
 │   │   └── urls.py # Any app URLs must be included in the main
