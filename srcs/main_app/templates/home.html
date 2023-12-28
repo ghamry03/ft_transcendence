@@ -1,0 +1,23 @@
+<div class="row">
+    <div class="navigationBar col-3">
+        <div class="row">
+            <div class="col">
+
+            </div>
+        </div>
+    </div>
+    <div class="welcomeBar col-9">
+        <div class="row">
+            <div class="col-10">
+                <p>Welcome back {{ data.first_name}}, it's PONGPING time!</p>
+            </div>
+            <div class="col-2">
+                {% if state == True %}
+                    {% include "gameButton.html" %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+
+</div>

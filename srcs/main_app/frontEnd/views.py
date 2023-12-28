@@ -5,17 +5,23 @@ import requests
 # Create your views here.
 
 def index(request):
-    context = {
-        'data':request.session['userData'],
-        'blah':"hello World"
-    }
+    if 'userData' in request.session:
+        context = {
+            'data':request.session['userData'],
+            'state': True
+        }
+    else:
+        context = {
+            'state': False
+
+        }
     return (render(request, 'main.html' , context))
 
 def login(request):
     files = {
     'grant_type': (None, 'authorization_code'),
-    'client_id': (None, 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'),
-    'client_secret': (None, 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'),
+    'client_id': (None, 'u-s4t2ud-0ddaf921e5492df40a174c01c6e982998ac8a8405a4f53a5066bc62006e749b7'),
+    'client_secret': (None, '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'),
     'code': (None, request.GET.get('code')),
     'redirect_uri': (None, 'http://127.0.0.1:8000/login'),
     }
@@ -44,3 +50,8 @@ def login(request):
 
     return redirect('/')
 
+#This will render the template for the logged in state
+#This should be called from the main template
+#
+def homeLoggedIn(request):
+    return HttpResponse(render(request, 'home.html'))

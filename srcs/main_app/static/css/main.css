@@ -1,0 +1,63 @@
+@font-face {
+    font-family: 'ps2p';
+    src: local('Ps2p'),
+         url('../fonts/ps2p.ttf') format("truetype");
+  }
+
+h1,h2,h3,h4,h5,h6{
+    font-family: 'ps2p';
+    padding: 0;
+    margin: 0;
+}
+
+*, html{
+    padding: 0;
+    margin: 0;
+}
+.navigationBar{
+    position: relative;
+    z-index: 99;
+    left: 0;
+    height: 100vh;
+    width: 50px;
+    background-color: #FFB3CB;
+    border-radius: 0px 13px 13px 0px;
+}
+.topBar{
+    position: relative;
+    height: 100;
+    z-index: 90;
+    width: 100%;
+    /* background-color: red; */
+    padding: 24px;
+}
+.profilePic{
+    border-radius: 100%;
+    max-width: 64px;
+    max-height: 64px;
+    min-width: 64px;
+    min-height: 64px;
+}
+body{
+    background-color: #74569B;
+}
+#userName{
+    margin-right: 16px;
+    font-family: 'ps2p';
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.pongping{
+    color: #FEFFCF;
+    text-transform: uppercase;
+    text-align: center;
+text-shadow: 0px 4px 0px #59322B;
+font-family: 'ps2p';
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
