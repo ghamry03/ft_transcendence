@@ -8,11 +8,11 @@ def index(request):
     if 'userData' in request.session:
         context = {
             'data':request.session['userData'],
-            'state': True
+            'isLoggedIn': True
         }
     else:
         context = {
-            'state': False
+            'isLoggedIn': False
 
         }
     return (render(request, 'main.html' , context))
@@ -54,4 +54,7 @@ def login(request):
 #This should be called from the main template
 #
 def homeLoggedIn(request):
-    return HttpResponse(render(request, 'home.html'))
+    context = {
+        
+    }
+    return HttpResponse(render(request, 'home.html', context))

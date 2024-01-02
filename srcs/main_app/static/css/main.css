@@ -4,6 +4,11 @@
          url('../fonts/ps2p.ttf') format("truetype");
   }
 
+:root{
+    --beach-bunny: #FCF9F4;
+    --beach-bunny-red: #EF6E7F;
+}
+
 h1,h2,h3,h4,h5,h6{
     font-family: 'ps2p';
     padding: 0;
@@ -61,3 +66,57 @@ font-style: normal;
 font-weight: 400;
 line-height: normal;
 }
+
+.buttonCard {
+    width: 50%;
+    height: 50vh;
+    margin: 2em auto;
+    background-color: var(--beach-bunny);
+    box-shadow: 
+    
+    /*top left & top right border*/
+    -10px 0px 0px var(--beach-bunny), 
+    -5px -5px 0px var(--beach-bunny), 
+    0px -10px 0px var(--beach-bunny), 
+    -10px -5px 0px black, 
+    -5px -10px 0px black, 
+    0px -15px 0 0 black, 
+
+    10px 0px 0px var(--beach-bunny), 
+    5px -5px 0px var(--beach-bunny), 
+    0px -10px 0px var(--beach-bunny),
+    10px -5px 0px black, 
+    5px -10px 0px black, 
+    0px -15px 0 0 black, 
+
+    /*bottom left & bottom right borders*/
+    -10px 0px 0px var(--beach-bunny), 
+    -5px 5px 0px var(--beach-bunny), 
+    0px 10px 0px var(--beach-bunny),
+    -10px 5px 0px black, 
+    -5px 10px 0px black, 
+    0px 15px 0 0 black, 
+
+    10px 0px 0px var(--beach-bunny), 
+    5px 5px 0px var(--beach-bunny), 
+    0px 10px 0px var(--beach-bunny),
+    10px 5px 0px black, 
+    5px 10px 0px black, 
+    0px 15px 0 0 black, 
+    /*left & right black border*/
+    -15px 0 0 0 black,
+    15px 0 0 0 black,
+
+    /*card highlight*/
+    10px 0px 0px var(--beach-bunny), 
+    5px 5px 0px var(--beach-bunny), 
+    0px 10px 0px var(--beach-bunny),
+    20px 5px 0px var(--beach-bunny-red),
+    20px 10px 0px var(--beach-bunny-red), 
+    15px 15px 0px var(--beach-bunny-red), 
+    10px 20px 0 0 var(--beach-bunny-red),
+    5px 20px 0 0 var(--beach-bunny-red)
+    ;
+
+
+  }

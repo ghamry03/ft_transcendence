@@ -12,12 +12,23 @@
                 <p>Welcome back {{ data.first_name}}, it's PONGPING time!</p>
             </div>
             <div class="col-2">
-                {% if state == True %}
                     {% include "gameButton.html" %}
-                {% endif %}
             </div>
         </div>
     </div>
     
+    
 
+</div>
+
+<div class="row">
+    <div class="col">
+        {% include "buttonCard.html" %}
+    </div>
+    <div class="col">
+        {% include "buttonCard.html" %}
+    </div>
+    <div class="col">
+        {% include "buttonCard.html" %}
+    </div>
 </div>

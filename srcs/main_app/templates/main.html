@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>{% block title %}{% endblock %}</title>
   {% load bootstrap5 %}
@@ -10,65 +11,56 @@
 </head>
 
 <script>
-    function getHome() {   
-                fetch('/home')
-                .then(response => {
-                    return response.text();
-                })
-                .then(text => {
-                    var parser = new DOMParser();
+  function getHome() {
+    fetch('/home')
+      .then(response => {
+        return response.text();
+      })
+      .then(text => {
+        var parser = new DOMParser();
 
-                    // Parse the text
-                    var doc = parser.parseFromString(text, "text/html").querySelector("body").innerHTML;
-                    console.log(doc);
-                    document.querySelector('#mainContentArea').innerHTML = doc;
-                });
+        // Parse the html we need
+        var doc = parser.parseFromString(text, "text/html").querySelector("body").innerHTML;
+        // console.log(doc);
+        document.querySelector('#mainContentArea').innerHTML = doc;
+      });
 
-            }
+  }
 
 
-            document.addEventListener("DOMContentLoaded", function() {
-                let isLoggedin = "{{state |yesno:'true,false'}}";
-                if (isLoggedin)
-                    getHome()
-            });
+  document.addEventListener("DOMContentLoaded", function () {
+    let isLoggedin = "{{isLoggedIn |yesno:'true,false'}}";
+    // console.log(isLoggedin);
+    if (isLoggedin == "true") {
+      // console.log("im in der");
+      getHome()
+    }
+  });
 </script>
 
 <body>
-    <div class="mainContainer">
-        <div class="topBar">
-            <div class="row">
-                <div class="col-8 offset-2 d-flex justify-content-center align-middle ">
-                    <h1 class="pongping align-self-center">pong<br/>ping</h1>
-                </div>
-                <div class="col-2 d-flex justify-content-end ">
-                    {% if state == False %}
-                    <a href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-0ddaf921e5492df40a174c01c6e982998ac8a8405a4f53a5066bc62006e749b7&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Flogin&response_type=code">Login Here</a>
-                    {% endif %}
-                    <h1 id="userName" class="align-self-center align-middle">{{ data.login }}</h1>
-                    <img src="{{data.image.versions.small}}" class="profilePic align-middle">
-                </div>
-            </div>
+  <div class="mainContainer">
+    <div class="topBar">
+      <div class="row">
+        <div class="col-6 d-flex justify-content-start align-middle ">
+          <h1 class="pongping align-self-center">pong<br />ping</h1>
+        </div>
+        <div class="col-6 d-flex justify-content-end ">
+          {% if isLoggedIn == False %}
+          <a
+            href="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-0ddaf921e5492df40a174c01c6e982998ac8a8405a4f53a5066bc62006e749b7&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Flogin&response_type=code">Login
+            Here</a>
+          {% endif %}
+          <h1 id="userName" class="align-self-center align-middle">{{ data.login }}</h1>
+          <img src="{{data.image.versions.small}}" class="profilePic align-middle">
+        </div>
+      </div>
 
-        </div>
-        <div id="mainContentArea">
-            
-        </div>
-        
+    </div>
+    <div id="mainContentArea">
     </div>
 
-<!-- <div class="container">
-  <ul class="nav bg-info">
-    <li class="nav-item">
-      <a class="nav-link link-light" href="/">HOME</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link link-light" href="/members">MEMBERS</a>
-    </li>
-  </ul>
-
-  {% block content %}
-  {% endblock %}
-</div> -->
+  </div>
 </body>
+
 </html>
