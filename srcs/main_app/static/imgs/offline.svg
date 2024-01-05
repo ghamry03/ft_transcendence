@@ -1,0 +1,32 @@
+<svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.5 61.25H18.75V57.5H22.5V61.25Z" fill="black"/>
+<path d="M67.5 61.25L71.25 61.25V57.5L67.5 57.5V61.25Z" fill="black"/>
+<path d="M37.5 42.5H41.25V46.25H37.5V42.5Z" fill="black"/>
+<path d="M37.5 38.75H33.75V42.5H37.5V38.75Z" fill="black"/>
+<path d="M22.5 38.75L18.75 38.75V42.5H22.5V38.75Z" fill="black"/>
+<path d="M60 42.5H63.75V46.25H60V42.5Z" fill="black"/>
+<path d="M60 31.25L56.25 31.25V27.5H60V31.25Z" fill="black"/>
+<path d="M60 38.75L63.75 38.75V31.25L60 31.25V38.75Z" fill="black"/>
+<path d="M56.25 27.5V23.75L37.5 23.75V27.5L56.25 27.5Z" fill="black"/>
+<path d="M37.5 27.5H33.75V35L37.5 35V27.5Z" fill="black"/>
+<path d="M22.5 35V38.75L33.75 38.75V35L22.5 35Z" fill="black"/>
+<path d="M15 57.5H18.75V42.5H15L15 57.5Z" fill="black"/>
+<path d="M22.5 61.25V65H67.5V61.25H22.5Z" fill="black"/>
+<path d="M71.25 57.5H75V42.5H71.25V57.5Z" fill="black"/>
+<path d="M71.25 42.5V38.75H63.75V42.5H71.25Z" fill="black"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M56.25 27.5L37.5 27.5V35H33.75V38.75H22.5V42.5H18.75V57.5H22.5V61.25H67.5V57.5H71.25V42.5H63.75V38.75H60V31.25H56.25V27.5ZM63.75 42.5V46.25H60V42.5H63.75ZM37.5 42.5H33.75V38.75H37.5V42.5ZM37.5 42.5H41.25V46.25H37.5V42.5Z" fill="#EF6E7F"/>
+<path d="M18.75 22.4999H22.5V26.2499H18.75V22.4999Z" fill="black"/>
+<path d="M22.5 26.2499H26.25V29.9999H22.5V26.2499Z" fill="black"/>
+<path d="M26.25 29.9999H30V33.7499H26.25V29.9999Z" fill="black"/>
+<path d="M30 33.7499H33.75V37.4999H30V33.7499Z" fill="black"/>
+<path d="M33.75 37.4999H37.5V41.2499H33.75V37.4999Z" fill="black"/>
+<path d="M37.5 41.2499H41.25V44.9999H37.5V41.2499Z" fill="black"/>
+<path d="M41.25 44.9999H45V48.7499H41.25V44.9999Z" fill="black"/>
+<path d="M45 48.7499H48.75V52.4999H45V48.7499Z" fill="black"/>
+<path d="M48.75 52.4999H52.5V56.2499H48.75V52.4999Z" fill="black"/>
+<path d="M52.5 56.2499H56.25V59.9999H52.5V56.2499Z" fill="black"/>
+<path d="M56.25 59.9999H60V63.7499H56.25V59.9999Z" fill="black"/>
+<path d="M60 63.7499H63.75V67.4999H60V63.7499Z" fill="black"/>
+<path d="M63.75 67.4999H67.5V71.2499H63.75V67.4999Z" fill="black"/>
+<path d="M67.5 71.2499H71.25V74.9999H67.5V71.2499Z" fill="black"/>
+</svg>

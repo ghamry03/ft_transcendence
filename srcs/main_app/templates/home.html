@@ -1,34 +1,36 @@
-<div class="row">
-    <div class="navigationBar col-3">
-        <div class="row">
+<div class="row g-0">
+    <div class="col-2 flex-grow-1">
+        <div class="navigationBar row m-0">
             <div class="col">
 
             </div>
         </div>
     </div>
-    <div class="welcomeBar col-9">
+    <div class="welcomeBar col-8">
         <div class="row">
             <div class="col-10">
-                <p>Welcome back {{ data.first_name}}, it's PONGPING time!</p>
+                <p id="welcome">Welcome back {{ data.first_name}}, it's PONGPING time!</p>
             </div>
             <div class="col-2">
                     {% include "gameButton.html" %}
             </div>
         </div>
+        
+        <div class="row g-5 m-0">
+            <div class="col-4">
+                {% include "buttonCard.html" %}
+            </div>
+            <div class="col-4">
+                {% include "buttonCard.html" %}
+            </div>
+            <div class="col-4">
+                {% include "buttonCard.html" %}
+            </div>
+        </div>
     </div>
+
+    <div class="col-2"></div>
     
     
 
-</div>
-
-<div class="row">
-    <div class="col">
-        {% include "buttonCard.html" %}
-    </div>
-    <div class="col">
-        {% include "buttonCard.html" %}
-    </div>
-    <div class="col">
-        {% include "buttonCard.html" %}
-    </div>
 </div>

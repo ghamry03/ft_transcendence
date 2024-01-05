@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 import requests
+import os
 
 # Create your views here.
 
@@ -20,8 +21,8 @@ def index(request):
 def login(request):
     files = {
     'grant_type': (None, 'authorization_code'),
-    'client_id': (None, 'u-s4t2ud-0ddaf921e5492df40a174c01c6e982998ac8a8405a4f53a5066bc62006e749b7'),
-    'client_secret': (None, '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'),
+    'client_id': (None, os.environ['INTRA_UID']),
+    'client_secret': (None, os.environ['INTRA_SECRET']),
     'code': (None, request.GET.get('code')),
     'redirect_uri': (None, 'http://127.0.0.1:8000/login'),
     }
