@@ -1,0 +1,81 @@
+body {
+	background-color:#2A1948;
+}
+  
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+  
+.button{
+	display: flex;
+	justify-content: center;
+	margin-top: 15px;
+}
+  
+.btn {
+	background-color: #1B102E;
+	border: none;
+	color: #0abdc6;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 10px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+  
+.btn:hover {
+	background-color:none;
+}
+  
+canvas {
+	background: #1B102E;
+	border-radius: 5%;
+	padding: 30px;
+}
+
+#readyGo {
+    display: table;
+}
+
+@keyframes count {
+    0% { transform: scale(1.5); }
+    100% { transform: scale(1); }
+}
+
+.nums {
+	opacity:    0.5; 
+	background: #000; 
+    color: white;
+	width:      100%;
+	height:     100%; 
+	z-index:    10;
+	position:   fixed;
+    font-size: 5rem;
+	font-family:'Courier New', Courier, monospace;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    text-align: center;
+	display: table-cell;
+	vertical-align: middle;
+    animation: count 0.1s cubic-bezier(0.1,0.1,1,1) 1;
+}
+
+/* div.fadeMe {
+	opacity:    0.5; 
+	background: #000; 
+	width:      100%;
+	height:     100%; 
+	z-index:    10;
+	top:        0; 
+	left:       0; 
+	position:   fixed;
+  } */

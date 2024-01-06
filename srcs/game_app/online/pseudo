@@ -1,0 +1,17 @@
+connect:
+	create new player in player list:
+		player id = create a player id for the new user
+		self.players[player_id] = 
+	find match for new player:
+		opponentid = find a player who's opponentid is None and set their opponent id as this player id
+		set self.players[playerid].opponentid = opponentid
+
+players[playerid] = {
+	"playerid": self.player_id,
+	"opponentid": None,
+	"movingUp": False,
+	"movingDown": False,
+}
+
+
+

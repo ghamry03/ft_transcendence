@@ -81,13 +81,13 @@ function keyDownHandler(e)
 function keyUpHandler(e)
 {
   if (e.key === "ArrowUp")
-    upPressed = false;
- else if (e.key === "ArrowDown")
-    downPressed = false;
- else if (e.key === "w")
-    wPressed = false;
- else if (e.key === "s")
-    sPressed = false;
+      upPressed = false;
+  else if (e.key === "ArrowDown")
+      downPressed = false;
+  else if (e.key === "w")
+      wPressed = false;
+  else if (e.key === "s")
+      sPressed = false;
 }
 
 // Update game state
@@ -106,10 +106,10 @@ function update()
     leftPaddleYaxis += paddleSpeed;
 
   // Move right paddle automatically based on ball position
-  // if (ballYaxis > rightPaddleYaxis + paddleHeight / 2)
-  //   rightPaddleYaxis += paddleSpeed;
-  // else if (ballYaxis < rightPaddleYaxis + paddleHeight / 2)
-  //   rightPaddleYaxis -= paddleSpeed;
+  if (ballYaxis > rightPaddleYaxis + paddleHeight / 2)
+    rightPaddleYaxis += paddleSpeed;
+  else if (ballYaxis < rightPaddleYaxis + paddleHeight / 2)
+    rightPaddleYaxis -= paddleSpeed;
 
   // Move ball
   ballXaxis += ballSpeedXaxis;
@@ -138,6 +138,7 @@ function update()
     rightPlayerScore++;
     reset();
   }
+
   else if (ballXaxis > canvas.width)
   {
     leftPlayerScore++;

@@ -25,7 +25,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('offline/', include('offline.urls')),
-    path('', RedirectView.as_view(url='offline/', permanent=True)),
+	path('online/', include('online.urls')),
+    # path('', RedirectView.as_view(url='offline/', permanent=True)),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

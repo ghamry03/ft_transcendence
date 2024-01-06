@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="{% static 'css/game.css' %}"/>
+
+    {% comment %} <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script> {% endcomment %}
+
+    <script src="{% static 'js/canvas.js' %}"></script>
+
+    <title>Multiplayer Demo</title>
+  </head>
+  <body>
+    {% comment %} <multiplayer-channels-demo></multiplayer-channels-demo> {% endcomment %}
+    {% comment %} <canvas id="gameCanvas" width="1024" height="580"></canvas> {% endcomment %}
+    <div class="container">
+      <canvas id="gameCanvas" width="1024" height="580"></canvas>
+    </div>
+    <div class="button">
+      <button id="start-btn" class="btn">Start</button>
+      <button id="pause-btn" class="btn">Stop</button>
+      <button id="restart-btn" class="btn">Restart</button>
+    </div>
+    <div id="readyGo"></div>
+  </div>
+  </body>
+</html>
