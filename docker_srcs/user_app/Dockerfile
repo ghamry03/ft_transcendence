@@ -15,17 +15,12 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 # RUN django-admin startproject mysite
 
+EXPOSE 8000
 
 # COPY . .
 
 
 # CMD [ "python", "./your-daemon-or-script.py" ]
-# COPY entrypoint.sh /
-# RUN chmod a+x /entrypoint.sh
-# ENTRYPOINT [ "/entrypoint.sh"]
-
-CMD python3 manage.py makemigrations && python3 manage.py migrate
-
-EXPOSE 8000
-CMD python manage.py runserver 0.0.0.0:8000
-# CMD [ "/bin/bash" ]
+COPY entrypoint.sh /
+RUN chmod a+x /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh"]

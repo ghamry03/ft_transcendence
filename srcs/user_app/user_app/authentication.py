@@ -7,6 +7,8 @@ class api_auth(authentication.BaseAuthentication):
     def authenticate(self, request):
         uid = request.META.get('HTTP_X_UID')
         token = request.META.get('HTTP_X_TOKEN')
+        # TODO: check if auth type exists ( intra, .. )
+        # auth_type = request.META.get('HTTP_X_TYPE')
         if not uid or not token:
             raise exceptions.ParseError('Missing authentication headers')
         self.validate_uid(uid, token)
