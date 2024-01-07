@@ -133,8 +133,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'user_app.authentication.api_auth',
-        # 'my_app.authentication.ExampleAuthentication',
     ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'user_app.permissions.IsRequestedUser',
+    # )
 }
 
 MEDIA_URL = '/media/'

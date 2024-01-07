@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import User
 from .serializers import UserSerializer
-from rest_framework import permissions
+from user_app.permissions import IsRequestedUser
 
 # List view of all Users
 class UsersListApiView(APIView):
@@ -23,14 +23,6 @@ class UsersListApiView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class IsRequestedUser(permissions.BasePermission):
-    def has_permission(self, request, view):
-        user = int(request.META.get('HTTP_X_UID')) 
-        requested_user = int(view.kwargs['user_id'])
-        if not user or requested_user:
-            return False
-        return user == requested_user
 
 class UserDetailApiView(APIView):
     permission_classes = (IsRequestedUser,)
