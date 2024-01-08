@@ -15,11 +15,12 @@ def index(request):
             'username': request.session['login'],
             'uid': request.session['uid'],
             'status': request.session['status']
+
         }
     else:
         context = {
-            'isLoggedIn': False
-
+            'isLoggedIn': False,
+            'authUrl': environ.Env()('AUTH_URL')
         }
     return (render(request, 'main.html' , context))
 
