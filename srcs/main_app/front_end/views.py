@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 import requests
+import environ
 import os
 
 # Create your views here.
@@ -27,6 +28,8 @@ def login(request):
     'redirect_uri': (None, 'http://127.0.0.1:8000/login'),
     }
 
+    # requests.post('user_app/akjs')
+
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
     if response.status_code == 200:
         json_response = response.json()
@@ -38,6 +41,13 @@ def login(request):
             }
 
             me_response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
+            headers = {
+                'HTTP_X_UID': str(me_response.json()['id']),
+                'HTTP_X_TOKEN': access_token
+
+            }
+            user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/', headers=headers)
+            print(user_api_response)
             request.session['access_token'] = access_token
             request.session['userData'] = me_response.json() #this is temporary
             print("Received access token:", access_token)
