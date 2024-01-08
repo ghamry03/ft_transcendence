@@ -12,25 +12,54 @@ services:
     main_app:
         build: ./main_app
         restart: on-failure
+        ports:
+            - "8000:8000"
+        # command:
+        # - sh
+        # - -c
+        # - |
+        #   python manage.py makemigrations
+        #   python manage.py migrate --noinput
+        #   python manage.py runserver 0.0.0.0:8000
         volumes:
             - main_app_data:/home/main_app
         depends_on:
-            - postgres
-            - auth_app
+            user_app:
+                condition: service_started
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
 
-    auth_app:
-        build: ./auth_app
+    user_app:
+        build: ./user_app
         restart: on-failure
+        ports:
+            - "8001:8000"
         volumes:
-            - auth_app_data:/home/auth_app
+            - user_app_data:/home/user_app
         depends_on:
-            - postgres
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
 
     postgres:
         build: ./postgres
         restart: on-failure
         volumes:
             - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: pg_isready -U postgres
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
 
 volumes:
     main_app_data:
@@ -40,12 +69,12 @@ volumes:
             type: none
             device: ../srcs/main_app/
 
-    auth_app_data:
+    user_app_data:
         driver: local
         driver_opts:
             o: bind
             type: none
-            device: ../srcs/auth_app/
+            device: ../srcs/user_app/
 
     postgres_data:
         driver: local
@@ -53,3 +82,7 @@ volumes:
             o: bind
             type: none
             device: ../srcs/postgres/data
+
+networks:
+    user_app_network:
+        driver: bridge
