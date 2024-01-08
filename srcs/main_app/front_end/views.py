@@ -10,7 +10,11 @@ def index(request):
     if 'userData' in request.session:
         context = {
             'data':request.session['userData'],
-            'isLoggedIn': True
+            'isLoggedIn': True,
+            'img': request.session['img'],
+            'username': request.session['login'],
+            'uid': request.session['uid'],
+            'status': request.session['status']
         }
     else:
         context = {
@@ -41,13 +45,20 @@ def login(request):
             }
 
             me_response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
+            UID = str(me_response.json()['id'])
+            print(access_token)
+            print(UID)
             headers = {
-                'HTTP_X_UID': str(me_response.json()['id']),
-                'HTTP_X_TOKEN': access_token
+                'X-UID': UID,
+                'X-TOKEN': access_token
 
             }
-            user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/', headers=headers)
-            print(user_api_response)
+            user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/' + UID, headers=headers)
+            print(user_api_response.json())
+            request.session['img'] = user_api_response.json()['image']
+            request.session['uid'] = user_api_response.json()['uid']
+            request.session['login'] = user_api_response.json()['username']
+            request.session['status'] = user_api_response.json()['status']
             request.session['access_token'] = access_token
             request.session['userData'] = me_response.json() #this is temporary
             print("Received access token:", access_token)
