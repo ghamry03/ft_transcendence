@@ -8,149 +8,224 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync
 
 class RemotePlayerConsumer(AsyncWebsocketConsumer):
-    MAX_SPEED = 5
-    THRUST = 0.2
 
     game_group_name = "game_group"
+    queue = []
     players = {}
     update_lock = asyncio.Lock()
     logger = logging.getLogger(__name__)
-    # connections = {}
+    paddleHeight = 80
+    paddleWidth = 10
+    paddleSpeed = 5
+    canvasHeight = 580
+    canvasWidth = 1024
 
     async def connect(self):
-        # print("connected to server woohoo!!")
+        
         self.player_id = str(uuid.uuid4())
         self.logger.info("player %s connected to server", self.player_id)
         await self.accept()
-
-        await self.channel_layer.group_add(
-            self.player_id, self.channel_name
-        )
-
         await self.send(
             text_data=json.dumps({"type": "playerId", "playerId": self.player_id})
         )
 
-        opponentId = None
-        matchFound = False
+        queuedPlayerId = None
         async with self.update_lock:
             # search for a match in the queue
-            for queuedPlayer in self.players.values():
-                if queuedPlayer["opponentId"] == None:
-                    self.logger.info("found a player %s with no opponent", queuedPlayer["id"])
-                    queuedPlayer["opponentId"] = self.player_id # assign new player to a player in the queue
-                    opponentId = queuedPlayer["id"]
-                    await self.channel_layer.group_send(
-                        opponentId,
-                        {"type": "matchStatus", "status": True, "playerDirection": 1},
-                    )
-                    matchFound = True
-                    break
-            self.players[self.player_id] = { # add new player to player pool
-                "id": self.player_id,
-                "opponentId": opponentId,
-                "movingUp": False,
-                "movingDown": False,
-                "updatePending": False,
-            }
-            await self.send(
-                text_data=json.dumps({"type": "matchStatus", "status": matchFound, "playerDirection": -1})
-            )
+            if len(self.queue) > 0:
+                queuedPlayerId = self.queue[0]
+                # if queuedPlayer["opponentId"] == None:
+                self.logger.info("found a player %s with no opponent", queuedPlayerId)
 
-        self.logger.info("count clients = %d", len(self.players))
-        
-        # if len(self.players) == 1:
-        asyncio.create_task(self.game_loop(self.player_id))
+                # moving queued player from queue to player pool
+                self.queue.pop(0)
+                self.players[queuedPlayerId] = {
+                    "id": queuedPlayerId,
+                    "opponentId": self.player_id,
+                    "paddlePosition":  self.canvasHeight / 2 - self.paddleHeight / 2,
+                    "upPressed": False,
+                    "downPressed": False,
+                    "ready": False,
+                    "gid": queuedPlayerId
+                }
+                
+                # adding new player to the opponent's group
+                await self.channel_layer.group_add(
+                    queuedPlayerId, self.channel_name
+                )
 
-    async def findMatch(self, newPlayerId):
-        opponentId = None
-        matchFound = False
-        async with self.update_lock:
-            # search for a match in the queue
-            for queuedPlayer in self.players.values():
-                if queuedPlayer["opponentId"] == None:
-                    self.logger.info("found a player %s with no opponent", queuedPlayer["id"])
-                    queuedPlayer["opponentId"] = newPlayerId # assign new player to a player in the queue
-                    opponentId = queuedPlayer["id"]
-                    await self.channel_layer.group_send(
-                        opponentId,
-                        {"type": "matchStatus", "status": True},
-                    )
-                    matchFound = True
-                    break
-            self.players[newPlayerId] = { # add new player to player pool
-                "id": newPlayerId,
-                "opponentId": opponentId,
-                "movingUp": False,
-                "movingDown": False,
-                "updatePending": False,
-            }
-            await self.send(
-                text_data=json.dumps({"type": "matchStatus", "status": matchFound})
-            )
+                # adding new player to player pool
+                self.players[self.player_id] = { # add new player to player pool
+                    "id": self.player_id,
+                    "opponentId": queuedPlayerId,
+                    "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
+                    "upPressed": False,
+                    "downPressed": False,
+                    "ready": False,
+                    "gid": queuedPlayerId
+                }               
+                # asyncio.create_task(self.game_loop(queuedPlayerId, self.player_id))
+                await self.channel_layer.group_send(
+                    queuedPlayerId,
+                    {"type": "matchFound", "first": queuedPlayerId},
+                )
+            else:
+                self.queue.append(self.player_id)
+                await self.channel_layer.group_add(
+                    self.player_id, self.channel_name
+                )
+
+        self.logger.info("queue len = %d", len(self.queue))
+
 
     async def disconnect(self, close_code):
         async with self.update_lock:
-            if self.player_id in self.players:
+            if self.player_id in self.queue:
+                self.queue.pop(self.queue.index(self.player_id))
+            elif self.player_id in self.players:
                 # if this player is in a match with another player, we want to let the them know that this player disconnected
                 opponentId = self.players[self.player_id]["opponentId"]
-                if opponentId != None:
-                    self.players[opponentId]["opponentId"] = None
+                gid = self.players[self.player_id]["gid"]
+                # if opponentId != None:
+                #     self.players[opponentId]["opponentId"] = None
                 del self.players[self.player_id]
-        await self.channel_layer.group_discard(
-            self.player_id, self.channel_name
-        )
+                await self.channel_layer.group_discard(
+                    self.player_id, self.channel_name
+                )
+                await self.channel_layer.group_send(
+                    gid,
+                    {"type": "disconnected"}
+                )
+                del self.players[opponentId]
+
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        key = text_data_json.get("key", "")
-        keyDown = text_data_json.get("keyDown")
-        player_id = text_data_json["playerId"]
 
-        # self.logger.info("event from player %s", player_id)
-        player = self.players.get(player_id, None)
+        playerId = text_data_json.get("playerId")
+        player = self.players.get(playerId, None)
         if not player:
             self.logger.info("not a player")
             return
         
-        if key == "w":
-            player["movingUp"] = keyDown
-        elif key == "s":
-            player["movingDown"] = keyDown
-        player["updatePending"] = True
+        msg_type = text_data_json.get("type")
+        if msg_type == "keypress":
+            key = text_data_json.get("key")
+            keyDown = text_data_json.get("keyDown")   
+            if key == "w":
+                player["upPressed"] = keyDown
+            elif key == "s":
+                player["downPressed"] = keyDown
 
+        elif msg_type == "ready":
+            player["ready"] = True
+            opponent = self.players[player["opponentId"]]
+            if opponent["ready"] == True:
+                self.logger.info("both are ready!")
+                if playerId == player["gid"]:
+                    asyncio.create_task(self.game_loop(playerId, player["opponentId"]))
+                else:
+                    asyncio.create_task(self.game_loop(player["gid"], playerId))
+
+            
     async def state_update(self, event):
         # self.logger.info("sending a status update!!")
         await self.send(
             text_data=json.dumps(
                 {
                     "type": "stateUpdate",
-                    "objects": event["objects"],
+                    "leftPaddle": event["leftPaddle"],
+                    "rightPaddle": event["rightPaddle"],
+                    "ballX": event["ballX"],
+                    "ballY": event["ballY"],
                 }
             )
         )
     
-    async def matchStatus(self, event):
+    async def matchFound(self, event):
         # self.logger.info("sending a status update!!")
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "matchStatus",
-                    "status": event["status"],
-                    "playerDirection": event["playerDirection"],
+                    "type": "matchFound",
+                    "first": event["first"],
+                }
+            )
+        )
+    
+    async def disconnected(self, event):
+        # self.logger.info("sending a status update!!")
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "disconnected",
                 }
             )
         )
 
-    async def game_loop(self, playerId):
-        while playerId in self.players:
+    async def game_loop(self, playerId1, playerId2):
+        ballXaxis = self.canvasWidth / 2
+        ballYaxis = self.canvasHeight / 2
+        ballRadius = 10
+        ballSpeedXaxis = 5
+        ballSpeedYaxis = 5
+        while playerId1 in self.players and playerId2 in self.players:
             async with self.update_lock:
-                player = self.players[playerId]
-                if player["opponentId"] != None: # player has an opponent 
-                    if player["updatePending"]:
-                        player["updatePending"] = False
-                        await self.channel_layer.group_send(
-                            player["opponentId"],
-                            {"type": "state_update", "objects": player},
-                            )
+                player1 = self.players[playerId1]
+                player2 = self.players[playerId2]
+
+                if player1["upPressed"] and player1["paddlePosition"] > 0:
+                    player1["paddlePosition"] -= self.paddleSpeed
+                elif player1["downPressed"] and player1["paddlePosition"] + self.paddleHeight < self.canvasHeight:
+                    player1["paddlePosition"] += self.paddleSpeed    
+                if player2["upPressed"] and player2["paddlePosition"] > 0:
+                    player2["paddlePosition"] -= self.paddleSpeed
+                elif player2["downPressed"] and player2["paddlePosition"] + self.paddleHeight < self.canvasHeight:
+                    player2["paddlePosition"] += self.paddleSpeed    
+
+                # ball pos calc - move to a sync function later
+                ballXaxis += ballSpeedXaxis
+                ballYaxis += ballSpeedYaxis
+
+                # Top & bottom collision
+                if ballYaxis - ballRadius < 0 or ballYaxis + ballRadius > self.canvasHeight:
+                    ballSpeedYaxis = -ballSpeedYaxis
+
+                # Left paddle collision
+                if (
+                    ballXaxis - ballRadius < self.paddleWidth
+                    and player1["paddlePosition"] < ballYaxis < player1["paddlePosition"] + self.paddleHeight
+                ):
+                    ballSpeedXaxis = -ballSpeedXaxis
+
+                # Right paddle collision
+                if (
+                    ballXaxis + ballRadius > self.canvasWidth - self.paddleWidth
+                    and player2["paddlePosition"] < ballYaxis < player2["paddlePosition"] + self.paddleHeight
+                ):
+                    ballSpeedXaxis = -ballSpeedXaxis
+
+                # Check if ball goes out of bounds on left or right side of canvas
+                if ballXaxis < 0:
+                    # rightPlayerScore += 1
+                    ballXaxis = self.canvasWidth / 2;
+                    ballYaxis = self.canvasHeight / 2;
+
+                elif ballXaxis > self.canvasWidth:
+                    # leftPlayerScore += 1
+                    ballXaxis = self.canvasWidth / 2;
+                    ballYaxis = self.canvasHeight / 2;
+
+                # if player1["updatePending"]:
+                    # player1["updatePending"] = False
+                await self.channel_layer.group_send(
+                    playerId1,
+                    { 
+                        "type": "state_update", 
+                        "leftPaddle": player1["paddlePosition"], 
+                        "rightPaddle": player2["paddlePosition"], 
+                        "ballX": ballXaxis, 
+                        "ballY": ballYaxis 
+                    },
+                )
             await asyncio.sleep(0.05)

@@ -41,4 +41,3 @@ class PlayerMatch(models.Model):
     def get_absolute_url(self):
         """Returns the url to access a particular genre instance."""
         return reverse('game-detail', args=[str(self.matchId)])
-    

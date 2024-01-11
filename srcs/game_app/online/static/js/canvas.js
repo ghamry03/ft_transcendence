@@ -7,21 +7,18 @@ document.addEventListener("DOMContentLoaded", function () {
 	const restartBtn = document.getElementById("restart-btn");
 
 	var animationId;
-	var gameRunning = false;
+	// var gameRunning = false;
 
 	// Ball
 	var ballRadius = 10;
 	var ballXaxis = canvas.width / 2;
 	var ballYaxis = canvas.height / 2;
-	var ballSpeedXaxis = 5;
-	var ballSpeedYaxis = 5;
 
 	// Paddles
 	var paddleHeight = 80;
 	var paddleWidth = 10;
 	var leftPaddleYaxis = canvas.height / 2 - paddleHeight / 2;
 	var rightPaddleYaxis = canvas.height / 2 - paddleHeight / 2;
-	var paddleSpeed = 5;
 
 	// Score
 	var leftPlayerScore = 0;
@@ -30,13 +27,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	var wPressed = false;
 	var sPressed = false;
-	var opponentWPressed = false;
-	var opponentSPressed = false;
 
 	// socket info 
 	var ws;
 	var playerId;
-	var playerDirection; // will be 1 or -1, this will be multiplied with ballSpeedXaxis 
 
 	function countdown(parent, callback) {
 		var texts = ['Match found!', '3', '2', '1', 'GO'];
@@ -93,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	{
 		ws.close();
 		console.log("stopped game");
-		gameRunning = false;
+		// gameRunning = false;
 		cancelAnimationFrame(animationId);
 	});
 	
@@ -110,29 +104,43 @@ document.addEventListener("DOMContentLoaded", function () {
 		const messageData = JSON.parse(event.data);
 		if (messageData.type === "stateUpdate") {
 			console.log("status update");
-			opponentWPressed = messageData.objects.movingUp;
-			opponentSPressed = messageData.objects.movingDown;
+			ballXaxis = messageData.ballX;
+			ballYaxis = messageData.ballY;
+			leftPaddleYaxis = messageData.leftPaddle;
+			rightPaddleYaxis = messageData.rightPaddle;
 		} 
 		else if (messageData.type === "playerId") {
 			playerId = messageData.playerId;
 			console.log("your player id is ", playerId);
 		}
-		else if (messageData.type === "matchStatus") {
-			console.log("match status received: ", messageData.status);
-			if (messageData.status)
-			{
-				countdown( document.getElementById("readyGo"), animateGame);
-				ballSpeedXaxis *= messageData.playerDirection
+		else if (messageData.type === "matchFound") {
+			console.log("match found, first is: ", messageData.first);
+			// if (messageData.first == playerId) {
+			// 	left = true;
+			// 	console.log("i am left");
+			// }
+			// gameRunning = true;
+			countdown(document.getElementById("readyGo"), animateGame);
+			// ballSpeedXaxis *= messageData.playerDirection
+			if (isOpen(ws)) {
+				ws.send(
+					JSON.stringify({
+						type: "ready",
+						playerId: playerId
+					})
+				);
 			}
-		}		
+		}
+		else if (messageData.type === "disconnected")
+			console.log("opponent has disconnected");
 	};
-
 
 	function sendKeyUpdate(key, keyDown)
 	{
 		if (isOpen(ws)) {
 			ws.send(
-				JSON.stringify({ 
+				JSON.stringify({
+					type: "keypress",
 					key: key,
 					keyDown: keyDown,
 					playerId: playerId
@@ -171,10 +179,11 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	const animateGame = (time) => {
-		update();
+		// update();
 		draw();
 		// Start the animation loop
-		animationId = requestAnimationFrame(animateGame);
+		// if (gameRunning == true)
+			animationId = requestAnimationFrame(animateGame);
 	};
 
 	// Reset ball
@@ -188,57 +197,63 @@ document.addEventListener("DOMContentLoaded", function () {
 	// Update game state
 	const update = () => {
 		// Opponent paddle movement
-		if (opponentWPressed && rightPaddleYaxis > 0)
-			rightPaddleYaxis -= paddleSpeed;
-		else if (opponentSPressed && rightPaddleYaxis + paddleHeight < canvas.height)
-			rightPaddleYaxis += paddleSpeed;
+		// if (opponentWPressed && rightPaddleYaxis > 0)
+		// 	rightPaddleYaxis -= paddleSpeed;
+		// else if (opponentSPressed && rightPaddleYaxis + paddleHeight < canvas.height)
+		// 	rightPaddleYaxis += paddleSpeed;
 
 		// Move right paddle based on "w" and "s" keys
-		if (wPressed && leftPaddleYaxis > 0)
-			leftPaddleYaxis -= paddleSpeed;
-		else if (sPressed && leftPaddleYaxis + paddleHeight < canvas.height)
-			leftPaddleYaxis += paddleSpeed;
+		// if (wPressed && leftPaddleYaxis > 0)
+		// 	leftPaddleYaxis -= paddleSpeed;
+		// else if (sPressed && leftPaddleYaxis + paddleHeight < canvas.height)
+		// 	leftPaddleYaxis += paddleSpeed;
 
 		// Move ball
-		ballXaxis += ballSpeedXaxis;
-		ballYaxis += ballSpeedYaxis;
+		// ballXaxis += ballSpeedXaxis;
+		// ballYaxis += ballSpeedYaxis;
 
-		// Top & bottom collision
-		if (ballYaxis - ballRadius < 0 ||
-			ballYaxis + ballRadius > canvas.height)
-			ballSpeedYaxis = -ballSpeedYaxis;
+		// // Top & bottom collision
+		// if (ballYaxis - ballRadius < 0 ||
+		// 	ballYaxis + ballRadius > canvas.height)
+		// 	ballSpeedYaxis = -ballSpeedYaxis;
 
-		// Left paddle collision
-		if (ballXaxis - ballRadius < paddleWidth &&
-			ballYaxis > leftPaddleYaxis &&
-			ballYaxis < leftPaddleYaxis + paddleHeight)
-			ballSpeedXaxis = -ballSpeedXaxis;
+		// // Left paddle collision
+		// if (ballXaxis - ballRadius < paddleWidth &&
+		// 	ballYaxis > leftPaddleYaxis &&
+		// 	ballYaxis < leftPaddleYaxis + paddleHeight)
+		// 	ballSpeedXaxis = -ballSpeedXaxis;
 
-		// Right paddle collision
-		if (ballXaxis + ballRadius > canvas.width - paddleWidth &&
-			ballYaxis > rightPaddleYaxis &&
-			ballYaxis < rightPaddleYaxis + paddleHeight)
-			ballSpeedXaxis = -ballSpeedXaxis;
+		// // Right paddle collision
+		// if (ballXaxis + ballRadius > canvas.width - paddleWidth &&
+		// 	ballYaxis > rightPaddleYaxis &&
+		// 	ballYaxis < rightPaddleYaxis + paddleHeight)
+		// 	ballSpeedXaxis = -ballSpeedXaxis;
 
-		// Check if ball goes out of bounds on left or right side of canvas
-		if (ballXaxis < 0) 
-		{
-			rightPlayerScore++;
-			reset();
-		}
+		// // Check if ball goes out of bounds on left or right side of canvas
+		// if (ballXaxis < 0) 
+		// {
+		// 	// rightPlayerScore++;
+		// 	reset();
+		// }
 
-		else if (ballXaxis > canvas.width)
-		{
-			leftPlayerScore++;
-			reset();
-		}
+		// else if (ballXaxis > canvas.width)
+		// {
+		// 	// leftPlayerScore++;
+		// 	reset();
+		// }
 
 		// Check if a player has won
 		// This will be modified to know if you are player one or two and then decide to output win / lose accordingly
-		if (leftPlayerScore === maxScore)
+		if (leftPlayerScore === maxScore) {
+			// gameRunning = false;
+			cancelAnimationFrame(animationId);
 			alert("Left wins!")
-		else if (rightPlayerScore === maxScore)
+		}
+		else if (rightPlayerScore === maxScore) {
+			// gameRunning = false;
+			cancelAnimationFrame(animationId);
 			alert("Right wins!")
+		}
 	}
 
 	const draw = () => {
