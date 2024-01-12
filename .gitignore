@@ -4,6 +4,7 @@
 **/tenv
 docker_srcs/.env
 srcs/postgres/data
+srcs/user_app/media
 
 ##########################################
 # Byte-compiled / optimized / DLL files

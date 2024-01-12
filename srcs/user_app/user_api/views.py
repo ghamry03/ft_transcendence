@@ -1,88 +1,66 @@
+from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import permissions # need to figure out premissions
 from .models import User
 from .serializers import UserSerializer
+from user_app.permissions import IsRequestedUser
 
 # List view of all Users
 class UsersListApiView(APIView):
-    # TODO: figure it oud
-    # permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        users = User.objects.all().order_by('id') # try
-        # users = User.objects.filter(id=request.user.id) #?
+    def get(self, request):
+        """
+            curl -X GET -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}" \
+            http://localhost:8001/users/api/
+        """
+        users = User.objects.all().order_by('uid')
         serlializer = UserSerializer(users, many=True)
         return Response(serlializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, *args, **kwargs):
-        # data = {
-        #     'id': request.data.get('id'),
-        #     'username': request.data.get('username'),
-        #     'first_name': request.data.get('first_name'),
-        #     'last_name': request.data.get('last_name'),
-        # }
+    def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class UserDetailApiView(APIView):
-    # TODO: figure it oud
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (IsRequestedUser,)
 
     def getObjectById(self, user_id):
         try:
-            return User.objects.get(id=user_id)
+            return User.objects.get(uid=user_id)
         except User.DoesNotExist:
-            return None
+            raise Http404
 
-    def get(self, requset, user_id, *args, **kwargs):
-        user_query = self.getObjectById(user_id)
-        if user_query is None:
-            return Response(
-                {"res", "User with this id does not exist"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    def get(self, request, user_id):
+        try:
+            user_query = self.getObjectById(user_id)
+        except:
+            req_uid = request.META.get('HTTP_X_UID')
+            req_token = request.META.get('HTTP_X_TOKEN')
+            if int(req_uid) == user_id:
+                user_query = User()
+                user_query.oaut_42_user(req_token)
+            else:
+                raise Http404
+
         serializer = UserSerializer(user_query)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, user_id, *args, **kwargs):
+    def put(self, request, user_id):
         user_query = self.getObjectById(user_id)
-        if not user_query:
-            return Response(
-                {"res", "User with this id does not exist"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        # reqData = {
-        #     'id': request.data.get('id'),
-        #     'username': request.data.get('username'),
-        #     'first_name': request.data.get('first_name'),
-        #     'last_name': request.data.get('last_name'),
-        # }
         serializer = UserSerializer(
                 user_query,
                 data=request.data,
-                partial=True,  # not working
+                partial=True,
         )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, user_id, *args, **kwargs):
+    def delete(self, request, user_id):
         user_query = self.getObjectById(user_id)
-        if not user_query:
-            return Response(
-                {"res", "User with this id does not exist"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         user_query.delete()
-        return Response(
-            {"res", "User deleted"},
-            status=status.HTTP_200_OK,
-        )
+        return Response(status=status.HTTP_204_NO_CONTENT)

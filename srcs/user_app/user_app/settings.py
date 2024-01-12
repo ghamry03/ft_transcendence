@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from os import getenv
+from os import path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,7 +80,7 @@ WSGI_APPLICATION = 'user_app.wsgi.application'
 DATABASES = {
         'default': {
             'ENGINE': getenv('SQL_ENGINE'),
-            'NAME': getenv('POSTGRES_NAME'),
+            'NAME': getenv('POSTGRES_DB'),
             'USER': getenv('POSTGRES_USER'),
             'PASSWORD': getenv('POSTGRES_PASSWORD'),
             'HOST': getenv('SQL_HOST'),
@@ -128,3 +129,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'user_app.authentication.api_auth',
+    ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'user_app.permissions.IsRequestedUser',
+    # )
+}
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = path.join(BASE_DIR, 'media/')
