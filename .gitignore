@@ -1,8 +1,12 @@
+**/migrations
 **/.env
 **/__pycache__
 **/tenv
 docker_srcs/.env
 srcs/postgres/data
+srcs/user_app/media
+docker_srcs/user_app/.DS_Store
+srcs/game_app/offline/static/images
 
 ##########################################
 # Byte-compiled / optimized / DLL files
@@ -171,5 +175,3 @@ notes
 
 .DS_Store
 docker_srcs/.DS_Store
-docker_srcs/user_app/.DS_Store
-srcs/game_app/offline/static/images
