@@ -1,29 +1,31 @@
 version: "3"
 services:
-    main_app:
+    mainapp:
         build: ./main_app
-        image: main_app
-        container_name: main_app
+        image: mainapp
+        container_name: mainapp
         restart: on-failure
         ports:
             - "8000:8000"
+        networks:
+            - user_app_network
         volumes:
             - ../srcs/main_app/:/home/main_app
             # - main_app_data:/home/main_app
         depends_on:
-            user_app:
+            userapp:
+                condition: service_started
+            gameapp:
                 condition: service_started
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
-        networks:
-            - user_app_network
-    
-    game_app:
+
+    gameapp:
         build: ./game_app
-        image: game_app
-        container_name: game_app
+        image: gameapp
+        container_name: gameapp
         restart: on-failure
         ports:
             - "2000:2000"
@@ -31,17 +33,17 @@ services:
             - ../srcs/game_app/:/home/game_app
             # - game_app_data:/home/game_app
         depends_on:
-            user_app:
+            userapp:
                 condition: service_healthy
         env_file:
             - ./.env
         networks:
             - user_app_network
-
-    user_app:
+            
+    userapp:
         build: ./user_app
-        image: user_app
-        container_name: user_app
+        image: userapp
+        container_name: userapp
         restart: on-failure
         ports:
             - "3000:3000"
@@ -55,7 +57,7 @@ services:
         networks:
             - user_app_network
         healthcheck:
-            test: ["CMD", "curl", "--fail", "http://localhost:3000/user/health"]
+            test: ["CMD", "curl", "--fail", "http://localhost:3000/users/health"]
             interval: 5s
             timeout: 5s
             retries: 5

@@ -1,8 +1,9 @@
 from django.urls import path
+
 from .views import (
-        UsersListApiView,
-        UserDetailApiView,
-		health_check
+    UsersListApiView,
+    UserDetailApiView,
+	health_check
 )
 
 urlpatterns = [

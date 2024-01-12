@@ -9,6 +9,7 @@ from asgiref.sync import async_to_sync
 
 class RemotePlayerConsumer(AsyncWebsocketConsumer):
 
+    SPEED = 10
     game_group_name = "game_group"
     queue = []
     players = {}
@@ -16,7 +17,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
     logger = logging.getLogger(__name__)
     paddleHeight = 80
     paddleWidth = 10
-    paddleSpeed = 5
+    paddleSpeed = SPEED
     canvasHeight = 580
     canvasWidth = 1024
 
@@ -167,8 +168,8 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         ballXaxis = self.canvasWidth / 2
         ballYaxis = self.canvasHeight / 2
         ballRadius = 10
-        ballSpeedXaxis = 5
-        ballSpeedYaxis = 5
+        ballSpeedXaxis = self.SPEED
+        ballSpeedYaxis = self.SPEED
         while playerId1 in self.players and playerId2 in self.players:
             async with self.update_lock:
                 player1 = self.players[playerId1]

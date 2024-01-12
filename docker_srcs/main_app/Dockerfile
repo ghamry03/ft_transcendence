@@ -1,7 +1,7 @@
 FROM python:3.12.0-bullseye
 
 WORKDIR /home/main_app
-                                                         
+
 COPY requirements.txt ./
 # RUN pip install virtualenv
 # RUN virtualenv venv
