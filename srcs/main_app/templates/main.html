@@ -24,10 +24,9 @@
         // console.log(doc);
         document.querySelector('#mainContentArea').innerHTML = doc;
       });
-
-  }
-
-
+      
+    }
+    
   document.addEventListener("DOMContentLoaded", function () {
     let isLoggedin = "{{isLoggedIn |yesno:'true,false'}}";
     // console.log(isLoggedin);
@@ -36,6 +35,8 @@
       getHome()
     }
   });
+  {% comment %} ws = new WebSocket("ws://gameapp:2000/ws/game/"); {% endcomment %}
+
 </script>
 
 <body>
