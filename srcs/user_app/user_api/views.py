@@ -44,7 +44,6 @@ class UserDetailApiView(APIView):
                 user_query.oaut_42_user(req_token)
             else:
                 raise Http404
-
         serializer = UserSerializer(user_query)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -81,3 +81,9 @@ def homeLoggedIn(request):
         
     }
     return HttpResponse(render(request, 'home.html', context))
+
+def loadGamePage(request):
+    context = {
+        
+    }
+    return HttpResponse(render(request, 'game.html', context))

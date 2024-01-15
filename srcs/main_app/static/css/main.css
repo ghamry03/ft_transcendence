@@ -30,7 +30,7 @@ body{
 
 .mainContainer{
     max-width: 1440px;
-    background-color: #74569B;
+    background-color: #2A1948;
     min-height: 100vh;
 }
 .navigationBar{
@@ -68,6 +68,7 @@ body{
 }
 
 #userName{
+    color: #FEFFCF;
     margin-right: 16px;
     font-family: 'ps2p';
     font-size: 12px;
@@ -80,12 +81,12 @@ body{
     color: #FEFFCF;
     text-transform: uppercase;
     text-align: center;
-text-shadow: 0px 4px 0px #59322B;
-font-family: 'ps2p';
-font-size: 12px;
-font-style: normal;
-font-weight: 400;
-line-height: normal;
+    text-shadow: 0px 4px 0px #59322B;
+    font-family: 'ps2p';
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .pixelCard {
@@ -196,5 +197,6 @@ line-height: normal;
   .welcomeBar #welcome{
     font-family: 'ps2p';
     font-size: 16px;
-
+    color: #FEFFCF;
+    
   }

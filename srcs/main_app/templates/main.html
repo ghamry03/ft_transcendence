@@ -8,9 +8,13 @@
   {% bootstrap_css %}
   {% bootstrap_javascript %}
   <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/game.css' %}">
+  {% comment %} <script src="{% static 'js/canvas.js' %}" defer></script> {% endcomment %}
 </head>
 
 <script>
+	function isOpen(ws) { return ws.readyState === ws.OPEN }
+
   function getHome() {
     fetch('/home')
       .then(response => {
@@ -24,20 +28,52 @@
         // console.log(doc);
         document.querySelector('#mainContentArea').innerHTML = doc;
       });
-      
-    }
+  }
+  
+  function loadGame() {
+    // ws = new WebSocket("ws://localhost:2000/ws/game/");
+    // console.log(isOpen(ws));
+    fetch('/game')
+      .then(response => {
+        return response.text();
+      })
+      .then(text => {
+        var parser = new DOMParser();
+
+        // Parse the html we need
+        var doc = parser.parseFromString(text, "text/html").querySelector("body").innerHTML;
+        // console.log(doc);
+        document.querySelector('#mainContentArea').innerHTML = doc;
+      });
     
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     let isLoggedin = "{{isLoggedIn |yesno:'true,false'}}";
     // console.log(isLoggedin);
     if (isLoggedin == "true") {
       // console.log("im in der");
-      getHome()
+      getHome();
+      playOnlineButton = document.getElementById("playbutton");
+      // playOfflineButton = document.getElementById("play-offline");
+      // playTourButton = document.getElementById("play-tour");
+      playOnlineButton.addEventListener("click", function() {
+        loadGame();
+        let scriptEle = document.createElement("script");
+        scriptEle.setAttribute("src", "{% static 'js/canvas.js' %}");
+        scriptEle.setAttribute("type", "text/javascript");
+        scriptEle.setAttribute("async", "false");
+        document.body.appendChild(scriptEle);
+        scriptEle.addEventListener("load", () => {
+          console.log("Script loaded")
+          setUpGame();
+        });
+      });
     }
   });
-  {% comment %} ws = new WebSocket("ws://gameapp:2000/ws/game/"); {% endcomment %}
-
-</script>
+  console.log("{{username}}, {{uid}}");
+  
+</script> 
 
 <body>
   <div class="mainContainer">
@@ -53,10 +89,11 @@
             Here</a>
           {% endif %}
           <h1 id="userName" class="align-self-center align-middle">{{ username }}</h1>
-          <img src="http://localhost:8001/{{img}}" class="profilePic align-middle">
+          <img src="http://localhost:3000/{{img}}" class="profilePic align-middle">
         </div>
       </div>
 
+      <button id="playbutton">random</button>
     </div>
     <div id="mainContentArea">
     </div>
