@@ -6,10 +6,10 @@
             </div>
         </div>
     </div>
-    <div class="welcomeBar col-8">
+    <div id="homeContentArea" class="welcomeBar col-8">
         <div class="row">
             <div class="col-10">
-                <p id="welcome">Welcome back {{ first_name}}, it's PONGPING time!</p>
+                <p id="welcome">Welcome back {{ first_name }}, it's PONGPING time!</p>
             </div>
             <div class="col-2">
                     {% include "gameButton.html" %}
@@ -18,13 +18,13 @@
         
         <div class="row g-5 m-0">
             <div class="col-4">
-                {% include "buttonCard.html" with img="imgs/game.svg" title="Play Online" description="Get matched with a random player online" %}
+                {% include "buttonCard.html" with img="imgs/game.svg" title="Play Online" description="Get matched with a random player online" onClick="fetchPage('/online','#homeContentArea')" %}
             </div>
             <div class="col-4">
-                {% include "buttonCard.html" with img="imgs/offline.svg" title="Play Offline" description="Play a match against someone on the same keyboard" %}
+                {% include "buttonCard.html" with img="imgs/offline.svg" title="Play Offline" description="Play a match against someone on the same keyboard" onClick="fetchPage('/offline','#homeContentArea')" %}
             </div>
             <div class="col-4">
-                {% include "buttonCard.html" with img="imgs/cup.svg" title="Join a Tournament" description="Compete in a tournament or start your own!" %}
+                {% include "buttonCard.html" with img="imgs/cup.svg" title="Join a Tournament" description="Compete in a tournament or start your own!" onClick="playOnline()" %}
             </div>
         </div>
 

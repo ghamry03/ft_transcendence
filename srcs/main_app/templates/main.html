@@ -8,6 +8,9 @@
   {% bootstrap_css %}
   {% bootstrap_javascript %}
   <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <script type="text/javascript" src="{% static 'js/utils.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/game.css' %}"/>
+
 </head>
 
 <script>
@@ -29,10 +32,8 @@
     
   document.addEventListener("DOMContentLoaded", function () {
     let isLoggedin = "{{isLoggedIn |yesno:'true,false'}}";
-    // console.log(isLoggedin);
     if (isLoggedin == "true") {
-      // console.log("im in der");
-      getHome()
+      fetchPage('/home', '#mainContentArea');
     }
   });
   {% comment %} ws = new WebSocket("ws://gameapp:2000/ws/game/"); {% endcomment %}
@@ -40,7 +41,7 @@
 </script>
 
 <body>
-  <div class="mainContainer">
+  <div class="mainContainer w-100">
     <div class="topBar">
       <div class="row">
         <div class="col-6 d-flex justify-content-start align-middle ">
@@ -53,7 +54,7 @@
             Here</a>
           {% endif %}
           <h1 id="userName" class="align-self-center align-middle">{{ username }}</h1>
-          <img src="http://localhost:8001/{{img}}" class="profilePic align-middle">
+          <img src="http://localhost:3000{{img}}" class="profilePic align-middle">
         </div>
       </div>
 

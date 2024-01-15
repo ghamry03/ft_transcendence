@@ -3,6 +3,7 @@ from django.http import HttpResponse
 import requests
 import environ
 import os
+from django.template.loader import render_to_string
 
 # Create your views here.
 
@@ -81,3 +82,14 @@ def homeLoggedIn(request):
         
     }
     return HttpResponse(render(request, 'home.html', context))
+
+
+#This will render the template for the logged in state
+#This should be called from the main template
+#
+def onlineGame(request):
+    context = {
+        
+    }
+    x = render_to_string('game.html', context)
+    return HttpResponse(x)
