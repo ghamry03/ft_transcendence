@@ -14,11 +14,9 @@ function fetchPage(pageUrl , injectionPoint) {
         
         document.querySelector(injectionPoint).innerHTML = doc;
         if (pageUrl == '/online') {
-          var canvas = document.createElement('script');
-          canvas.setAttribute('src','/static/js/canvas.js');
-          document.querySelector(injectionPoint).appendChild(canvas);
+          var gamescript = document.createElement('script');
+          gamescript.setAttribute('src','/static/js/canvas.js');
+          document.querySelector(injectionPoint).appendChild(gamescript);
         }
       });
-
-      
 }

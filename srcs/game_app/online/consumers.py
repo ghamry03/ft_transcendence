@@ -18,65 +18,74 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
     paddleHeight = 80
     paddleWidth = 10
     paddleSpeed = SPEED
-    canvasHeight = 580
-    canvasWidth = 1024
+    canvasHeight = 510
+    canvasWidth = 960
+    # canvasHeight = 580
+    # canvasWidth = 1024
 
     async def connect(self):
         
-        self.player_id = str(uuid.uuid4())
-        self.logger.info("player %s connected to server", self.player_id)
+        # self.player_id = str(uuid.uuid4())
+        # self.logger.info("player %s connected to server", self.player_id)
         await self.accept()
-        await self.send(
-            text_data=json.dumps({"type": "playerId", "playerId": self.player_id})
-        )
+        # await self.send(
+        #     text_data=json.dumps({"type": "playerId", "playerId": self.player_id})
+        # )
+        self.player_id = self.scope['query_string'].decode('utf-8').split('=')[1]
+        if self.player_id in self.queue or self.player_id in self.players:
+            self.logger.info("same user already in game or queue")
+            await self.send(
+                text_data=json.dumps({"type": "inGame"})
+            )
+        else:
+            self.logger.info("player %s joined", self.player_id)
+            queuedPlayerId = None
+            async with self.update_lock:
+                # search for a match in the queue
+                if len(self.queue) > 0:
+                    queuedPlayerId = self.queue[0]
+                    # if queuedPlayer["opponentId"] == None:
+                    self.logger.info("found a player %s with no opponent", queuedPlayerId)
 
-        queuedPlayerId = None
-        async with self.update_lock:
-            # search for a match in the queue
-            if len(self.queue) > 0:
-                queuedPlayerId = self.queue[0]
-                # if queuedPlayer["opponentId"] == None:
-                self.logger.info("found a player %s with no opponent", queuedPlayerId)
+                    # moving queued player from queue to player pool
+                    self.queue.pop(0)
+                    self.players[queuedPlayerId] = {
+                        "id": queuedPlayerId,
+                        "opponentId": self.player_id,
+                        "paddlePosition":  self.canvasHeight / 2 - self.paddleHeight / 2,
+                        "upPressed": False,
+                        "downPressed": False,
+                        "ready": False,
+                        "gid": queuedPlayerId
+                    }
+                    
+                    # adding new player to the opponent's group
+                    await self.channel_layer.group_add(
+                        queuedPlayerId, self.channel_name
+                    )
 
-                # moving queued player from queue to player pool
-                self.queue.pop(0)
-                self.players[queuedPlayerId] = {
-                    "id": queuedPlayerId,
-                    "opponentId": self.player_id,
-                    "paddlePosition":  self.canvasHeight / 2 - self.paddleHeight / 2,
-                    "upPressed": False,
-                    "downPressed": False,
-                    "ready": False,
-                    "gid": queuedPlayerId
-                }
-                
-                # adding new player to the opponent's group
-                await self.channel_layer.group_add(
-                    queuedPlayerId, self.channel_name
-                )
+                    # adding new player to player pool
+                    self.players[self.player_id] = { # add new player to player pool
+                        "id": self.player_id,
+                        "opponentId": queuedPlayerId,
+                        "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
+                        "upPressed": False,
+                        "downPressed": False,
+                        "ready": False,
+                        "gid": queuedPlayerId
+                    }               
+                    # asyncio.create_task(self.game_loop(queuedPlayerId, self.player_id))
+                    await self.channel_layer.group_send(
+                        queuedPlayerId,
+                        {"type": "matchFound", "first": queuedPlayerId},
+                    )
+                else:
+                    self.queue.append(self.player_id)
+                    await self.channel_layer.group_add(
+                        self.player_id, self.channel_name
+                    )
 
-                # adding new player to player pool
-                self.players[self.player_id] = { # add new player to player pool
-                    "id": self.player_id,
-                    "opponentId": queuedPlayerId,
-                    "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
-                    "upPressed": False,
-                    "downPressed": False,
-                    "ready": False,
-                    "gid": queuedPlayerId
-                }               
-                # asyncio.create_task(self.game_loop(queuedPlayerId, self.player_id))
-                await self.channel_layer.group_send(
-                    queuedPlayerId,
-                    {"type": "matchFound", "first": queuedPlayerId},
-                )
-            else:
-                self.queue.append(self.player_id)
-                await self.channel_layer.group_add(
-                    self.player_id, self.channel_name
-                )
-
-        self.logger.info("queue len = %d", len(self.queue))
+            self.logger.info("queue len = %d", len(self.queue))
 
 
     async def disconnect(self, close_code):

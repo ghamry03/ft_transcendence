@@ -8,14 +8,12 @@
   {% bootstrap_css %}
   {% bootstrap_javascript %}
   <link rel="stylesheet" href="{% static 'css/main.css' %}">
-  <script type="text/javascript" src="{% static 'js/utils.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/utils.js' %}">var uid = "{{ uid }}";</script>
   <link rel="stylesheet" href="{% static 'css/game.css' %}"/>
 
 </head>
 
 <script>
-	function isOpen(ws) { return ws.readyState === ws.OPEN }
-
   function getHome() {
     fetch('/home')
       .then(response => {
@@ -55,6 +53,7 @@
       fetchPage('/home', '#mainContentArea');
     }
   });
+  console.log("username is {{username}}");
   {% comment %} ws = new WebSocket("ws://gameapp:2000/ws/game/"); {% endcomment %}
 
 </script>
@@ -76,8 +75,6 @@
           <img src="http://localhost:3000{{img}}" class="profilePic align-middle">
         </div>
       </div>
-
-      <button id="playbutton">random</button>
     </div>
     <div id="mainContentArea">
     </div>

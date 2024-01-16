@@ -1,26 +1,31 @@
 
 	const canvas = document.getElementById("gameCanvas");
 	const ctx = canvas.getContext("2d");
-	
+	const playerId = canvas.getAttribute("uid");
 	// const startBtn = document.getElementById("start-btn");
-	const pauseBtn = document.getElementById("pause-btn");
-	const restartBtn = document.getElementById("restart-btn");
+	// const pauseBtn = document.getElementById("pause-btn");
+	// const restartBtn = document.getElementById("restart-btn");
 
 	var animationId;
 	// var gameRunning = false;
 
+	const canvasW = canvas.getBoundingClientRect().width;
+	const canvasH = canvas.getBoundingClientRect().height;
+
+	canvas.width = canvasW;
+	canvas.height = canvasH;
 	// Ball
 	var ballRadius = 10;
-	var ballXaxis = canvas.width / 2;
-	var ballYaxis = canvas.height / 2;
+	var ballXaxis = canvasW / 2;
+	var ballYaxis = canvasH / 2;
 
 	// Paddles
-	var paddleHeight = 80;
+	var paddleHeight = canvasH / 4;
 	var paddleWidth = 10;
-	var leftPaddleYaxis = canvas.height / 2 - paddleHeight / 2;
-	var rightPaddleYaxis = canvas.height / 2 - paddleHeight / 2;
+	var leftPaddleYaxis = canvasH / 2 - paddleHeight / 2;
+	var rightPaddleYaxis = canvasH / 2 - paddleHeight / 2;
 
-	console.log("canvas height and width = ", canvas.height, canvas.width);
+	console.log("canvas height and width = ", canvasH, canvasW);
 	// Score
 	var leftPlayerScore = 0;
 	var rightPlayerScore = 0;
@@ -31,7 +36,7 @@
 
 	// socket info 
 	var ws;
-	var playerId;
+	// var playerId;
 
 	function countdown(parent, callback) {
 		var texts = ['Match found!', '3', '2', '1', 'GO'];
@@ -84,20 +89,20 @@
 	// 	}
 	// });
 
-	pauseBtn.addEventListener("click", function()
-	{
-		ws.close();
-		console.log("stopped game");
-		// gameRunning = false;
-		cancelAnimationFrame(animationId);
-	});
+	// pauseBtn.addEventListener("click", function()
+	// {
+	// 	ws.close();
+	// 	console.log("stopped game");
+	// 	// gameRunning = false;
+	// 	cancelAnimationFrame(animationId);
+	// });
 	
-	restartBtn.addEventListener("click", function()
-	{
-		ws.close();
-		cancelAnimationFrame(animationId);
-		document.location.reload();
-	});
+	// restartBtn.addEventListener("click", function()
+	// {
+	// 	ws.close();
+	// 	cancelAnimationFrame(animationId);
+	// 	document.location.reload();
+	// });
 
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
@@ -110,9 +115,11 @@
 			leftPaddleYaxis = messageData.leftPaddle;
 			rightPaddleYaxis = messageData.rightPaddle;
 		} 
-		else if (messageData.type === "playerId") {
-			playerId = messageData.playerId;
-			console.log("your player id is ", playerId);
+		else if (messageData.type === "inGame") {
+			// playerId = messageData.playerId;
+			console.log("you're queued or have another ongoing match on another tab or computer", playerId);
+			ws.close();
+			// show error pop up and redirect them back to home page 
 		}
 		else if (messageData.type === "matchFound") {
 			console.log("match found, first is: ", messageData.first);
@@ -189,8 +196,8 @@
 
 	// Reset ball
 	const reset = () => {
-		ballXaxis = canvas.width / 2;
-		ballYaxis = canvas.height / 2;
+		ballXaxis = canvasW / 2;
+		ballYaxis = canvasH / 2;
 		// ballSpeedXaxis = -ballSpeedXaxis;
 		// ballSpeedYaxis = -ballSpeedYaxis;
 	}
@@ -198,17 +205,17 @@
 	// Update game state
 	const update = () => {
 		// // Check if ball goes out of bounds on left or right side of canvas
-		// if (ballXaxis < 0) 
-		// {
-		// 	// rightPlayerScore++;
-		// 	reset();
-		// }
+		if (ballXaxis < 0) 
+		{
+			rightPlayerScore++;
+			// reset();
+		}
 
-		// else if (ballXaxis > canvas.width)
-		// {
-		// 	// leftPlayerScore++;
-		// 	reset();
-		// }
+		else if (ballXaxis > canvasW)
+		{
+			leftPlayerScore++;
+			// reset();
+		}
 
 		// Check if a player has won
 		// This will be modified to know if you are player one or two and then decide to output win / lose accordingly
@@ -226,16 +233,16 @@
 
 	const draw = () => {
 		// Clear canvas
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.clearRect(0, 0, canvasW, canvasH);
 
 		//Paddle colors
 		ctx.fillStyle = "#0abdc6";
-		ctx.font = "15px Arial";
-
+		ctx.font = "30px ps2p";
+	
 		//Draw middle line
 		ctx.beginPath();
-		ctx.moveTo(canvas.width / 2, 0);
-		ctx.lineTo(canvas.width / 2, canvas.height);
+		ctx.moveTo(canvasW / 2, 0);
+		ctx.lineTo(canvasW / 2, canvasH);
 		
 		//Set middle line color
 		ctx.strokeStyle = "#0abdc6";
@@ -252,27 +259,37 @@
 		ctx.fillRect(0, leftPaddleYaxis, paddleWidth, paddleHeight);
 
 		//Draw right paddle
-		ctx.fillRect(canvas.width - paddleWidth, rightPaddleYaxis, paddleWidth, paddleHeight);
+		ctx.fillRect(canvasW - paddleWidth, rightPaddleYaxis, paddleWidth, paddleHeight);
 
 		//Draw scores
-		ctx.fillText("Score: " + leftPlayerScore, 10, 20);
-		ctx.fillText("Score: " + rightPlayerScore, canvas.width - 70, 20);
+		if (leftPlayerScore < rightPlayerScore) {
+			ctx.fillStyle = "#FFB3B3"; // red
+			ctx.fillText(leftPlayerScore, canvasW / 2 - 50, 40);
+			ctx.fillStyle = "#C5FFC0"; // green
+			ctx.fillText(rightPlayerScore, canvasW / 2 + 25, 40);
+		}
+		else if (leftPlayerScore > rightPlayerScore) {
+			ctx.fillStyle = "#C5FFC0";
+			ctx.fillText(leftPlayerScore, canvasW / 2 - 50, 40);
+			ctx.fillStyle = "#FFB3B3";
+			ctx.fillText(rightPlayerScore, canvasW / 2 + 25, 40);
+		}
+		else {
+			ctx.fillStyle = "#C5FFC0";
+			ctx.fillText(leftPlayerScore, canvasW / 2 - 50, 40);
+			ctx.fillText(rightPlayerScore, canvasW / 2 + 25, 40);
+		}
 	}
 	// Entrypoint
 	const joinQueue = () => {
-		// Implement the initialization logic...
-
 		// Set up WebSocket connection
-		ws = new WebSocket("ws://localhost:2000/ws/game/");
+		ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
 		ws.onmessage = handleWebSocketMessage;
-
+		console.log("connecting to server with uid ", playerId);
+		
 		// Keyboard events
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);
-		// animateGame();
-		// Resize canvas on load and window resize
-		// resizeCanvas();
-		// window.addEventListener("resize", resizeCanvas);
 	};
 	draw();
 	joinQueue();
