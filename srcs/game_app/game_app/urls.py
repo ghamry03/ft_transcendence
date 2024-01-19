@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from game_api import urls as game_urls
 from django.views.generic import RedirectView
 
 # Use static() to add URL mapping to serve static files during development (only)
@@ -26,6 +27,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 	path('offline/', include('offline.urls')),
 	path('online/', include('online.urls')),
+	path('users/', include('user_app.urls')),
+	path('game/', include('game_app.urls')),
     # path('', RedirectView.as_view(url='offline/', permanent=True)),
 ]
 
