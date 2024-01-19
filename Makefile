@@ -28,10 +28,10 @@ server			:
 					$(DOCKER_CMD) up -d --no-deps --build server
 
 main			:
-					$(DOCKER_CMD) up -d --no-deps --build main_app
+					$(DOCKER_CMD) up -d --no-deps --build mainapp
 
 user			:
-					$(DOCKER_CMD) up -d --no-deps --build user_app
+					$(DOCKER_CMD) up -d --no-deps --build userapp
 
 postgres		:
 					$(DOCKER_CMD) up -d --no-deps --build postgres
@@ -40,13 +40,13 @@ server-sh		:
 					$(DOCKER_CMD) exec -it server /bin/bash
 
 main-sh		:
-					$(DOCKER_CMD) exec -it main_app /bin/bash
+					$(DOCKER_CMD) exec -it mainapp /bin/bash
 
 user-sh		:
-					$(DOCKER_CMD) exec -it user_app /bin/bash
+					$(DOCKER_CMD) exec -it userapp /bin/bash
 
 game-sh		:
-					$(DOCKER_CMD) exec -it game_app /bin/bash
+					$(DOCKER_CMD) exec -it gameapp /bin/bash
 
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
@@ -68,5 +68,5 @@ fclean			:
 re				: fclean all
 
 .PHONY			:	$(NAME) all build up down clean fclean re	\
-					server main_app user_app postgres			\
+					server mainapp userapp postgres			\
 					server-sh main-sh user-sh postgres-sh

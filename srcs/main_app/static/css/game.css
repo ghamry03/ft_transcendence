@@ -4,13 +4,13 @@
 	align-items: center;
 	justify-content: center;
 }
-  
+
 .onlineGame .button{
 	display: flex;
 	justify-content: center;
 	margin-top: 15px;
 }
-  
+
 .onlineGame .btn {
 	background-color: #1B102E;
 	border: none;
@@ -32,7 +32,7 @@
 .onlineGame canvas {
 	background: #1B102E;
 	border-radius: 5%;
-	padding: 30px;
+	padding: 20px;
 }
 
 .onlineGame #readyGo {

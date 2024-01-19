@@ -90,7 +90,7 @@ def homeLoggedIn(request):
 
 #This will render the template for the logged in state
 #This should be called from the main template
-#
+
 def onlineGame(request):
     context = {
         'uid': request.session['uid'],

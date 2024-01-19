@@ -45,7 +45,7 @@ services:
         # command: gunicorn game_app.wsgi:application --bind 0.0.0.0:2000
         depends_on:
             userapp:
-                condition: service_started
+                condition: service_healthy
         env_file:
             - ./.env
         networks:

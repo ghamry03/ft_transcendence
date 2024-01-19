@@ -1,10 +1,10 @@
-
 	const canvas = document.getElementById("gameCanvas");
 	const ctx = canvas.getContext("2d");
 	const playerId = canvas.getAttribute("uid");
-	// const startBtn = document.getElementById("start-btn");
-	// const pauseBtn = document.getElementById("pause-btn");
-	// const restartBtn = document.getElementById("restart-btn");
+
+	const paddleHScale = 0.2
+	const paddleWScale = 0.015
+	const remoteCanvasH = 510;
 
 	var animationId;
 	// var gameRunning = false;
@@ -14,16 +14,18 @@
 
 	canvas.width = canvasW;
 	canvas.height = canvasH;
-	// Ball
-	var ballRadius = 10;
-	var ballXaxis = canvasW / 2;
-	var ballYaxis = canvasH / 2;
-
+	var scaleFactor = canvasH / remoteCanvasH;
+	
 	// Paddles
-	var paddleHeight = canvasH / 4;
-	var paddleWidth = 10;
+	var paddleHeight = canvasH * paddleHScale;
+	var paddleWidth = canvasW * paddleWScale;
 	var leftPaddleYaxis = canvasH / 2 - paddleHeight / 2;
 	var rightPaddleYaxis = canvasH / 2 - paddleHeight / 2;
+	
+	// Ball
+	var ballXaxis = canvasW / 2;
+	var ballYaxis = canvasH / 2;
+	var ballRadius = paddleWidth;
 
 	console.log("canvas height and width = ", canvasH, canvasW);
 	// Score
@@ -110,10 +112,12 @@
 		const messageData = JSON.parse(event.data);
 		if (messageData.type === "stateUpdate") {
 			console.log("status update");
-			ballXaxis = messageData.ballX;
-			ballYaxis = messageData.ballY;
-			leftPaddleYaxis = messageData.leftPaddle;
-			rightPaddleYaxis = messageData.rightPaddle;
+			ballXaxis = messageData.ballX * scaleFactor;
+			ballYaxis = messageData.ballY * scaleFactor;
+			leftPaddleYaxis = messageData.leftPaddle * scaleFactor;
+			rightPaddleYaxis = messageData.rightPaddle * scaleFactor;
+			leftPlayerScore = messageData.leftScore;
+			rightPlayerScore = messageData.rightScore;
 		} 
 		else if (messageData.type === "inGame") {
 			// playerId = messageData.playerId;
@@ -284,6 +288,7 @@
 	const joinQueue = () => {
 		// Set up WebSocket connection
 		ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
+		console.log("ws is ", ws);
 		ws.onmessage = handleWebSocketMessage;
 		console.log("connecting to server with uid ", playerId);
 		
