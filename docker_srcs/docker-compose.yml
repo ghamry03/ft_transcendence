@@ -6,14 +6,16 @@ services:
         ports:
             - "80:80"
         depends_on:
-            - main_app
+            - mainapp
             - postgres
 
-    main_app:
+    mainapp:
         build: ./main_app
         restart: on-failure
         ports:
             - "8000:8000"
+        networks:
+            - user_app_network
         # command:
         # - sh
         # - -c
@@ -24,14 +26,14 @@ services:
         volumes:
             - main_app_data:/home/main_app
         depends_on:
-            user_app:
+            userapp:
                 condition: service_started
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
 
-    user_app:
+    userapp:
         build: ./user_app
         restart: on-failure
         ports:

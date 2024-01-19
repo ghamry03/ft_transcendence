@@ -1,0 +1,200 @@
+@font-face {
+    font-family: 'ps2p';
+    src: local('Ps2p'),
+         url('../fonts/ps2p.ttf') format("truetype");
+  }
+
+:root{
+    --beach-bunny: #FCF9F4;
+    --beach-bunny-red: #EF6E7F;
+    --beach-bunny-lavendar: #E9DCFF;
+    --beach-bunny-lavendar-dark: #D4BBFE;
+}
+
+h1,h2,h3,h4,h5,h6{
+    font-family: 'ps2p';
+    padding: 0;
+    margin: 0;
+}
+
+*, html{
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    background-color: black;
+}
+
+.mainContainer{
+    max-width: 1440px;
+    background-color: #74569B;
+    min-height: 100vh;
+}
+.navigationBar{
+    position: relative;
+    z-index: 99;
+    left: 0;
+    height: 100vh;
+    min-width: 20%;
+    max-height: 80vh;
+    width: 50px;
+    background-color: #FFB3CB;
+    border-radius: 0px 13px 13px 0px;
+    transition: width ease-out 0.3s;
+}
+
+.navigationBar:hover{
+    width: 80%;
+    cursor: pointer;
+}
+
+.topBar{
+    position: relative;
+    height: 100;
+    z-index: 90;
+    width: 100%;
+    /* background-color: red; */
+    padding: 24px;
+}
+.profilePic{
+    border-radius: 100%;
+    max-width: 64px;
+    max-height: 64px;
+    min-width: 64px;
+    min-height: 64px;
+}
+
+#userName{
+    margin-right: 16px;
+    font-family: 'ps2p';
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.pongping{
+    color: #FEFFCF;
+    text-transform: uppercase;
+    text-align: center;
+text-shadow: 0px 4px 0px #59322B;
+font-family: 'ps2p';
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+
+.pixelCard {
+    width: 100%;
+    margin: 2em auto;
+    background-color: var(--beach-bunny);
+    box-shadow: 
+    
+    /*top left & top right border*/
+    -10px 0px 0px var(--beach-bunny), 
+    -5px -5px 0px var(--beach-bunny), 
+    0px -10px 0px var(--beach-bunny), 
+    -10px -5px 0px black, 
+    -5px -10px 0px black, 
+    0px -15px 0 0 black, 
+
+    10px 0px 0px var(--beach-bunny), 
+    5px -5px 0px var(--beach-bunny), 
+    0px -10px 0px var(--beach-bunny),
+    10px -5px 0px black, 
+    5px -10px 0px black, 
+    0px -15px 0 0 black, 
+
+    /*bottom left & bottom right borders*/
+    -10px 0px 0px var(--beach-bunny), 
+    -5px 5px 0px var(--beach-bunny), 
+    0px 10px 0px var(--beach-bunny),
+    -10px 5px 0px black, 
+    -5px 10px 0px black, 
+    0px 15px 0 0 black, 
+
+    10px 0px 0px var(--beach-bunny), 
+    5px 5px 0px var(--beach-bunny), 
+    0px 10px 0px var(--beach-bunny),
+    10px 5px 0px black, 
+    5px 10px 0px black, 
+    0px 15px 0 0 black, 
+    /*left & right black border*/
+    -15px 0 0 0 black,
+    15px 0 0 0 black,
+
+    /*card highlight*/
+    10px 0px 0px var(--beach-bunny), 
+    5px 5px 0px var(--beach-bunny), 
+    0px 10px 0px var(--beach-bunny),
+    20px 5px 0px var(--beach-bunny-red),
+    20px 10px 0px var(--beach-bunny-red), 
+    15px 15px 0px var(--beach-bunny-red), 
+    10px 20px 0 0 var(--beach-bunny-red),
+    5px 20px 0 0 var(--beach-bunny-red)
+    ;
+
+    transition: all ease-out 0.3s;
+  }
+
+.pixelHover:hover{
+    cursor: pointer;
+    background-color: var(--beach-bunny-lavendar);
+
+    box-shadow: 
+    
+    /*top left & top right border*/
+    -10px 0px 0px var(--beach-bunny-lavendar), 
+    -5px -5px 0px var(--beach-bunny-lavendar), 
+    0px -10px 0px var(--beach-bunny-lavendar), 
+    -10px -5px 0px var(--beach-bunny-lavendar-dark), 
+    -5px -10px 0px var(--beach-bunny-lavendar-dark), 
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark), 
+
+    10px 0px 0px var(--beach-bunny-lavendar), 
+    5px -5px 0px var(--beach-bunny-lavendar), 
+    0px -10px 0px var(--beach-bunny-lavendar),
+    10px -5px 0px var(--beach-bunny-lavendar-dark), 
+    5px -10px 0px var(--beach-bunny-lavendar-dark), 
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark), 
+
+    /*bottom left & bottom right borders*/
+    -10px 0px 0px var(--beach-bunny-lavendar), 
+    -5px 5px 0px var(--beach-bunny-lavendar), 
+    0px 10px 0px var(--beach-bunny-lavendar),
+    -10px 5px 0px var(--beach-bunny-lavendar-dark), 
+    -5px 10px 0px var(--beach-bunny-lavendar-dark), 
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark), 
+
+    10px 0px 0px var(--beach-bunny-lavendar), 
+    5px 5px 0px var(--beach-bunny-lavendar), 
+    0px 10px 0px var(--beach-bunny-lavendar),
+    10px 5px 0px var(--beach-bunny-lavendar-dark), 
+    5px 10px 0px var(--beach-bunny-lavendar-dark), 
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark), 
+    /*left & right black border*/
+    -15px 0 0 0 var(--beach-bunny-lavendar-dark),
+    15px 0 0 0 var(--beach-bunny-lavendar-dark),
+
+    /*card highlight*/
+    10px 0px 0px var(--beach-bunny-lavendar), 
+    5px 5px 0px var(--beach-bunny-lavendar), 
+    0px 10px 0px var(--beach-bunny-lavendar),
+    20px 5px 0px var(--beach-bunny-red),
+    20px 10px 0px var(--beach-bunny-red), 
+    15px 15px 0px var(--beach-bunny-red), 
+    0px 20px 0 0 black,
+    10px 20px 0 0 var(--beach-bunny-red),
+    5px 20px 0 0 black
+    ;
+}
+
+  .welcomeBar #welcome{
+    font-family: 'ps2p';
+    font-size: 16px;
+
+  }
