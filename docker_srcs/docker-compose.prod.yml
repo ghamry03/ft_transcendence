@@ -10,21 +10,21 @@ services:
         ports:
             - "80:80"
         depends_on:
-            - main_app
-            - user_app
+            - mainapp
+            - userapp
         networks:
             - user_app_network
 
-    main_app:
+    mainapp:
         build: 
           context: ../
           dockerfile: ./docker_srcs/main_app/Dockerfile.prod
-        image: main_app
-        container_name: main_app
+        image: mainapp
+        container_name: mainapp
         restart: on-failure
         expose:
           - 8000
-        command: gunicorn main_app.wsgi:application --bind 0.0.0.0:8000
+        command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
         depends_on:
             postgres:
                 condition: service_healthy
@@ -33,50 +33,34 @@ services:
         networks:
             - user_app_network
     
-    game_app:
+    gameapp:
         build: 
           context: ../
           dockerfile: ./docker_srcs/game_app/Dockerfile.prod
-        image: game_app
-        container_name: game_app
+        image: gameapp
+        container_name: gameapp
         restart: on-failure
         expose:
           - 2000
-        command: gunicorn game_app.wsgi:application --bind 0.0.0.0:2000
+        # command: gunicorn game_app.wsgi:application --bind 0.0.0.0:2000
         depends_on:
-            user_app:
-                condition: service_started
+            userapp:
+                condition: service_healthy
         env_file:
             - ./.env
         networks:
             - user_app_network
 
-    # auth_app:
-    #     build: 
-    #       context: ../
-    #       dockerfile: ./docker_srcs/auth_app/Dockerfile.prod
-    #     image: auth_app
-    #     container_name: auth_app
-    #     restart: on-failure
-    #     expose:
-    #       - 5000
-    #     command: gunicorn auth_app.wsgi:application --bind 0.0.0.0:5000
-    #     depends_on:
-    #         postgres:
-    #             condition: service_healthy
-    #     env_file:
-    #         - ./.env
-
-    user_app:
+    userapp:
         build:
           context: ../
           dockerfile: ./docker_srcs/user_app/Dockerfile.prod
-        image: user_app
-        container_name: user_app
+        image: userapp
+        container_name: userapp
         restart: on-failure
         expose:
           - 3000
-        command: gunicorn user_app.wsgi:application --bind 0.0.0.0:3000
+        command: gunicorn userapp.wsgi:application --bind 0.0.0.0:3000
         depends_on:
             postgres:
                 condition: service_healthy

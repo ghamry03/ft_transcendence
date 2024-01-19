@@ -179,7 +179,6 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 
 	const animateGame = (time) => {
-		// update();
 		draw();
 		// Start the animation loop
 		// if (gameRunning == true)
@@ -192,68 +191,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		ballYaxis = canvas.height / 2;
 		// ballSpeedXaxis = -ballSpeedXaxis;
 		// ballSpeedYaxis = -ballSpeedYaxis;
-	}
-
-	// Update game state
-	const update = () => {
-		// Opponent paddle movement
-		// if (opponentWPressed && rightPaddleYaxis > 0)
-		// 	rightPaddleYaxis -= paddleSpeed;
-		// else if (opponentSPressed && rightPaddleYaxis + paddleHeight < canvas.height)
-		// 	rightPaddleYaxis += paddleSpeed;
-
-		// Move right paddle based on "w" and "s" keys
-		// if (wPressed && leftPaddleYaxis > 0)
-		// 	leftPaddleYaxis -= paddleSpeed;
-		// else if (sPressed && leftPaddleYaxis + paddleHeight < canvas.height)
-		// 	leftPaddleYaxis += paddleSpeed;
-
-		// Move ball
-		// ballXaxis += ballSpeedXaxis;
-		// ballYaxis += ballSpeedYaxis;
-
-		// // Top & bottom collision
-		// if (ballYaxis - ballRadius < 0 ||
-		// 	ballYaxis + ballRadius > canvas.height)
-		// 	ballSpeedYaxis = -ballSpeedYaxis;
-
-		// // Left paddle collision
-		// if (ballXaxis - ballRadius < paddleWidth &&
-		// 	ballYaxis > leftPaddleYaxis &&
-		// 	ballYaxis < leftPaddleYaxis + paddleHeight)
-		// 	ballSpeedXaxis = -ballSpeedXaxis;
-
-		// // Right paddle collision
-		// if (ballXaxis + ballRadius > canvas.width - paddleWidth &&
-		// 	ballYaxis > rightPaddleYaxis &&
-		// 	ballYaxis < rightPaddleYaxis + paddleHeight)
-		// 	ballSpeedXaxis = -ballSpeedXaxis;
-
-		// // Check if ball goes out of bounds on left or right side of canvas
-		// if (ballXaxis < 0) 
-		// {
-		// 	// rightPlayerScore++;
-		// 	reset();
-		// }
-
-		// else if (ballXaxis > canvas.width)
-		// {
-		// 	// leftPlayerScore++;
-		// 	reset();
-		// }
-
-		// Check if a player has won
-		// This will be modified to know if you are player one or two and then decide to output win / lose accordingly
-		if (leftPlayerScore === maxScore) {
-			// gameRunning = false;
-			cancelAnimationFrame(animationId);
-			alert("Left wins!")
-		}
-		else if (rightPlayerScore === maxScore) {
-			// gameRunning = false;
-			cancelAnimationFrame(animationId);
-			alert("Right wins!")
-		}
 	}
 
 	const draw = () => {
@@ -292,7 +229,6 @@ document.addEventListener("DOMContentLoaded", function () {
 	}
 	// Entrypoint
 	const joinQueue = () => {
-		// Implement the initialization logic...
 
 		// Set up WebSocket connection
 		ws = new WebSocket("ws://localhost:2000/ws/game/");
@@ -301,10 +237,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		// Keyboard events
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);
-		// animateGame();
-		// Resize canvas on load and window resize
-		// resizeCanvas();
-		// window.addEventListener("resize", resizeCanvas);
 	};
 	draw();
 	joinQueue();

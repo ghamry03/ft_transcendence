@@ -79,17 +79,21 @@ def login(request):
 #
 def homeLoggedIn(request):
     context = {
-        
+        'username': request.session['login'],
+        'uid': request.session['uid']
     }
     return HttpResponse(render(request, 'home.html', context))
 
 
+# def joinQueue(request):
+    
+
 #This will render the template for the logged in state
 #This should be called from the main template
-#
+
 def onlineGame(request):
     context = {
-        
+        'uid': request.session['uid'],
     }
     x = render_to_string('game.html', context)
     return HttpResponse(x)
