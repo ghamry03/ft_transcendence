@@ -134,9 +134,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'user_app.authentication.api_auth',
     ),
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #     'user_app.permissions.IsRequestedUser',
-    # )
 }
 
 MEDIA_URL = '/media/'

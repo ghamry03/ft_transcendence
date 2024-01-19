@@ -11,6 +11,9 @@ class User(models.Model):
             max_length=64,
             unique=True,
     )
+    first_name = models.CharField(
+            max_length=64
+    )
     image = models.ImageField(
         # upload_to=settings.MEDIA_ROOT
     )
