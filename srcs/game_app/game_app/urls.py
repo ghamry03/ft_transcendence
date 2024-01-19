@@ -27,7 +27,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 	path('offline/', include('offline.urls')),
 	path('online/', include('online.urls')),
-	path('users/', include('user_app.urls')),
 	path('game/', include('game_app.urls')),
     # path('', RedirectView.as_view(url='offline/', permanent=True)),
 ]

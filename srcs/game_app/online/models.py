@@ -1,6 +1,5 @@
 from django.db import models
 from django.urls import reverse # Used to generate URLs by reversing the URL patterns
-from .models import Game, Tournament, PlayerMatch
 from rest_framework import serializers
 
 class UserApiUser(models.Model):
@@ -17,11 +16,6 @@ class UserApiUser(models.Model):
 class Tournament(models.Model):
     tid = models.AutoField(primary_key=True)
     startTime = models.DateField(auto_now_add=True)
-
-class GameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Game
-        fields = ['gid', 'startTime', 'endTime', 'tid']
 
 class Game(models.Model):
     gid = models.AutoField(primary_key=True)

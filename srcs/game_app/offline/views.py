@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import UserApiUser, Tournament, Game, PlayerMatch
+from .models import UserApUser, Tournament, Game, PlayerMatch
 
 # Create your views here.
 
