@@ -1,7 +1,11 @@
 @font-face {
     font-family: 'ps2p';
-    src: local('Ps2p'),
-         url('../fonts/ps2p.ttf') format("truetype");
+    src: url('../fonts/ps2p.ttf') format("truetype");
+  }
+@font-face {
+    font-family: 'bpdots';
+    src: local('Bpdots'),
+         url('../fonts/BPdotsSquares-Bold.ttf') format("truetype");
   }
 
 :root{
@@ -9,6 +13,9 @@
     --beach-bunny-red: #EF6E7F;
     --beach-bunny-lavendar: #E9DCFF;
     --beach-bunny-lavendar-dark: #D4BBFE;
+    --dark-purple-bg: #2A1948;
+    --text-bright: #FFFDE1;
+    --card-font-pink: #C185BA;
 }
 
 h1,h2,h3,h4,h5,h6{
@@ -30,7 +37,7 @@ body{
 
 .mainContainer{
     max-width: 1440px;
-    background-color: #74569B;
+    background-color: var(--dark-purple-bg);
     min-height: 100vh;
 }
 .navigationBar{
@@ -41,7 +48,7 @@ body{
     min-width: 20%;
     max-height: 80vh;
     width: 50px;
-    background-color: #FFB3CB;
+    background-color: var(--beach-bunny-lavendar-dark);
     border-radius: 0px 13px 13px 0px;
     transition: width ease-out 0.3s;
 }
@@ -194,7 +201,22 @@ line-height: normal;
 }
 
   .welcomeBar #welcome{
-    font-family: 'ps2p';
-    font-size: 16px;
+    font-family: 'bpdots';
+    font-size: 20px;
+    color: var(--text-bright);
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    -webkit-text-stroke-width: 1;
+    -webkit-text-stroke-color: var(--Chat-Chat-text, #000);
+  }
 
+  .pixelCard h3{
+    text-align: center;
+    font-family: 'ps2p';
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 138%; /* 24.84px */
+    color: var(--card-font-pink);
   }

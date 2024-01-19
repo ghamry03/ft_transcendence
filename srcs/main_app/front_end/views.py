@@ -9,13 +9,8 @@ import os
 def index(request):
     if 'userData' in request.session:
         context = {
-            'data':request.session['userData'],
-            'isLoggedIn': True,
-            'img': request.session['img'],
-            'username': request.session['login'],
-            'uid': request.session['uid'],
-            'status': request.session['status']
-
+            'userData':request.session['userData'],
+            'isLoggedIn': True
         }
     else:
         context = {
@@ -33,7 +28,6 @@ def login(request):
     'redirect_uri': (None, 'http://127.0.0.1:8000/login'),
     }
 
-    # requests.post('user_app/akjs')
 
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
     if response.status_code == 200:
@@ -56,12 +50,8 @@ def login(request):
             }
             user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/' + UID, headers=headers)
             print(user_api_response.json())
-            request.session['img'] = user_api_response.json()['image']
-            request.session['uid'] = user_api_response.json()['uid']
-            request.session['login'] = user_api_response.json()['username']
-            request.session['status'] = user_api_response.json()['status']
+            request.session['userData'] = user_api_response.json()
             request.session['access_token'] = access_token
-            request.session['userData'] = me_response.json() #this is temporary
             print("Received access token:", access_token)
         else:
             print("Access token not found in the response JSON")
@@ -78,6 +68,10 @@ def login(request):
 #
 def homeLoggedIn(request):
     context = {
-        
+        'userData' : request.session['userData']
     }
-    return HttpResponse(render(request, 'home.html', context))
+
+    httpResponse = HttpResponse(render(request, 'home.html', context))
+    httpResponse.set_cookie('uid' , request.session['uid'])
+    httpResponse.set_cookie('token' , request.session['access_token'])
+    return httpResponse
