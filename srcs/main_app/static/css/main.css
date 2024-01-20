@@ -16,6 +16,7 @@
     --dark-purple-bg: #2A1948;
     --text-bright: #FFFDE1;
     --card-font-pink: #C185BA;
+    --chat-text: #80629D;
 }
 
 h1,h2,h3,h4,h5,h6{
@@ -220,3 +221,74 @@ line-height: normal;
     line-height: 138%; /* 24.84px */
     color: var(--card-font-pink);
   }
+
+  #matchHistoryDash .content , #tournamentHistoryDash .content{
+    background-color: whitesmoke;
+    box-shadow: 
+    
+    /*top left & top right border*/
+    /*top left & top right border*/
+    -10px 0px 0px whitesmoke, 
+    -5px -5px 0px whitesmoke, 
+    0px -10px 0px whitesmoke, 
+    -10px -5px 0px var(--beach-bunny-lavendar-dark), 
+    -5px -10px 0px var(--beach-bunny-lavendar-dark), 
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark), 
+
+    10px 0px 0px whitesmoke, 
+    5px -5px 0px whitesmoke, 
+    0px -10px 0px whitesmoke,
+    10px -5px 0px var(--beach-bunny-lavendar-dark), 
+    5px -10px 0px var(--beach-bunny-lavendar-dark), 
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark), 
+
+    /*bottom left & bottom right borders*/
+    -10px 0px 0px whitesmoke, 
+    -5px 5px 0px whitesmoke, 
+    0px 10px 0px whitesmoke,
+    -10px 5px 0px var(--beach-bunny-lavendar-dark), 
+    -5px 10px 0px var(--beach-bunny-lavendar-dark), 
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark), 
+
+    10px 0px 0px whitesmoke, 
+    5px 5px 0px whitesmoke, 
+    0px 10px 0px whitesmoke,
+    10px 5px 0px var(--beach-bunny-lavendar-dark), 
+    5px 10px 0px var(--beach-bunny-lavendar-dark), 
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark), 
+    /*left & right black border*/
+    -15px 0 0 0 var(--beach-bunny-lavendar-dark),
+    15px 0 0 0 var(--beach-bunny-lavendar-dark),
+
+    /*card highlight*/
+    10px 0px 0px whitesmoke, 
+    5px 5px 0px whitesmoke, 
+    0px 10px 0px whitesmoke,
+    0px 20px 0 0 black,
+    5px 20px 0 0 black
+    ;
+  }
+
+  #matchHistoryDash .titleSection, #tournamentHistoryDash .titleSection{
+    
+    box-shadow: 
+    -10px 0px 0px whitesmoke,
+    10px 0px 0px whitesmoke,
+    -10px 5px 0px var(--beach-bunny-lavendar-dark),
+    10px 5px 0px var(--beach-bunny-lavendar-dark)
+    ;
+  }
+
+  #matchHistoryDash .title, #tournamentHistoryDash .title {
+    font-family: 'ps2p';
+    color: var(--chat-text);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-transform: uppercase;
+
+
+  }
+
+  
