@@ -21,6 +21,8 @@ class api_auth(authentication.BaseAuthentication):
                 'https://api.intra.42.fr/oauth/token/info',
                 headers=headers
         )
+        if response.status_code != 200:
+            raise exceptions.AuthenticationFailed('Failed to connect to intra')
         response_json = response.json()
         response_id = response_json.get('resource_owner_id')
         if not response_id:

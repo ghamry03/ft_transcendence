@@ -4,12 +4,10 @@
 **/tenv
 docker_srcs/server/old.conf
 notes
-srcs/game_app/offline/static/images
 srcs/user_app/media
 docker_srcs/.env
 srcs/postgres/data
 docker_srcs/user_app/.DS_Store
-srcs/game_app/offline/static/images
 
 ##########################################
 # Byte-compiled / optimized / DLL files

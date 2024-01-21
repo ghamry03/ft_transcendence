@@ -10,13 +10,8 @@ from django.template.loader import render_to_string
 def index(request):
     if 'userData' in request.session:
         context = {
-            'data':request.session['userData'],
-            'isLoggedIn': True,
-            'img': request.session['img'],
-            'username': request.session['login'],
-            'uid': request.session['uid'],
-            'status': request.session['status']
-
+            'userData':request.session['userData'],
+            'isLoggedIn': True
         }
     else:
         context = {
@@ -34,7 +29,6 @@ def login(request):
     'redirect_uri': (None, 'http://127.0.0.1:8000/login'),
     }
 
-    # requests.post('user_app/akjs')
 
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
     if response.status_code == 200:
@@ -56,12 +50,8 @@ def login(request):
             }
             user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/' + UID, headers=headers)
             print(user_api_response.json())
-            request.session['img'] = user_api_response.json()['image']
-            request.session['uid'] = user_api_response.json()['uid']
-            request.session['login'] = user_api_response.json()['username']
-            request.session['status'] = user_api_response.json()['status']
+            request.session['userData'] = user_api_response.json()
             request.session['access_token'] = access_token
-            request.session['userData'] = me_response.json() #this is temporary
             print("Received access token:", access_token)
         else:
             print("Access token not found in the response JSON")
@@ -78,14 +68,13 @@ def login(request):
 #
 def homeLoggedIn(request):
     context = {
-        'username': request.session['login'],
-        'uid': request.session['uid'],
-        'token': request.session['access_token'],
+        'userData' : request.session['userData']
     }
-    resp = HttpResponse(render(request, 'home.html', context))
-    resp.set_cookie('uid' , request.session['uid'])
-    resp.set_cookie('token' , request.session['access_token'])
-    return resp
+
+    httpResponse = HttpResponse(render(request, 'home.html', context))
+    httpResponse.set_cookie('uid' , request.session['userData']['uid'])
+    httpResponse.set_cookie('token' , request.session['access_token'])
+    return httpResponse
 
 
 # def joinQueue(request):
@@ -96,17 +85,23 @@ def homeLoggedIn(request):
 
 def onlineGame(request):
     context = {
-        'uid': request.session['uid'],
-        'token': request.session['access_token'],
+        # 'uid': request.session['uid'],
+        # 'token': request.session['access_token'],
+        # 'userData' : request.session['userData']
     }
     x = render_to_string('game.html', context)
+    return HttpResponse(x)
+
+def offlineGame(request):
+    context = {
+    }
+    x = render_to_string('offline.html', context)
     return HttpResponse(x)
 
 def getOpponentInfo(request):
     ownerUid = request.GET.get('ownerUid')
     targetUid = request.GET.get('targetUid')
     token = request.GET.get('token')
-    print("getimage: uid = ", ownerUid, "token = ", token)
     headers = {
         'X-UID': ownerUid,
         'X-TOKEN': token

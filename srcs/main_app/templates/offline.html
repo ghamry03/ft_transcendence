@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html>
   <head>
     <title>Pong Ping Game</title>
@@ -7,9 +7,9 @@
   <!-- Add additional CSS in static file -->
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/pong.css' %}" />
-</head>
+</head> {% endcomment %}
 
-<body>
+{% comment %} <body> {% endcomment %}
   <div class="container">
     <canvas id="canvas" width="1024" height="580"></canvas>
   </div>
@@ -32,10 +32,10 @@
     </div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-  {% load static %}
-  <script src="{% static 'js/pong.js' %}"></script>
+  {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {% endcomment %}
+  {% comment %} <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> {% endcomment %}
+  {% comment %} {% load static %} {% endcomment %}
+  {% comment %} <script src="{% static 'js/pong.js' %}"></script> {% endcomment %}
 
-</body>
-</html>
+{% comment %} </body>
+</html> {% endcomment %}

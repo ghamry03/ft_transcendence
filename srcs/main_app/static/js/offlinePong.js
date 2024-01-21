@@ -27,10 +27,6 @@ restartBtn.addEventListener("click", function()
   document.location.reload();
 });
 
-addEventListener("load", (event) => {
-  draw();
-});
-
 // Canvas
 var padding = 30;
 // var canvasHeight = canvas.height - padding;
@@ -208,3 +204,5 @@ function loop()
   //Set animation for all frames to appear and be visible
   animationId = requestAnimationFrame(loop);
 }
+
+draw();

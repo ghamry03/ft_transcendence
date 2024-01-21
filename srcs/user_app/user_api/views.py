@@ -1,28 +1,36 @@
 from django.http import Http404, JsonResponse
 from rest_framework.views import APIView
+from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework import status
 from .models import User
 from .serializers import UserSerializer
 from user_app.permissions import IsRequestedUser
+from os import remove
 
 # List view of all Users
 class UsersListApiView(APIView):
     def get(self, request):
         """
-            curl -X GET -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}" \
-            http://localhost:8001/users/api/
+            curl -X GET -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"         \
+                    {URL}/users/api/
         """
         users = User.objects.all().order_by('uid')
         serlializer = UserSerializer(users, many=True)
         return Response(serlializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        """
+            curl -X POST -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
+                    -F "uid={NEW_USER}" -F "username={NEW_USERNAME}"    \
+                    -F "image=@{IMG_PATH}"                              \
+                    {URL}/users/api/
+        """
         serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class UserDetailApiView(APIView):
     permission_classes = (IsRequestedUser,)
@@ -32,9 +40,13 @@ class UserDetailApiView(APIView):
         try:
             return User.objects.get(uid=user_id)
         except User.DoesNotExist:
-            raise Http404
+            raise exceptions.NotFound
 
     def get(self, request, user_id):
+        """
+            curl -X GET -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}" \
+                    {URL}/users/api/{TARGET_USER}
+        """
         try:
             user_query = self.getObjectById(user_id)
         except:
@@ -48,20 +60,31 @@ class UserDetailApiView(APIView):
         serializer = UserSerializer(user_query)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, user_id):
+    def post(self, request, user_id):
+        """
+            curl -X POST -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
+                    -F "uid={NEW_USER}" -F "username={NEW_USERNAME}"    \
+                    -F "image=@{IMG_PATH}"                              \
+                    {URL}/users/api/{TARGET_USER}
+        """
         user_query = self.getObjectById(user_id)
         serializer = UserSerializer(
                 user_query,
                 data=request.data,
                 partial=True,
         )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id):
+        # TODO: fix a bug where the admin page delete isn't deleting the image, (MOST PROB the MEDIA)
+        """
+            curl -X POST -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
+                    {URL}/users/api/{TARGET_USER}
+        """
         user_query = self.getObjectById(user_id)
+        remove('media/' + str(user_query.image))
         user_query.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

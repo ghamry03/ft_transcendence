@@ -8,8 +8,8 @@ from .views import (
 )
 
 urlpatterns = [
-	path('mh/<int:player>/', UserMatchListApiView.as_view()),
-	path('tg/<int:id>/', TournamentGameListApiView.as_view()),
-	path('mp/<int:gid>/', MatchPlayerListApiView.as_view()),
+	path('matchHistory/<int:player>/', UserMatchListApiView.as_view()),
+	path('tournamentsGames/<int:id>/', TournamentGameListApiView.as_view()),
+	path('players/<int:gid>/', MatchPlayerListApiView.as_view()),
 	path('health', health_check, name='health_check'),
 ]

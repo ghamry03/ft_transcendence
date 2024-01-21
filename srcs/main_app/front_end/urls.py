@@ -7,6 +7,7 @@ urlpatterns = [
     path('login/', views.login, name="login"),
     path('home/', views.homeLoggedIn, name="home"),
     path('online/', views.onlineGame, name="onlineGame"),
+    path('offline/', views.offlineGame, name="offlineGame"),
 	path('playerInfo/', views.getOpponentInfo, name='getOpponentInfo'),
 	
 ]

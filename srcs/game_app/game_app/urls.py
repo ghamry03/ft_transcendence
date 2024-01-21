@@ -25,10 +25,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('offline/', include('offline.urls')),
 	path('online/', include('online.urls')),
 	path('game/', include('game_api.urls')),
-    # path('', RedirectView.as_view(url='offline/', permanent=True)),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

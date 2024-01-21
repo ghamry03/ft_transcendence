@@ -6,8 +6,6 @@ from .models import UserApiUser, Tournament, Game, PlayerMatch
 from django.utils import timezone
 from asgiref.sync import sync_to_async
 
-# from asgiref.sync import async_to_sync
-
 class RemotePlayerConsumer(AsyncWebsocketConsumer):
 
     PADDING = 20
@@ -48,11 +46,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         return game.id
     
     @sync_to_async
-    def endGame(self, gid, player1, player2):
-        pid1 = player1["id"]
-        pid2 = player2["id"]
-        score1 = player1["score"]
-        score2 = player2["score"]
+    def endGame(self, gid, pid1, pid2, score1, score2):
         game = Game.objects.get(id=int(gid))
         game.endtime = timezone.now()
         game.save()
@@ -138,8 +132,12 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 self.queue.pop(self.queue.index(self.player_id))
             elif self.player_id in self.players:
                 # if this player is in a match with another player, we want to let the them know that this player disconnected
-                opponentId = self.players[self.player_id]["opponentId"]
                 groupOwner = self.players[self.player_id]["groupOwner"]
+                opponentId = self.players[self.player_id]["opponentId"]
+                score1 = self.players[self.player_id]["score"]
+                score2 = self.players[opponentId]["score"]
+                gid = self.players[self.player_id]['gid']
+
                 del self.players[self.player_id]
                 await self.channel_layer.group_discard(
                     self.player_id, self.channel_name
@@ -149,6 +147,8 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     {"type": "disconnected"}
                 )
                 del self.players[opponentId]
+                await self.endGame(gid, self.player_id, opponentId, score1, score2)
+
 
     async def receive(self, text_data):
         clientData = json.loads(text_data)
@@ -285,6 +285,9 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     },
                 )
                 if player1["score"] == 11 or player2["score"] == 11:
-                    await self.endGame(player1["gid"], player1, player2)
+                    gid = player1["gid"]
+                    score1 = player1["score"]
+                    score2 = player2["score"]
+                    await self.endGame(gid, playerId1, playerId2, score1, score2)
                     break
             await asyncio.sleep(0.05)
