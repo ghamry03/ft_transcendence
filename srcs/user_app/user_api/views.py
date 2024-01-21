@@ -26,6 +26,7 @@ class UsersListApiView(APIView):
 
 class UserDetailApiView(APIView):
     permission_classes = (IsRequestedUser,)
+    # authentication_classes = ()
 
     def getObjectById(self, user_id):
         try:

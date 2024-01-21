@@ -2,7 +2,7 @@
     font-family: 'ps2p';
     src: local('Ps2p'),
          url('../fonts/ps2p.ttf') format("truetype");
-  }
+}
 
 @font-face {
     font-family: 'bpdots';
