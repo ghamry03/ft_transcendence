@@ -1,8 +1,6 @@
 import json
-import uuid
 import asyncio
 import logging
-import requests
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import UserApiUser, Tournament, Game, PlayerMatch
 from django.utils import timezone
@@ -132,23 +130,25 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
             self.logger.info("queue len = %d", len(self.queue))
 
     async def disconnect(self, close_code=None):
-        if close_code is None:
-            async with self.update_lock:
-                if self.player_id in self.queue:
-                    self.queue.pop(self.queue.index(self.player_id))
-                elif self.player_id in self.players:
-                    # if this player is in a match with another player, we want to let the them know that this player disconnected
-                    opponentId = self.players[self.player_id]["opponentId"]
-                    groupOwner = self.players[self.player_id]["groupOwner"]
-                    del self.players[self.player_id]
-                    await self.channel_layer.group_discard(
-                        self.player_id, self.channel_name
-                    )
-                    await self.channel_layer.group_send(
-                        groupOwner,
-                        {"type": "disconnected"}
-                    )
-                    del self.players[opponentId]
+        # this is a check for duplicate tab we so dont disconnect the other tab
+        if close_code == 3001: 
+            return 
+        async with self.update_lock:
+            if self.player_id in self.queue:
+                self.queue.pop(self.queue.index(self.player_id))
+            elif self.player_id in self.players:
+                # if this player is in a match with another player, we want to let the them know that this player disconnected
+                opponentId = self.players[self.player_id]["opponentId"]
+                groupOwner = self.players[self.player_id]["groupOwner"]
+                del self.players[self.player_id]
+                await self.channel_layer.group_discard(
+                    self.player_id, self.channel_name
+                )
+                await self.channel_layer.group_send(
+                    groupOwner,
+                    {"type": "disconnected"}
+                )
+                del self.players[opponentId]
 
     async def receive(self, text_data):
         clientData = json.loads(text_data)
