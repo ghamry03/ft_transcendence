@@ -12,6 +12,7 @@ class UserMatchListApiView(APIView):
     def get(self, request, player):
         matches = PlayerMatch.objects.filter(player = player)
         serializer = MatchSerializer(matches, many=True)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 # List view of all Games for a given Tournament
@@ -24,7 +25,7 @@ class TournamentGameListApiView(APIView):
 # List all players in a given match
 class MatchPlayerListApiView(APIView):
     def get(self, request, gid):
-        players = PlayerMatch.objects.filter(gid=gid)
+        players = PlayerMatch.objects.filter(id=gid)
         serializer = MatchSerializer(players, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
  
