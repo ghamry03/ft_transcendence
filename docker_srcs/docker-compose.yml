@@ -1,0 +1,90 @@
+version: "3"
+services:
+    server:
+        build: ./server
+        restart: on-failure
+        ports:
+            - "80:80"
+        depends_on:
+            - mainapp
+            - postgres
+
+    mainapp:
+        build: ./main_app
+        restart: on-failure
+        ports:
+            - "8000:8000"
+        networks:
+            - user_app_network
+        # command:
+        # - sh
+        # - -c
+        # - |
+        #   python manage.py makemigrations
+        #   python manage.py migrate --noinput
+        #   python manage.py runserver 0.0.0.0:8000
+        volumes:
+            - main_app_data:/home/main_app
+        depends_on:
+            userapp:
+                condition: service_started
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+
+    userapp:
+        build: ./user_app
+        restart: on-failure
+        ports:
+            - "8001:8000"
+        volumes:
+            - user_app_data:/home/user_app
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+
+    postgres:
+        build: ./postgres
+        restart: on-failure
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: pg_isready -U postgres
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+
+volumes:
+    main_app_data:
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: ../srcs/main_app/
+
+    user_app_data:
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: ../srcs/user_app/
+
+    postgres_data:
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: ../srcs/postgres/data
+
+networks:
+    user_app_network:
+        driver: bridge

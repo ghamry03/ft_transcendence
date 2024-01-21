@@ -1,0 +1,5 @@
+Django==4.2.7
+djangorestframework
+psycopg2-binary==2.9.9 # to connect the django app to the database
+requests
+pillow
