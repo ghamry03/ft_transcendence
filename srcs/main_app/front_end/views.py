@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import requests
 import environ
 import os
@@ -53,7 +53,6 @@ def login(request):
             headers = {
                 'X-UID': UID,
                 'X-TOKEN': access_token
-
             }
             user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/' + UID, headers=headers)
             print(user_api_response.json())
@@ -80,9 +79,13 @@ def login(request):
 def homeLoggedIn(request):
     context = {
         'username': request.session['login'],
-        'uid': request.session['uid']
+        'uid': request.session['uid'],
+        'token': request.session['access_token'],
     }
-    return HttpResponse(render(request, 'home.html', context))
+    resp = HttpResponse(render(request, 'home.html', context))
+    resp.set_cookie('uid' , request.session['uid'])
+    resp.set_cookie('token' , request.session['access_token'])
+    return resp
 
 
 # def joinQueue(request):
@@ -94,6 +97,19 @@ def homeLoggedIn(request):
 def onlineGame(request):
     context = {
         'uid': request.session['uid'],
+        'token': request.session['access_token'],
     }
     x = render_to_string('game.html', context)
     return HttpResponse(x)
+
+def getOpponentInfo(request):
+    ownerUid = request.GET.get('ownerUid')
+    targetUid = request.GET.get('targetUid')
+    token = request.GET.get('token')
+    print("getimage: uid = ", ownerUid, "token = ", token)
+    headers = {
+        'X-UID': ownerUid,
+        'X-TOKEN': token
+    }
+    opponentInfo = requests.get('http://userapp:3000/users/api/' + targetUid, headers=headers)
+    return JsonResponse(opponentInfo.json())

@@ -1,7 +1,10 @@
 	const canvas = document.getElementById("gameCanvas");
+	const leftScore = document.getElementById("leftScore");
+	const rightScore = document.getElementById("rightScore");
 	const ctx = canvas.getContext("2d");
-	const playerId = canvas.getAttribute("uid");
-
+	const playerId = getCookie("uid");
+	const token = getCookie("token");
+	
 	const paddleHScale = 0.2
 	const paddleWScale = 0.015
 	const remoteCanvasH = 510;
@@ -38,8 +41,49 @@
 
 	// socket info 
 	var ws;
-	// var playerId;
+	var leftPlayerId;
+	var rightPlayerId;
+	var leftPlayerImg;
+	var rightPlayerImg;
 
+	function getCookie(cname) {
+		let name = cname + "=";
+		let decodedCookie = decodeURIComponent(document.cookie);
+		let ca = decodedCookie.split(';');
+		for(let i = 0; i < ca.length; i++) {
+		  let c = ca[i];
+		  while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		  }
+		  if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		  }
+		}
+		return "";
+	}
+	
+	// function getImage(uid, token) {
+	// 	var imgUrl;
+	// 	fetch('http://127.0.0.1:8000/playerInfo/?uid=' + uid + "&token=" + token)
+	// 		.then(response => {
+	// 			return response.json();
+	// 		})
+	// 		.then(jsonResponse => {
+	// 			imgUrl = jsonResponse.image;
+	// 		});
+	// 	return imgUrl;
+	// }
+
+	async function getImage(ownerUid, targetUid, token) {
+		try {
+			const response = await fetch('playerInfo/?ownerUid=' + ownerUid + "&targetUid=" + targetUid + "&token=" + token);
+			const jsonResponse = await response.json();
+			return jsonResponse.image;
+		} catch (error) {
+			console.error("Error fetching image:", error);
+		}
+	}
+	
 	function countdown(parent, callback) {
 		var texts = ['Match found!', '3', '2', '1', 'GO'];
 		
@@ -83,30 +127,18 @@
 		// });	
 	}
 
-	// startBtn.addEventListener("click", function()
-	// {
-	// 	if (!gameRunning) {
-	// 		gameRunning = true;
-	// 		initializeGame();
-	// 	}
-	// });
-
-	// pauseBtn.addEventListener("click", function()
-	// {
-	// 	ws.close();
-	// 	console.log("stopped game");
-	// 	// gameRunning = false;
-	// 	cancelAnimationFrame(animationId);
-	// });
-	
-	// restartBtn.addEventListener("click", function()
-	// {
-	// 	ws.close();
-	// 	cancelAnimationFrame(animationId);
-	// 	document.location.reload();
-	// });
-
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
+
+	function getPlayerImages(uid) {
+		fetch('http://localhost:3000/users/api/' + uid, {
+			headers: {
+				'X-UID': uid,
+				'X-TOKEN': token
+			}
+		})
+		.then(response => response.json())
+		.then(data => console.log(JSON.stringify(data)))
+	}
 
 	const handleWebSocketMessage = (event) => {
 		const messageData = JSON.parse(event.data);
@@ -120,29 +152,44 @@
 			rightPlayerScore = messageData.rightScore;
 		} 
 		else if (messageData.type === "inGame") {
-			// playerId = messageData.playerId;
 			console.log("you're queued or have another ongoing match on another tab or computer", playerId);
-			ws.close();
+			ws.close(3001, "Player already in-game");
 			// show error pop up and redirect them back to home page 
 		}
 		else if (messageData.type === "matchFound") {
-			console.log("match found, first is: ", messageData.first);
-			// if (messageData.first == playerId) {
-			// 	left = true;
-			// 	console.log("i am left");
-			// }
-			// gameRunning = true;
+			leftPlayerId = messageData.left;
+			rightPlayerId = messageData.right;
+			console.log("match found, left = ", leftPlayerId, " right = ", rightPlayerId);
+			
 			countdown(document.getElementById("readyGo"), animateGame);
-			// ballSpeedXaxis *= messageData.playerDirection
+			var leftImage = document.getElementById("leftImage");
+			var rightImage = document.getElementById("rightImage");
+			getImage(playerId, leftPlayerId, token)
+				.then(imgUrl => {
+					console.log("Image URL:", imgUrl);
+					leftImage.src = "http://localhost:3000" + imgUrl;
+				});
+			getImage(playerId, rightPlayerId, token)
+				.then(imgUrl => {
+					console.log("Image URL:", imgUrl);
+					rightImage.src = "http://localhost:3000" + imgUrl;
+				});
 			if (isOpen(ws)) {
 				ws.send(
 					JSON.stringify({
 						type: "ready",
-						playerId: playerId
+						playerId: playerId,
 					})
 				);
 			}
 		}
+		// else if (messageData.type === "playerImages") {
+		// 	leftImage = document.getElementById("leftImage");
+		// 	rightImage = document.getElementById("rightImage");
+		// 	leftImage.src = "http://localhost:3000/" + messageData.leftImage;
+		// 	rightImage.src = "http://localhost:3000/" + messageData.rightImage;
+		// }
+
 		else if (messageData.type === "disconnected")
 			console.log("opponent has disconnected");
 	};
@@ -239,59 +286,56 @@
 		// Clear canvas
 		ctx.clearRect(0, 0, canvasW, canvasH);
 
-		//Paddle colors
-		ctx.fillStyle = "#0abdc6";
-		ctx.font = "30px ps2p";
-	
 		//Draw middle line
+		const color2 = "#57f2e5"
+		const color1 = "#FFB3CB"
+
+		ctx.strokeStyle = color1;
 		ctx.beginPath();
 		ctx.moveTo(canvasW / 2, 0);
 		ctx.lineTo(canvasW / 2, canvasH);
 		
-		//Set middle line color
-		ctx.strokeStyle = "#0abdc6";
+		// ctx.strokeStyle = "#FFB3CB";
 		ctx.stroke();
 		ctx.closePath();
-
+		
 		//Draw ball
+		ctx.fillStyle = color2;
 		ctx.beginPath();
 		ctx.arc(ballXaxis, ballYaxis, ballRadius, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.closePath();
-
+		
 		//Draw left paddle
+		ctx.fillStyle = color1;
 		ctx.fillRect(0, leftPaddleYaxis, paddleWidth, paddleHeight);
 
 		//Draw right paddle
 		ctx.fillRect(canvasW - paddleWidth, rightPaddleYaxis, paddleWidth, paddleHeight);
 
 		//Draw scores
+		// right is winning
+		leftScore.innerText = leftPlayerScore;
+		rightScore.innerText = rightPlayerScore;
 		if (leftPlayerScore < rightPlayerScore) {
-			ctx.fillStyle = "#FFB3B3"; // red
-			ctx.fillText(leftPlayerScore, canvasW / 2 - 50, 40);
-			ctx.fillStyle = "#C5FFC0"; // green
-			ctx.fillText(rightPlayerScore, canvasW / 2 + 25, 40);
+			leftScore.style.color = "#FFB3B3";
 		}
-		else if (leftPlayerScore > rightPlayerScore) {
-			ctx.fillStyle = "#C5FFC0";
-			ctx.fillText(leftPlayerScore, canvasW / 2 - 50, 40);
-			ctx.fillStyle = "#FFB3B3";
-			ctx.fillText(rightPlayerScore, canvasW / 2 + 25, 40);
+		if (rightPlayerScore < leftPlayerScore) {
+			rightScore.style.color = "#FFB3B3";
 		}
-		else {
-			ctx.fillStyle = "#C5FFC0";
-			ctx.fillText(leftPlayerScore, canvasW / 2 - 50, 40);
-			ctx.fillText(rightPlayerScore, canvasW / 2 + 25, 40);
+		if (leftPlayerScore == rightPlayerScore) {
+			leftScore.style.color = "#C5FFC0";
+			rightScore.style.color = "#C5FFC0";
 		}
 	}
 	// Entrypoint
 	const joinQueue = () => {
 		// Set up WebSocket connection
+		console.log("uid = ", playerId, " token = ", token);
 		ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
 		console.log("ws is ", ws);
 		ws.onmessage = handleWebSocketMessage;
 		console.log("connecting to server with uid ", playerId);
-		
 		// Keyboard events
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);

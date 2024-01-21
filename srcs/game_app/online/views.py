@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import UserApiUser, Tournament, Game, PlayerMatch
+import requests
 
 def index(request):
     num_users = UserApiUser.objects.all().count()

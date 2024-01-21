@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'ps2p';
+    src: local('Ps2p'),
+         url('../fonts/ps2p.ttf') format("truetype");
+}
+
 .onlineGame .container {
 	display: flex;
 	flex-direction: column;
@@ -65,13 +71,50 @@
     animation: count 0.1s cubic-bezier(0.1,0.1,1,1) 1;
 }
 
-/* div.fadeMe {
-	opacity:    0.5; 
-	background: #000; 
-	width:      100%;
-	height:     100%; 
-	z-index:    10;
-	top:        0; 
-	left:       0; 
-	position:   fixed;
-  } */
+.column {
+	float: left;
+	width: 47%;
+	padding: 10px;
+	display: flex;
+}
+
+#separator {
+	float: left;
+	width: 6%;
+	font-family: 'ps2p';
+	color: #57f2e5;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 70px;
+	padding: 10px;
+	text-align: center;
+}
+
+.image-cropper {
+	width: 70px;
+	height: 70px;
+	position: relative;
+	overflow: hidden;
+	border-radius: 50%;
+	margin-left: auto;
+	margin-right: auto;
+	float: left;
+}
+
+.playerpfp {
+	display: inline;
+	margin: 0 auto;
+	margin-left: -15%;
+	height: 100%;
+	width: auto;
+}
+
+p.score {
+	font-family: 'ps2p';
+	font-size: 30px;
+	float: right;
+	color: #acacac;
+	line-height: 70px;
+	/* display: table-cell;
+  	vertical-align: middle; */
+}

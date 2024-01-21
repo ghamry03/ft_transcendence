@@ -4,3 +4,5 @@ gunicorn==21.2.0
 psycopg2-binary==2.9.9 # to connect the django app to the database
 channels==4.0.0
 daphne==4.0.0
+django-request==1.6.3
+requests==2.31.0

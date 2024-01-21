@@ -1,5 +1,4 @@
 import json
-import uuid
 import asyncio
 import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -46,15 +45,30 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
             score=0
         )
         self.logger.info("added new game info to db")
+        return game.id
+    
+    @sync_to_async
+    def endGame(self, gid, player1, player2):
+        pid1 = player1["id"]
+        pid2 = player2["id"]
+        score1 = player1["score"]
+        score2 = player2["score"]
+        game = Game.objects.get(id=int(gid))
+        game.endtime = timezone.now()
+        game.save()
+
+        player1 = PlayerMatch.objects.get(game=gid, player=pid1)
+        player1.score = score1
+        player1.save()
+
+        player2 = PlayerMatch.objects.get(game=gid, player=pid2)
+        player2.score = score2
+        player2.save()
+        self.logger.info("game with gid %d ended", gid)
 
     async def connect(self):
         
-        # self.player_id = str(uuid.uuid4())
-        # self.logger.info("player %s connected to server", self.player_id)
         await self.accept()
-        # await self.send(
-        #     text_data=json.dumps({"type": "playerId", "playerId": self.player_id})
-        # )
         self.player_id = self.scope['query_string'].decode('utf-8').split('=')[1]
         if self.player_id in self.queue or self.player_id in self.players:
             self.logger.info("same user already in game or queue")
@@ -68,8 +82,8 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 # search for a match in the queue
                 if len(self.queue) > 0:
                     queuedPlayerId = self.queue[0]
-                    # if queuedPlayer["opponentId"] == None:
                     self.logger.info("found a player %s with no opponent", queuedPlayerId)
+                    gid = await self.createGame(queuedPlayerId, self.player_id)
 
                     # moving queued player from queue to player pool
                     self.queue.pop(0)
@@ -81,7 +95,8 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                         "downPressed": False,
                         "ready": False,
                         "score": 0,
-                        "gid": queuedPlayerId
+                        "groupOwner": queuedPlayerId,
+                        "gid": gid
                     }
                     
                     # adding new player to the opponent's group
@@ -98,16 +113,14 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                         "downPressed": False,
                         "ready": False,
                         "score": 0,
-                        "gid": queuedPlayerId
+                        "groupOwner": queuedPlayerId,
+                        "gid": gid
                     }               
                     # asyncio.create_task(self.game_loop(queuedPlayerId, self.player_id))
                     await self.channel_layer.group_send(
                         queuedPlayerId,
-                        {"type": "matchFound", "first": queuedPlayerId},
-                        # {"type": "matchFound", "first": queuedPlayerId, "second": self.player_id},
+                        {"type": "matchFound", "left": int(queuedPlayerId), "right": int(self.player_id)},
                     )
-                    # tempGid = str(uuid.uuid4())
-                    await self.createGame(queuedPlayerId, self.player_id)
                 else:
                     self.queue.append(self.player_id)
                     await self.channel_layer.group_add(
@@ -116,39 +129,40 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
 
             self.logger.info("queue len = %d", len(self.queue))
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, close_code=None):
+        # this is a check for duplicate tab we so dont disconnect the other tab
+        if close_code == 3001: 
+            return 
         async with self.update_lock:
             if self.player_id in self.queue:
                 self.queue.pop(self.queue.index(self.player_id))
             elif self.player_id in self.players:
                 # if this player is in a match with another player, we want to let the them know that this player disconnected
                 opponentId = self.players[self.player_id]["opponentId"]
-                gid = self.players[self.player_id]["gid"]
-                # if opponentId != None:
-                #     self.players[opponentId]["opponentId"] = None
+                groupOwner = self.players[self.player_id]["groupOwner"]
                 del self.players[self.player_id]
                 await self.channel_layer.group_discard(
                     self.player_id, self.channel_name
                 )
                 await self.channel_layer.group_send(
-                    gid,
+                    groupOwner,
                     {"type": "disconnected"}
                 )
                 del self.players[opponentId]
 
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
+        clientData = json.loads(text_data)
+        msg_type = clientData.get("type")
 
-        playerId = text_data_json.get("playerId")
+        playerId = clientData.get("playerId")
         player = self.players.get(playerId, None)
         if not player:
             self.logger.info("not a player")
             return
         
-        msg_type = text_data_json.get("type")
         if msg_type == "keypress":
-            key = text_data_json.get("key")
-            keyDown = text_data_json.get("keyDown")   
+            key = clientData.get("key")
+            keyDown = clientData.get("keyDown")
             if key == "w":
                 player["upPressed"] = keyDown
             elif key == "s":
@@ -157,16 +171,13 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         elif msg_type == "ready":
             player["ready"] = True
             opponent = self.players[player["opponentId"]]
-            if opponent["ready"] == True:
-                # self.logger.info("both are ready! sleeping..")
-                # asyncio.sleep(3)
-                # self.logger.info("slept")
+            if opponent["ready"] == True:                
                 await asyncio.sleep(6)
-                if playerId == player["gid"]:
+                if playerId == player["groupOwner"]:
                     asyncio.create_task(self.game_loop(playerId, player["opponentId"]))
                 else:
-                    asyncio.create_task(self.game_loop(player["gid"], playerId))
-       
+                    asyncio.create_task(self.game_loop(player["groupOwner"], playerId))
+
     async def state_update(self, event):
         # self.logger.info("sending a status update!!")
         await self.send(
@@ -189,7 +200,8 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
             text_data=json.dumps(
                 {
                     "type": "matchFound",
-                    "first": event["first"],
+                    "left": event["left"],
+                    "right": event["right"],
                 }
             )
         )
@@ -250,14 +262,16 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     player2["score"] += 1
                     ballXaxis = self.canvasWidth / 2;
                     ballYaxis = self.canvasHeight / 2;
+                    ballSpeedXaxis = -ballSpeedXaxis
+                    ballSpeedYaxis = -ballSpeedYaxis
 
                 elif ballXaxis > self.canvasWidth - self.PADDING:
                     player1["score"] += 1
                     ballXaxis = self.canvasWidth / 2;
                     ballYaxis = self.canvasHeight / 2;
+                    ballSpeedXaxis = -ballSpeedXaxis
+                    ballSpeedYaxis = -ballSpeedYaxis
 
-                if player1["score"] == 11 or player2["score"] == 11:
-                    break
                 await self.channel_layer.group_send(
                     playerId1,
                     { 
@@ -270,4 +284,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                         "ballY": ballYaxis 
                     },
                 )
+                if player1["score"] == 11 or player2["score"] == 11:
+                    await self.endGame(player1["gid"], player1, player2)
+                    break
             await asyncio.sleep(0.05)
