@@ -1,6 +1,9 @@
 import requests
 from urllib.parse import urlparse
 from rest_framework import exceptions
+# from .serializers import UserSerializer
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 
 class oauth_42:
     url = 'https://api.intra.42.fr/v2/me'
@@ -37,19 +40,32 @@ class oauth_42:
         response = requests.get(self.image_url)
         if response.status_code != 200:
             raise exceptions.AuthenticationFailed('Failed to connect to intra')
-        image_file = open('media/' + self.image_name, 'wb')
-        image_file.write(response.content)
-        image_file.close()
+        # image_file = open('media/' + self.image_name, 'wb')
+        # image_file.write(response.content)
+        # image_file.close()
+
+        img_temp = NamedTemporaryFile(delete=True)
+        img_temp.write(response.content)
+        img_temp.flush()
+        return img_temp
 
 
     def get_user(self, user):
         self.me()
         self.image_url = self.get_image_url()
         self.image_name = self.get_image_name()
-        self.fetch_image()
+        tmp_img = self.fetch_image()
+        # user.image(requests.get(self.image_url).content)
         user.uid = int(self.get_uid())
         user.username = self.get_username()
         user.first_name = self.get_first_name()
-        user.image = self.image_name
+        user.image.save(
+            self.image_name,
+            File(tmp_img),
+            save=True
+        )
         user.save()
-
+        # serializer = UserSerializer(user)
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save()
+        #

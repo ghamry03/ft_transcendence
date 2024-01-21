@@ -6,7 +6,6 @@ from rest_framework import status
 from .models import User
 from .serializers import UserSerializer
 from user_app.permissions import IsRequestedUser
-from os import remove
 
 # List view of all Users
 class UsersListApiView(APIView):
@@ -80,10 +79,10 @@ class UserDetailApiView(APIView):
     def delete(self, request, user_id):
         # TODO: fix a bug where the admin page delete isn't deleting the image, (MOST PROB the MEDIA)
         """
-            curl -X POST -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
+            curl -X DELETE -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
                     {URL}/users/api/{TARGET_USER}
         """
         user_query = self.getObjectById(user_id)
-        remove('media/' + str(user_query.image))
+        # remove(settings.MEDIA_URL + str(user_query.image))
         user_query.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
