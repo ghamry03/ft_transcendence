@@ -4,14 +4,14 @@ from online.models import Game, Tournament, PlayerMatch
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
-        fields = ['gid', 'startTime', 'endTime', 'tid']
+        fields = ['id', 'starttime', 'endtime', 'tournament']
 
 class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
-        fields = ['tid', 'startTime']
+        fields = ['id', 'starttime']
 
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlayerMatch
-        fields = ['gid', 'pid', 'score']
+        fields = ['id', 'game', 'player', 'score']

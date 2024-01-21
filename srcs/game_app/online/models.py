@@ -14,7 +14,7 @@ class UserApiUser(models.Model):
 
 class Tournament(models.Model):
     id = models.AutoField(primary_key=True)
-    startTime = models.DateTimeField(auto_now_add=True)
+    starttime = models.DateTimeField(auto_now_add=True)
 
 # this model stores game info that relates to the game overall and not one specific player
 class Game(models.Model):
