@@ -1,5 +1,6 @@
 from django.db import models
 from .oauth_42 import oauth_42
+from os import remove
 
 # Create your models here.
 class User(models.Model):
@@ -29,8 +30,20 @@ class User(models.Model):
 
     def __str__(self):
         return f"""id: {self.uid} - username: {self.username} -
-                picture: {self.image} - status: {self.status}
+                    first_name: {self.first_name} -
+                    picture: {self.image} - status: {self.status}
             """
+
+    def save(self, *args, **kwargs):
+        try:
+            this = User.objects.get(uid=self.uid)
+            if this.image != self.image :
+                remove(this.image.path)
+        except: pass
+        super(User, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return super(User, self).delete(*args, **kwargs)
 
     def oaut_42_user(self, token):
         api = oauth_42(token)

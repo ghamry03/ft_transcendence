@@ -21,10 +21,7 @@ class IsRequestedUser(permissions.BasePermission):
             if self.UserExist(requested_user):
                 return True
             elif user != requested_user:
-                print("huh 2")
                 raise exceptions.PermissionDenied
         elif user != requested_user:
-            print(user, requested_user)
-            print("huh 3")
             raise exceptions.PermissionDenied
         return True
