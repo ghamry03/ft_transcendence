@@ -22,8 +22,6 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
     paddleWidth = canvasWidth * paddleWScale
     ballRadius = paddleWidth
     paddleSpeed = SPEED
-    # canvasHeight = 580
-    # canvasWidth = 1024
 
     @sync_to_async
     def createGame(self, pid1, pid2):
