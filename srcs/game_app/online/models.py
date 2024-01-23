@@ -5,6 +5,7 @@ from rest_framework import serializers
 class UserApiUser(models.Model):
     uid = models.BigIntegerField(primary_key=True)
     username = models.CharField(unique=True, max_length=64)
+    first_name = models.CharField(max_length=64)
     image = models.CharField(max_length=100)
     status = models.SmallIntegerField()
 
@@ -15,6 +16,14 @@ class UserApiUser(models.Model):
 class Tournament(models.Model):
     id = models.AutoField(primary_key=True)
     starttime = models.DateTimeField(auto_now_add=True)
+
+# class TourAppTournament(models.Model):
+#     starttime = models.DateTimeField(db_column='starttime')  # Field name made lowercase.
+#     endtime = models.DateTimeField(db_column='endtime')  # Field name made lowercase.
+
+#     class Meta:
+#         managed = False
+#         db_table = 'tour_app_tournament'
 
 # this model stores game info that relates to the game overall and not one specific player
 class Game(models.Model):
