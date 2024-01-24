@@ -65,7 +65,6 @@ def get_player_image(self, owner_uid, target_uid, token):
 			'X-TOKEN': token
 		}
 		opponent_info = requests.get(f'http://userapp:3000/users/api/{target_uid}', headers=headers)
-		print(opponent_info)
 		return opponent_info.json().get('image')
 
 
@@ -80,7 +79,7 @@ class   MatchHistoryApiView(APIView):
 		games_details = []
 		for match in user_matches:
 			token = request.META.get('HTTP_X_TOKEN')
-			print(token)
+
 			# Fetching the game this match is part of
 			game = match.game
 
