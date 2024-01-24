@@ -45,12 +45,14 @@ def calculate_time_passed(self, game_endtime):
 		time_difference = current_time - game_endtime
 
 		if time_difference.days < 1:
-			hours_passed = time_difference.seconds // 3600
 			if time_difference.hours < 1:
+				if time_difference.minutes < 1:
+					return f"{time_difference.seconds} seconds"
 				minutes_passed = time_difference.seconds // 60
 				if minutes_passed == 1:
 					return f"{minutes_passed} minute"
 				return f"{minutes_passed} minutes"
+			hours_passed = time_difference.seconds // 3600
 			if hours_passed == 1:
 				return f"{hours_passed} hour"
 			return f"{hours_passed} hours"
