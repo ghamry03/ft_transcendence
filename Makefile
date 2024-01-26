@@ -48,6 +48,9 @@ user-sh		:
 game-sh		:
 					$(DOCKER_CMD) exec -it gameapp /bin/bash
 
+tour-sh		:
+					$(DOCKER_CMD) exec -it tourapp /bin/bash
+
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
 

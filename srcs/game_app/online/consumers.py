@@ -2,7 +2,7 @@ import json
 import asyncio
 import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import UserApiUser, Tournament, Game, PlayerMatch
+from .models import UserApiUser, Game, PlayerMatch
 from django.utils import timezone
 from asgiref.sync import sync_to_async
 

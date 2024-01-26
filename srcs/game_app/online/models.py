@@ -17,20 +17,20 @@ class UserApiUser(models.Model):
 #     id = models.AutoField(primary_key=True)
 #     starttime = models.DateTimeField(auto_now_add=True)
 
-class TourAppTournament(models.Model):
-    starttime = models.DateTimeField(db_column='starttime')  # Field name made lowercase.
-    endtime = models.DateTimeField(db_column='endtime')  # Field name made lowercase.
+class TourGameTournament(models.Model):
+    starttime = models.DateTimeField()
+    endtime = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'tour_app_tournament'
+        db_table = 'tour_game_tournament'
 
 # this model stores game info that relates to the game overall and not one specific player
 class Game(models.Model):
     id = models.AutoField(primary_key=True)
     starttime = models.DateTimeField(auto_now_add=True)
     endtime = models.DateTimeField(auto_now=True)
-    tournament = models.ForeignKey(OnlineTournament, on_delete=models.CASCADE, null=True)
+    tournament = models.ForeignKey(TourGameTournament, on_delete=models.CASCADE, null=True)
     def __str__(self):
         """String for representing the Model object."""
         return self.id
