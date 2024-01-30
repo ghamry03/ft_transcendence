@@ -46,7 +46,7 @@ ps				:
 					$(DOCKER_CMD) ps
 
 logs			:
-					$(DOCKER_CMD) logs
+					$(DOCKER_CMD) logs -f
 
 clean			:	down
 
