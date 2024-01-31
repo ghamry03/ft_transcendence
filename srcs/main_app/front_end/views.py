@@ -98,6 +98,16 @@ def offlineGame(request):
     x = render_to_string('offline.html', context)
     return HttpResponse(x)
 
+def tournament(request):
+    context = {
+        'userData' : request.session['userData']
+        # 'uid': request.session['uid'],
+        # 'token': request.session['access_token'],
+        # 'userData' : request.session['userData']
+    }
+    x = render_to_string('tournament.html', context)
+    return HttpResponse(x)
+
 def getOpponentInfo(request):
     ownerUid = request.GET.get('ownerUid')
     targetUid = request.GET.get('targetUid')

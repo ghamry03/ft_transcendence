@@ -1,0 +1,19 @@
+.outer-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+}
+
+.image-container {
+	display: flex;
+	justify-content: center;
+}
+
+.image-container img {
+	width: 70px; /* Adjust size as needed */
+	height: 70px; /* Adjust size as needed */
+	border-radius: 50%; /* Makes the border circle */
+	/* border: 2px solid #000; Border color and width */
+	margin: 0 10px; /* Adjust spacing between images */
+}
