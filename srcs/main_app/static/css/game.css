@@ -90,7 +90,7 @@
 	text-align: center;
 }
 
-.image-cropper {
+/* .image-cropper {
 	width: 70px;
 	height: 70px;
 	position: relative;
@@ -107,6 +107,34 @@
 	margin-left: -15%;
 	height: 100%;
 	width: auto;
+} */
+
+.img-circle {
+    border-radius: 50%;
+    position: relative;
+    height: 70px;
+    width: 70px;
+    overflow: hidden;
+	margin-left: auto;
+	margin-right: auto;
+    float: left;
+    /* margin-right: 10px; */
+}
+
+.img-circle.hor img {
+    position: absolute;
+    left: 50%;
+    width: auto;
+    height: 70px;
+    transform: translateX(-50%);
+ }
+
+.img-circle.vert img {
+    position: absolute;
+    top: 50%;
+    width: 70px;
+    height: auto;
+    transform: translateY(-50%);
 }
 
 p.score {

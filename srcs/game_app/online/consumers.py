@@ -9,7 +9,7 @@ from asgiref.sync import sync_to_async
 class RemotePlayerConsumer(AsyncWebsocketConsumer):
 
     PADDING = 20
-    SPEED = 10
+    SPEED = 13
     paddleHScale = 0.2
     paddleWScale = 0.015
     queue = []

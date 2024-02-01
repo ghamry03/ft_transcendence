@@ -25,9 +25,26 @@ class AsyncLock {
     }
 }
 
+console.log("hii");
 const playerId = getCookie("uid");
 const token = getCookie("token");
 const lock = new AsyncLock();
+const bracket = document.getElementById("queue");
+const gameContainer = document.getElementById("gameBox");
+
+function toggleBracket() {
+	bracketContainer = document.getElementById("bracketContainer");
+	if (bracketContainer.style.display === "none") {
+		bracketContainer.style.display = "flex";
+		while (gameContainer.firstChild) {
+			gameContainer.firstChild.remove()
+		}
+	} 
+	else {
+		bracketContainer.style.display = "none";
+		fetchPage('/tourGame', "#gameBox");
+	}
+}
 
 function getCookie(cname) {
 	let name = cname + "=";
@@ -83,14 +100,14 @@ async function addPlayerImages(playerList) {
 	await lock.acquire()
 	try {
 		var i = 0;
-		var playerImages = document.getElementById("queue").children;
+		var playerImages = bracket.children;
 		for (const playerId of playerList) {
 			// await addImage(playerId);
 			if (playerId == 0)
 				break
 			const imgUrl = await getImage(playerId);
-			playerImages[i].setAttribute("src", 'http://localhost:3000' + imgUrl);
-			playerImages[i].setAttribute("data-uid", playerId);
+			playerImages[i].firstElementChild.setAttribute("src", 'http://localhost:3000' + imgUrl);
+			playerImages[i].firstElementChild.setAttribute("data-uid", playerId);
 			i++;
 		}
 	} finally {
@@ -123,7 +140,7 @@ const handleWebSocketMessage = (event) => {
 	switch (messageData.type) {
 		case "tournamentStarted":
 			console.log("Tournament starting... Player list = ");
-			printNames(messageData.playerList);
+			// printNames(messageData.playerList);
 			break;
 		case "tournamentFound":
 			console.log("tournament found! player list = ", messageData.playerList);
@@ -149,7 +166,6 @@ const handleWebSocketMessage = (event) => {
 	}
 }
 
-// Entrypoint``1q	
 const joinQueue = () => {
 	// Set up WebSocket connection
 	console.log("uid = ", playerId, " token = ", token);
