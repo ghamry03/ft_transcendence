@@ -28,6 +28,7 @@ def login(request):
     'code': (None, request.GET.get('code')),
     'redirect_uri': (None, 'http://127.0.0.1:8000/login'),
     }
+    print(files['client_id'], files['client_secret'], files['code'])
 
 
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)

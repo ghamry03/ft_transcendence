@@ -25,6 +25,14 @@ class TourGameTournament(models.Model):
         managed = False
         db_table = 'tour_game_tournament'
 
+# class TourAppTournament(models.Model):
+#     starttime = models.DateTimeField(db_column='starttime')  # Field name made lowercase.
+#     endtime = models.DateTimeField(db_column='endtime')  # Field name made lowercase.
+
+#     class Meta:
+#         managed = False
+#         db_table = 'tour_app_tournament'
+
 # this model stores game info that relates to the game overall and not one specific player
 class Game(models.Model):
     id = models.AutoField(primary_key=True)
