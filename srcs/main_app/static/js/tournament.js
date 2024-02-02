@@ -25,7 +25,6 @@ class AsyncLock {
     }
 }
 
-console.log("hii");
 const playerId = getCookie("uid");
 const token = getCookie("token");
 const lock = new AsyncLock();

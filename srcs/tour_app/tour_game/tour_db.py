@@ -28,3 +28,17 @@ def createGame(pid1, pid2, tour):
 		score=0
 	)
 	return game.id
+
+@sync_to_async
+def endGame(gid, pid1, pid2, score1, score2):
+	game = OnlineGame.objects.get(id=int(gid))
+	game.endtime = timezone.now()
+	game.save()
+
+	player1 = OnlinePlayermatch.objects.get(game=gid, player=pid1)
+	player1.score = score1
+	player1.save()
+
+	player2 = OnlinePlayermatch.objects.get(game=gid, player=pid2)
+	player2.score = score2
+	player2.save()

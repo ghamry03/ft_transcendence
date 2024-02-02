@@ -34,7 +34,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 if self.queue.size() < self.PLAYER_MAX:
                     tourName = self.tournaments[-1]
                     # self.queue.append(self.playerId)
-                    playerPos = self.queue.addPlayer(self.playerId)
+                    playerPos = self.queue.addPlayer(self.playerId, self.channel_name)
                     self.logger.info("Player %s joined", self.playerId)
                     self.logger.info("Queue len = %d", self.queue.size())
                     self.logger.info("Adding player to group %s", tourName)
@@ -57,8 +57,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     )
                     self.logger.info("channel name = %s", self.channel_name)
                 if self.queue.size() == self.PLAYER_MAX:
-                    playerList = self.queue.getCopy()
-                    asyncio.create_task(self.runTournament(tourName, playerList))
+                    playerUids, channelNames = self.queue.getCopy()
+                    asyncio.create_task(self.runTournament(tourName, playerUids, channelNames))
                     self.queue.clear()
 
     # Called when the WebSocket closes for any reason
@@ -81,6 +81,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                             "playerId": self.playerId,
                         }
                     )
+                elif len(self.tournaments) > 0:
+                    self.tournaments.pop()
             elif self.playerId in self.players:
                 tourGroupName = self.players[self.playerId]["groupName"]
                 del self.players[self.playerId]
@@ -142,23 +144,45 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         # for every task that finishes, update the scores in the db and broadcast the results to everyone
         # ...
 
-    async def runTournament(self, tourName, playerList):
+    async def runTournament(self, tourName, playerUids, channels):
         self.logger.info("Starting tournament %s", tourName)
         await self.channel_layer.group_send(
             tourName,
-            {"type": "tournamentStarted", "playerList": playerList},
+            {"type": "tournamentStarted", "playerList": playerUids},
         )
         # tour = await tour_db.createTournament()
         # for i in range(0, self.PLAYER_MAX, 2):
-        #     pid1 = playerList[i]
-        #     pid2 = playerList[i + 1]
+        #     pid1 = playerUids[i]
+        #     channel1 = channels[i]
+        #     pid2 = playerUids[i + 1]
+        #     channel2 = channels[i + 1]
         #     gid = await tour_db.createGame(pid1, pid2, tour)
-        #     playerList[pid1] = {
-        #         "id": pid1,
-        #         "opponentId": pid2,
-        #         "tid": tour.id,
-        #         "gid": gid,
-        #     }
+        #     groupName = str(pid1) + "_" + str(pid2)
+        #     await self.channel_layer.group_add(
+        #         groupName, channel1
+        #     )
+        #     await self.channel_layer.group_add(
+        #         groupName, channel2
+        #     )
+            # self.players[pid1] = {
+            #     "id": pid1,
+            #     "opponentId": pid2,
+            #     "tid": tour.id,
+            #     "gid": gid,
+            #     "score": 0,
+            #     "groupName": groupName
+            # }
+            # self.players[pid2] = {
+            #     "id": pid2,
+            #     "opponentId": pid1,
+            #     "tid": tour.id,
+            #     "gid": gid,
+            #     "score": 0,
+            #     "groupName": groupName
+            # }
+
+            # ...
+            # asyncio.create_task(self.game_loop(playerId, player["opponentId"]))
 
 
         
