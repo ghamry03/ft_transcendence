@@ -1,14 +1,18 @@
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponse
 from django.utils.timezone import now
+from django.utils import timezone
 
 import requests
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+import logging
 
-from online.models import PlayerMatch, Game
+from online.models import PlayerMatch, Game, TourGameTournament, UserApiUser
 from game_api.serializer import MatchSerializer, GameSerializer
+
+logger = logging.getLogger(__name__)
 
 # List view of all Matches for a given User and his scores
 class UserMatchListApiView(APIView):
@@ -63,13 +67,15 @@ def calculate_time_passed(self, game_endtime):
 				return "1 second"
 			return f"{time_difference.seconds} seconds"
 
-def get_player_image(self, owner_uid, target_uid, token):
+def get_player_image(self, target_uid, owner_uid, token):
 		headers = {
 			'X-UID': str(owner_uid),
 			'X-TOKEN': token
 		}
 		opponent_info = requests.get(f'http://userapp:3000/users/api/{target_uid}', headers=headers)
+		logger.info("Fetching opponent image")
 		return opponent_info.json().get('image')
+
 class   MatchHistoryApiView(APIView):
 	def get(self, request, user_id):
 		# Retrieve all matches for the user
@@ -113,6 +119,43 @@ class   MatchHistoryApiView(APIView):
 			games_details.append(game_data)
 
 		return Response(games_details, status=status.HTTP_200_OK)
+
+class CreateGameApiView(APIView):
+	def get(self, request, pid1, pid2, tid):
+		logger.info("creating a db record")
+		tour = TourGameTournament.objects.get(id=tid)
+		game = Game.objects.create(
+			starttime=timezone.now(),
+			tournament=tour
+		)
+		player1 = UserApiUser.objects.get(uid=pid1)
+		PlayerMatch.objects.create(
+			game=game,
+			player=player1,
+			score=0
+		)
+		player2 = UserApiUser.objects.get(uid=pid2)
+		PlayerMatch.objects.create(
+			game=game,
+			player=player2,
+			score=0
+		)
+		return HttpResponse(game.id)
+
+class EndGameApiView(APIView):
+	def get(self, request, gid, pid1, pid2, score1, score2):
+		game = Game.objects.get(id=int(gid))
+		game.endtime = timezone.now()
+		game.save()
+
+		player1 = PlayerMatch.objects.get(game=gid, player=pid1)
+		player1.score = score1
+		player1.save()
+
+		player2 = PlayerMatch.objects.get(game=gid, player=pid2)
+		player2.score = score2
+		player2.save()
+		return Response(status=status.HTTP_200_OK)
 
 def health_check(request):
 	return JsonResponse({'status': 'ok'})

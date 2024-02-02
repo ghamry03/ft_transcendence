@@ -150,24 +150,27 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             tourName,
             {"type": "tournamentStarted", "playerList": playerUids},
         )
-        # tour = await tour_db.createTournament()
-        # for i in range(0, self.PLAYER_MAX, 2):
-        #     pid1 = playerUids[i]
-        #     channel1 = channels[i]
-        #     pid2 = playerUids[i + 1]
-        #     channel2 = channels[i + 1]
-        #     gid = await tour_db.createGame(pid1, pid2, tour)
-        #     groupName = str(pid1) + "_" + str(pid2)
-        #     await self.channel_layer.group_add(
-        #         groupName, channel1
-        #     )
-        #     await self.channel_layer.group_add(
-        #         groupName, channel2
-        #     )
+        tid = await tour_db.createTournament()
+        self.logger.info("created tournament with id = %d", tid)
+        for i in range(0, self.PLAYER_MAX, 2):
+            pid1 = playerUids[i]
+            channel1 = channels[i]
+            pid2 = playerUids[i + 1]
+            channel2 = channels[i + 1]
+            gameIdResponse = requests.get('http://gameapp:2000/game/createGame/' + str(pid1) + '/' + str(pid2) + '/' + str(tid) + '/')
+            self.logger.info("gameIdResponse = %s", gameIdResponse)
+            # gid = await tour_db.createGame(pid1, pid2, tour)
+            # groupName = str(pid1) + "_" + str(pid2)
+            # await self.channel_layer.group_add(
+            #     groupName, channel1
+            # )
+            # await self.channel_layer.group_add(
+            #     groupName, channel2
+            # )
             # self.players[pid1] = {
             #     "id": pid1,
             #     "opponentId": pid2,
-            #     "tid": tour.id,
+            #     "tid": tid,
             #     "gid": gid,
             #     "score": 0,
             #     "groupName": groupName
@@ -175,7 +178,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             # self.players[pid2] = {
             #     "id": pid2,
             #     "opponentId": pid1,
-            #     "tid": tour.id,
+            #     "tid": tid,
             #     "gid": gid,
             #     "score": 0,
             #     "groupName": groupName
