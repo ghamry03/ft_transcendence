@@ -169,7 +169,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         elif msg_type == "ready":
             player["ready"] = True
             opponent = self.players[player["opponentId"]]
-            if opponent["ready"] == True:                
+            if opponent["ready"] == True:
                 await asyncio.sleep(6)
                 if playerId == player["groupOwner"]:
                     asyncio.create_task(self.game_loop(playerId, player["opponentId"]))
@@ -221,6 +221,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         ballSpeedYaxis = self.SPEED
         while playerId1 in self.players and playerId2 in self.players:
             # async with self.update_lock:
+            # consider changing the while condition to terminate 
             player1 = self.players[playerId1]
             player2 = self.players[playerId2]
 
@@ -258,15 +259,15 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
             # Check if ball goes out of bounds on left or right side of canvas
             if ballXaxis < 0:
                 player2["score"] += 1
-                ballXaxis = self.canvasWidth / 2;
-                ballYaxis = self.canvasHeight / 2;
+                ballXaxis = self.canvasWidth / 2
+                ballYaxis = self.canvasHeight / 2
                 ballSpeedXaxis = -ballSpeedXaxis
                 ballSpeedYaxis = -ballSpeedYaxis
 
             elif ballXaxis > self.canvasWidth - self.PADDING:
                 player1["score"] += 1
-                ballXaxis = self.canvasWidth / 2;
-                ballYaxis = self.canvasHeight / 2;
+                ballXaxis = self.canvasWidth / 2
+                ballYaxis = self.canvasHeight / 2
                 ballSpeedXaxis = -ballSpeedXaxis
                 ballSpeedYaxis = -ballSpeedYaxis
 

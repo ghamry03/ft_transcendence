@@ -158,9 +158,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             pid2 = playerUids[i + 1]
             channel2 = channels[i + 1]
             gameIdResponse = requests.get('http://gameapp:2000/game/createGame/' + str(pid1) + '/' + str(pid2) + '/' + str(tid) + '/')
-            self.logger.info("gameIdResponse = %s", gameIdResponse)
-            # gid = await tour_db.createGame(pid1, pid2, tour)
-            # groupName = str(pid1) + "_" + str(pid2)
+            gid = int(gameIdResponse.text)
+            groupName = str(pid1) + "_" + str(pid2)
             # await self.channel_layer.group_add(
             #     groupName, channel1
             # )
