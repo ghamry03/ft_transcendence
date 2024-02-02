@@ -220,73 +220,73 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         ballSpeedXaxis = self.SPEED
         ballSpeedYaxis = self.SPEED
         while playerId1 in self.players and playerId2 in self.players:
-            # async with self.update_lock:
+            async with self.update_lock:
             # consider changing the while condition to terminate 
-            player1 = self.players[playerId1]
-            player2 = self.players[playerId2]
+                player1 = self.players[playerId1]
+                player2 = self.players[playerId2]
 
-            if player1["upPressed"] and player1["paddlePosition"] > self.PADDING:
-                player1["paddlePosition"] -= self.paddleSpeed
-            elif player1["downPressed"] and player1["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
-                player1["paddlePosition"] += self.paddleSpeed    
-            if player2["upPressed"] and player2["paddlePosition"] > self.PADDING:
-                player2["paddlePosition"] -= self.paddleSpeed
-            elif player2["downPressed"] and player2["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
-                player2["paddlePosition"] += self.paddleSpeed    
+                if player1["upPressed"] and player1["paddlePosition"] > self.PADDING:
+                    player1["paddlePosition"] -= self.paddleSpeed
+                elif player1["downPressed"] and player1["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
+                    player1["paddlePosition"] += self.paddleSpeed    
+                if player2["upPressed"] and player2["paddlePosition"] > self.PADDING:
+                    player2["paddlePosition"] -= self.paddleSpeed
+                elif player2["downPressed"] and player2["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
+                    player2["paddlePosition"] += self.paddleSpeed    
 
-            # ball pos calc - move to a sync function later
-            ballXaxis += ballSpeedXaxis
-            ballYaxis += ballSpeedYaxis
+                # ball pos calc - move to a sync function later
+                ballXaxis += ballSpeedXaxis
+                ballYaxis += ballSpeedYaxis
 
-            # Top & bottom collision
-            if ballYaxis - self.ballRadius < self.PADDING or ballYaxis + self.ballRadius > self.canvasHeight - self.PADDING:
-                ballSpeedYaxis = -ballSpeedYaxis
+                # Top & bottom collision
+                if ballYaxis - self.ballRadius < self.PADDING or ballYaxis + self.ballRadius > self.canvasHeight - self.PADDING:
+                    ballSpeedYaxis = -ballSpeedYaxis
 
-            # Left paddle collision
-            if (
-                ballXaxis - self.ballRadius < self.paddleWidth
-                and player1["paddlePosition"] < ballYaxis < player1["paddlePosition"] + self.paddleHeight
-            ):
-                ballSpeedXaxis = -ballSpeedXaxis
+                # Left paddle collision
+                if (
+                    ballXaxis - self.ballRadius < self.paddleWidth
+                    and player1["paddlePosition"] < ballYaxis < player1["paddlePosition"] + self.paddleHeight
+                ):
+                    ballSpeedXaxis = -ballSpeedXaxis
 
-            # Right paddle collision
-            if (
-                ballXaxis + self.ballRadius > self.canvasWidth - self.paddleWidth - self.PADDING
-                and player2["paddlePosition"] < ballYaxis < player2["paddlePosition"] + self.paddleHeight
-            ):
-                ballSpeedXaxis = -ballSpeedXaxis
+                # Right paddle collision
+                if (
+                    ballXaxis + self.ballRadius > self.canvasWidth - self.paddleWidth - self.PADDING
+                    and player2["paddlePosition"] < ballYaxis < player2["paddlePosition"] + self.paddleHeight
+                ):
+                    ballSpeedXaxis = -ballSpeedXaxis
 
-            # Check if ball goes out of bounds on left or right side of canvas
-            if ballXaxis < 0:
-                player2["score"] += 1
-                ballXaxis = self.canvasWidth / 2
-                ballYaxis = self.canvasHeight / 2
-                ballSpeedXaxis = -ballSpeedXaxis
-                ballSpeedYaxis = -ballSpeedYaxis
+                # Check if ball goes out of bounds on left or right side of canvas
+                if ballXaxis < 0:
+                    player2["score"] += 1
+                    ballXaxis = self.canvasWidth / 2
+                    ballYaxis = self.canvasHeight / 2
+                    ballSpeedXaxis = -ballSpeedXaxis
+                    ballSpeedYaxis = -ballSpeedYaxis
 
-            elif ballXaxis > self.canvasWidth - self.PADDING:
-                player1["score"] += 1
-                ballXaxis = self.canvasWidth / 2
-                ballYaxis = self.canvasHeight / 2
-                ballSpeedXaxis = -ballSpeedXaxis
-                ballSpeedYaxis = -ballSpeedYaxis
+                elif ballXaxis > self.canvasWidth - self.PADDING:
+                    player1["score"] += 1
+                    ballXaxis = self.canvasWidth / 2
+                    ballYaxis = self.canvasHeight / 2
+                    ballSpeedXaxis = -ballSpeedXaxis
+                    ballSpeedYaxis = -ballSpeedYaxis
 
-            await self.channel_layer.group_send(
-                playerId1,
-                { 
-                    "type": "state_update", 
-                    "leftPaddle": player1["paddlePosition"], 
-                    "rightPaddle": player2["paddlePosition"],
-                    "leftScore": player1["score"],
-                    "rightScore": player2["score"], 
-                    "ballX": ballXaxis, 
-                    "ballY": ballYaxis 
-                },
-            )
-            if player1["score"] == 11 or player2["score"] == 11:
-                gid = player1["gid"]
-                score1 = player1["score"]
-                score2 = player2["score"]
-                await self.endGame(gid, playerId1, playerId2, score1, score2)
-                break
-            # await asyncio.sleep(0.05)
+                await self.channel_layer.group_send(
+                    playerId1,
+                    { 
+                        "type": "state_update", 
+                        "leftPaddle": player1["paddlePosition"], 
+                        "rightPaddle": player2["paddlePosition"],
+                        "leftScore": player1["score"],
+                        "rightScore": player2["score"], 
+                        "ballX": ballXaxis,
+                        "ballY": ballYaxis 
+                    },
+                )
+                if player1["score"] == 11 or player2["score"] == 11:
+                    gid = player1["gid"]
+                    score1 = player1["score"]
+                    score2 = player2["score"]
+                    await self.endGame(gid, playerId1, playerId2, score1, score2)
+                    break
+            await asyncio.sleep(0.05)
