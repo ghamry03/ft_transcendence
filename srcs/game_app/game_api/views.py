@@ -70,8 +70,6 @@ def get_player_image(self, owner_uid, target_uid, token):
 		}
 		opponent_info = requests.get(f'http://userapp:3000/users/api/{target_uid}', headers=headers)
 		return opponent_info.json().get('image')
-
-# curl -X GET -H "X-UID: 88336" -H "X-TOKEN: d66e120599e0a695baa97ca2f3bd2b7c2bee4e1ffc271cff851a613a3badcff8" http://localhost:2000/game/matchhistory/88336/
 class   MatchHistoryApiView(APIView):
 	def get(self, request, user_id):
 		# Retrieve all matches for the user
