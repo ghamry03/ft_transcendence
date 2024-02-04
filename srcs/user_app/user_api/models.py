@@ -15,9 +15,7 @@ class User(models.Model):
     first_name = models.CharField(
             max_length=64
     )
-    image = models.ImageField(
-        # upload_to=settings.MEDIA_ROOT
-    )
+    image = models.ImageField()
     STATUS_CHOICE = [
         (0, 'Offline'),
         (1, 'Online'),
@@ -43,8 +41,10 @@ class User(models.Model):
         super(User, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        remove(self.image.path)
         return super(User, self).delete(*args, **kwargs)
 
-    def oaut_42_user(self, token):
+    def new_42_user(self, token):
         api = oauth_42(token)
-        api.get_user(self)
+        api.create_user(self)
+        self.save()
