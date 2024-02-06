@@ -1,6 +1,8 @@
 import requests
 from urllib.parse import urlparse
 from rest_framework import exceptions
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 
 class oauth_42:
     url = 'https://api.intra.42.fr/v2/me'
@@ -37,19 +39,28 @@ class oauth_42:
         response = requests.get(self.image_url)
         if response.status_code != 200:
             raise exceptions.AuthenticationFailed('Failed to connect to intra')
-        image_file = open('media/' + self.image_name, 'wb')
-        image_file.write(response.content)
-        image_file.close()
+
+        img_temp = NamedTemporaryFile(delete=True)
+        img_temp.write(response.content)
+        img_temp.flush()
+        return img_temp
 
 
-    def get_user(self, user):
+    def create_user(self, new_user):
         self.me()
+
+        new_user.uid = int(self.get_uid())
+        new_user.username = self.get_username()
+        new_user.first_name = self.get_first_name()
+
+        new_user.validate_unique()
+
         self.image_url = self.get_image_url()
         self.image_name = self.get_image_name()
-        self.fetch_image()
-        user.uid = int(self.get_uid())
-        user.username = self.get_username()
-        user.first_name = self.get_first_name()
-        user.image = self.image_name
-        user.save()
+        tmp_img = self.fetch_image()
 
+        new_user.image.save(
+            self.image_name,
+            File(tmp_img),
+            save=True
+        )

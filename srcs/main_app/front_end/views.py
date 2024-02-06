@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 import requests
 import environ
 import os
@@ -22,11 +22,11 @@ def index(request):
 
 def login(request):
     files = {
-    'grant_type': (None, 'authorization_code'),
-    'client_id': (None, os.environ['INTRA_UID']),
-    'client_secret': (None, os.environ['INTRA_SECRET']),
-    'code': (None, request.GET.get('code')),
-    'redirect_uri': (None, 'http://127.0.0.1:8000/login'),
+        'grant_type': (None, 'authorization_code'),
+        'client_id': (None, os.environ['INTRA_UID']),
+        'client_secret': (None, os.environ['INTRA_SECRET']),
+        'code': (None, request.GET.get('code')),
+        'redirect_uri': (None, 'http://127.0.0.1:8000/login'),
     }
 
 
@@ -34,6 +34,8 @@ def login(request):
     if response.status_code == 200:
         json_response = response.json()
         access_token = json_response.get('access_token', None)
+        refresh_token = json_response.get('refresh_token', None)
+
 
         if access_token:
             headers = {
@@ -52,6 +54,7 @@ def login(request):
             print(user_api_response.json())
             request.session['userData'] = user_api_response.json()
             request.session['access_token'] = access_token
+            request.session['refresh_token'] = refresh_token
             print("Received access token:", access_token)
         else:
             print("Access token not found in the response JSON")
@@ -75,6 +78,29 @@ def homeLoggedIn(request):
     httpResponse.set_cookie('uid' , request.session['userData']['uid'])
     httpResponse.set_cookie('token' , request.session['access_token'])
     return httpResponse
+
+def refreshUserToken(request):
+    files = {
+        'grant_type': (None, 'refresh_token'),
+        'refresh_token': (None, request.session['refresh_token']),
+        'client_id': (None, os.environ['INTRA_UID']),
+        'client_secret': (None, os.environ['INTRA_SECRET'])
+    }
+    response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
+    if response.status_code == 200:
+        json_response = response.json()
+        request.session['access_token'] = json_response.get('access_token', None)
+        request.session['refresh_token'] = json_response.get('refresh_token', None)
+
+        return JsonResponse(
+            { 'message': 'Token renewed successfully' },
+            status=response.status_code
+        )
+
+    return JsonResponse(
+        { 'message': "Can't refresh_token" },
+        status=response.status_code
+    )
 
 
 # def joinQueue(request):

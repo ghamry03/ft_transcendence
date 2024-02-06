@@ -48,6 +48,15 @@ user-sh		:
 game-sh		:
 					$(DOCKER_CMD) exec -it gameapp /bin/bash
 
+main-logs		:
+					docker logs -f mainapp
+
+user-logs		:
+					docker logs -f userapp
+
+game-logs		:
+					docker logs -f gameapp
+
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
 
@@ -58,7 +67,7 @@ ps				:
 					$(DOCKER_CMD) ps
 
 logs			:
-					$(DOCKER_CMD) logs
+					$(DOCKER_CMD) logs -f
 
 clean			:	down
 
