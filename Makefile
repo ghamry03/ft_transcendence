@@ -51,6 +51,18 @@ game-sh		:
 tour-sh		:
 					$(DOCKER_CMD) exec -it tourapp /bin/bash
 
+main-logs		:
+					docker logs -f mainapp
+
+user-logs		:
+					docker logs -f userapp
+
+game-logs		:
+					docker logs -f gameapp
+
+tour-logs		:
+					docker logs -f tourapp
+
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
 
