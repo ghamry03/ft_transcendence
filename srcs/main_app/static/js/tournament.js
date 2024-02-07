@@ -30,18 +30,44 @@ const token = getCookie("token");
 const lock = new AsyncLock();
 const bracket = document.getElementById("queue");
 const gameContainer = document.getElementById("gameBox");
+var ctx;
+var canvas;
+var leftScore;
+var rightScore;
+const paddleHScale = 0.2
+const paddleWScale = 0.015
+const remoteCanvasH = 510;
 
-function toggleBracket() {
+var animationId;
+
+var canvasW;
+var canvasH;
+var scaleFactor;
+
+// Paddles
+var paddleHeight;
+var paddleWidth;
+var leftPaddleYaxis;
+var rightPaddleYaxis;
+
+var leftPlayerScore = 0;
+var rightPlayerScore = 0;
+var maxScore = 10;
+
+var wPressed = false;
+var sPressed = false;
+
+async function toggleBracket() {
 	bracketContainer = document.getElementById("bracketContainer");
 	if (bracketContainer.style.display === "none") {
 		bracketContainer.style.display = "flex";
 		while (gameContainer.firstChild) {
 			gameContainer.firstChild.remove()
 		}
-	} 
+	}
 	else {
 		bracketContainer.style.display = "none";
-		fetchPage('/tourGame', "#gameBox");
+		await fetchPage('/tourGame', "#gameBox");
 	}
 }
 
@@ -133,10 +159,81 @@ async function printNames(playerList) {
 	}
 }
 
+function countdown(parent, callback) {
+	var texts = ['Match found!', '3', '2', '1', 'GO'];
+	
+	// This will store the paragraph we are currently displaying
+	var paragraph = null;
+	
+	// This is the function we will call every 1000 ms using setInterval
+	function count() {
+		if (paragraph) {
+			paragraph.remove();
+		}
+		if (texts.length === 0) {
+			// If we ran out of text, use the callback to get started
+			clearInterval(interval);
+			callback();
+			return;
+		}
+		// Trim array
+		var text = texts.shift();
+		
+		// Create a paragraph to add to the DOM
+		// This new paragraph will trigger an animation
+		paragraph = document.createElement("div");
+		paragraph.textContent = text;
+		paragraph.className = text + " nums";
+		parent.appendChild(paragraph);
+	}
+	// Initiate an interval, but store it in a variable so we can remove it later.
+	var interval = setInterval( count, 1000 );  
+}
+
+async function setUpMatch(leftPlayerId, rightPlayerId) {
+	await toggleBracket();
+	countdown(document.getElementById("readyGo"), animateGame);
+	var leftImage = document.getElementById("leftImage");
+	var rightImage = document.getElementById("rightImage");
+	document.addEventListener("keydown", keyDownHandler);
+	document.addEventListener("keyup", keyUpHandler);
+	getImage(leftPlayerId)
+		.then(imgUrl => {
+			console.log("Image URL:", imgUrl);
+			leftImage.src = "http://localhost:3000" + imgUrl;
+		});
+	getImage(rightPlayerId)
+		.then(imgUrl => {
+			console.log("Image URL:", imgUrl);
+			rightImage.src = "http://localhost:3000" + imgUrl;
+		});
+	canvas = document.getElementById("gameCanvas");
+	leftScore = document.getElementById("leftScore");
+	rightScore = document.getElementById("rightScore");
+	ctx = canvas.getContext("2d");
+	canvasW = canvas.getBoundingClientRect().width;
+	canvasH = canvas.getBoundingClientRect().height;
+	canvas.width = canvasW;
+	canvas.height = canvasH;
+}
+
 const handleWebSocketMessage = (event) => {
 	const messageData = JSON.parse(event.data);
 	
 	switch (messageData.type) {
+		case "stateUpdate":
+			console.log("status update");
+			// ballXaxis = messageData.ballX * scaleFactor;
+			// ballYaxis = messageData.ballY * scaleFactor;
+			// leftPaddleYaxis = messageData.leftPaddle * scaleFactor;
+			// rightPaddleYaxis = messageData.rightPaddle * scaleFactor;
+			// leftPlayerScore = messageData.leftScore;
+			// rightPlayerScore = messageData.rightScore;
+			break;
+		case "roundStarting":
+			console.log("Round starting... Left = ", messageData.leftPlayer, " Right = ", messageData.rightPlayer);
+			setUpMatch(messageData.leftPlayer, messageData.rightPlayer);
+			break;
 		case "tournamentStarted":
 			console.log("Tournament starting... Player list = ");
 			// printNames(messageData.playerList);
@@ -162,6 +259,100 @@ const handleWebSocketMessage = (event) => {
 		default:
 			// Handle default case if needed
 			break;
+	}
+}
+
+function sendKeyUpdate(key, keyDown)
+{
+	if (isOpen(ws)) {
+		ws.send(
+			JSON.stringify({
+				type: "keypress",
+				key: key,
+				keyDown: keyDown,
+				playerId: playerId
+			})
+		);
+	}
+}
+
+function keyDownHandler(e)
+{
+	if (e.key === "w" && !wPressed)
+	{
+		wPressed = true;
+		sendKeyUpdate(e.key, true);
+	}
+	else if (e.key === "s" && !sPressed)
+	{
+		sPressed = true;
+		sendKeyUpdate(e.key, true);
+	}
+}
+
+// Key release
+function keyUpHandler(e)
+{
+	if (e.key === "w" && wPressed)
+	{
+		wPressed = false;
+		sendKeyUpdate(e.key, false);
+	}
+	else if (e.key === "s" && sPressed)
+	{
+		sPressed = false;
+		sendKeyUpdate(e.key, false);
+	}
+}
+
+const animateGame = (time) => {
+	draw();
+	animationId = requestAnimationFrame(animateGame);
+};
+
+const draw = () => {
+	// Clear canvas
+	ctx.clearRect(0, 0, canvasW, canvasH);
+
+	//Draw middle line
+	const color2 = "#57f2e5"
+	const color1 = "#FFB3CB"
+
+	ctx.strokeStyle = color1;
+	ctx.beginPath();
+	ctx.moveTo(canvasW / 2, 0);
+	ctx.lineTo(canvasW / 2, canvasH);
+	
+	// ctx.strokeStyle = "#FFB3CB";
+	ctx.stroke();
+	ctx.closePath();
+	
+	//Draw ball
+	ctx.fillStyle = color2;
+	ctx.beginPath();
+	ctx.arc(ballXaxis, ballYaxis, ballRadius, 0, Math.PI * 2);
+	ctx.fill();
+	ctx.closePath();
+	
+	//Draw left paddle
+	ctx.fillStyle = color1;
+	ctx.fillRect(0, leftPaddleYaxis, paddleWidth, paddleHeight);
+
+	//Draw right paddle
+	ctx.fillRect(canvasW - paddleWidth, rightPaddleYaxis, paddleWidth, paddleHeight);
+
+	//Draw scores
+	leftScore.innerText = leftPlayerScore;
+	rightScore.innerText = rightPlayerScore;
+	if (leftPlayerScore < rightPlayerScore) {
+		leftScore.style.color = "#FFB3B3";
+	}
+	if (rightPlayerScore < leftPlayerScore) {
+		rightScore.style.color = "#FFB3B3";
+	}
+	if (leftPlayerScore == rightPlayerScore) {
+		leftScore.style.color = "#C5FFC0";
+		rightScore.style.color = "#C5FFC0";
 	}
 }
 

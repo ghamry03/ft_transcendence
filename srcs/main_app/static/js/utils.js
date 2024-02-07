@@ -4,7 +4,7 @@
  * @param {*} injectionPoint where to inject the fetched html example: "#mainContentArea" - has to be and id not class
  */
 function fetchPage(pageUrl , injectionPoint) {
-    fetch(pageUrl)
+    return fetch(pageUrl)
       .then(response => {
         return response.text();
       })

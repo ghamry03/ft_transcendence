@@ -11,13 +11,23 @@ from .PlayerQueue import PlayerQueue
 class TournamentConsumer(AsyncWebsocketConsumer):
 
     PLAYER_MAX = 8
+    PADDING = 20
+    SPEED = 13
     update_lock = asyncio.Lock()
     logger = logging.getLogger(__name__)
-    # queue = [0 for i in range(self.PLAYER_MAX)] 
     queue = PlayerQueue()
     players = {}
     tournaments = [] # list of group names of all active tournaments
     
+    paddleHScale = 0.2
+    paddleWScale = 0.015
+    canvasHeight = 510
+    canvasWidth = 960
+    paddleHeight = canvasHeight * paddleHScale
+    paddleWidth = canvasWidth * paddleWScale
+    ballRadius = paddleWidth
+    paddleSpeed = SPEED
+
 	# Called when the websocket is handshaking as part of the connection process
     async def connect(self):
         await self.accept()
@@ -130,6 +140,111 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         )
 
+    async def state_update(self, event):
+        # self.logger.info("sending a status update!!")
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "stateUpdate",
+                    "leftPaddle": event["leftPaddle"],
+                    "rightPaddle": event["rightPaddle"],
+                    "leftScore": event["leftScore"],
+                    "rightScore": event["rightScore"], 
+                    "ballX": event["ballX"],
+                    "ballY": event["ballY"],
+                }
+            )
+        )
+    
+    async def roundStarting(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "roundStarting",
+                    "roundNo": event["roundNo"],
+                    "leftPlayer": event["leftPlayer"],
+                    "rightPlayer": event["rightPlayer"],
+                }
+            )
+        )
+
+    async def game_loop(self, pid1, pid2, groupName):
+        await asyncio.sleep(6)
+        ballXaxis = self.canvasWidth / 2
+        ballYaxis = self.canvasHeight / 2
+        ballSpeedXaxis = self.SPEED
+        ballSpeedYaxis = self.SPEED
+        while pid1 in self.players and pid2 in self.players:
+            async with self.update_lock:
+            # consider changing the while condition to terminate 
+                player1 = self.players[pid1]
+                player2 = self.players[pid2]
+                if player1["upPressed"] and player1["paddlePosition"] > self.PADDING:
+                    player1["paddlePosition"] -= self.paddleSpeed
+                elif player1["downPressed"] and player1["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
+                    player1["paddlePosition"] += self.paddleSpeed    
+                if player2["upPressed"] and player2["paddlePosition"] > self.PADDING:
+                    player2["paddlePosition"] -= self.paddleSpeed
+                elif player2["downPressed"] and player2["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
+                    player2["paddlePosition"] += self.paddleSpeed    
+
+                # ball pos calc - move to a sync function later
+                ballXaxis += ballSpeedXaxis
+                ballYaxis += ballSpeedYaxis
+
+                # Top & bottom collision
+                if ballYaxis - self.ballRadius < self.PADDING or ballYaxis + self.ballRadius > self.canvasHeight - self.PADDING:
+                    ballSpeedYaxis = -ballSpeedYaxis
+
+                # Left paddle collision
+                if (
+                    ballXaxis - self.ballRadius < self.paddleWidth
+                    and player1["paddlePosition"] < ballYaxis < player1["paddlePosition"] + self.paddleHeight
+                ):
+                    ballSpeedXaxis = -ballSpeedXaxis
+
+                # Right paddle collision
+                if (
+                    ballXaxis + self.ballRadius > self.canvasWidth - self.paddleWidth - self.PADDING
+                    and player2["paddlePosition"] < ballYaxis < player2["paddlePosition"] + self.paddleHeight
+                ):
+                    ballSpeedXaxis = -ballSpeedXaxis
+
+                # Check if ball goes out of bounds on left or right side of canvas
+                if ballXaxis < 0:
+                    player2["score"] += 1
+                    ballXaxis = self.canvasWidth / 2
+                    ballYaxis = self.canvasHeight / 2
+                    ballSpeedXaxis = -ballSpeedXaxis
+                    ballSpeedYaxis = -ballSpeedYaxis
+
+                elif ballXaxis > self.canvasWidth - self.PADDING:
+                    player1["score"] += 1
+                    ballXaxis = self.canvasWidth / 2
+                    ballYaxis = self.canvasHeight / 2
+                    ballSpeedXaxis = -ballSpeedXaxis
+                    ballSpeedYaxis = -ballSpeedYaxis
+
+                await self.channel_layer.group_send(
+                    groupName,
+                    { 
+                        "type": "state_update", 
+                        "leftPaddle": player1["paddlePosition"], 
+                        "rightPaddle": player2["paddlePosition"],
+                        "leftScore": player1["score"],
+                        "rightScore": player2["score"], 
+                        "ballX": ballXaxis,
+                        "ballY": ballYaxis 
+                    },
+                )
+                if player1["score"] == 11 or player2["score"] == 11:
+                    gid = player1["gid"]
+                    score1 = player1["score"]
+                    score2 = player2["score"]
+                    requests.get('http://gameapp:2000/game/endGame/' + str(gid) + '/' + str(pid1) + '/' + str(pid2) + '/' + str(score1) + '/' + str(score2) + '/')
+                    break
+            await asyncio.sleep(0.05)
+
         # player {playerId, opponentId, gid, groupName, tid, score}
         # ---------------- SET UP ----------------
         # tid = create db record
@@ -152,6 +267,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
         tid = await tour_db.createTournament()
         self.logger.info("created tournament with id = %d", tid)
+        matches = []
         for i in range(0, self.PLAYER_MAX, 2):
             pid1 = playerUids[i]
             channel1 = channels[i]
@@ -160,32 +276,49 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             gameIdResponse = requests.get('http://gameapp:2000/game/createGame/' + str(pid1) + '/' + str(pid2) + '/' + str(tid) + '/')
             gid = int(gameIdResponse.text)
             groupName = str(pid1) + "_" + str(pid2)
-            # await self.channel_layer.group_add(
-            #     groupName, channel1
-            # )
-            # await self.channel_layer.group_add(
-            #     groupName, channel2
-            # )
-            # self.players[pid1] = {
-            #     "id": pid1,
-            #     "opponentId": pid2,
-            #     "tid": tid,
-            #     "gid": gid,
-            #     "score": 0,
-            #     "groupName": groupName
-            # }
-            # self.players[pid2] = {
-            #     "id": pid2,
-            #     "opponentId": pid1,
-            #     "tid": tid,
-            #     "gid": gid,
-            #     "score": 0,
-            #     "groupName": groupName
-            # }
+            self.logger.info("creating group with name = %s, %s", groupName, type(groupName))
+            await self.channel_layer.group_add(
+                groupName, channel1
+            )
+            await self.channel_layer.group_add(
+                groupName, channel2
+            )
+            self.players[pid1] = {
+                "id": pid1,
+                "opponentId": pid2,
+                "tid": tid,
+                "gid": gid,
+                "groupName": groupName,
+                "score": 0,
+                "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
+                "upPressed": False,
+                "downPressed": False,
+                "playerPos": i,
+            }
+            self.players[pid2] = {
+                "id": pid2,
+                "opponentId": pid1,
+                "tid": tid,
+                "gid": gid,
+                "groupName": groupName,
+                "score": 0,
+                "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
+                "upPressed": False,
+                "downPressed": False,
+                "playerPos": i,
+            }
+            await self.channel_layer.group_send(
+                groupName,
+                {
+                    "type": "roundStarting",
+                    "roundNo": 1,
+                    "leftPlayer": pid1, 
+                    "rightPlayer": pid2,
+                },
+            )
+            matches.append(asyncio.create_task(self.game_loop(pid1, pid2, groupName)))
+        round1Results = await asyncio.gather(*matches)
+        self.logger.info("round 1 results len = %d, type = %s", len(round1Results), type(round1Results))
 
-            # ...
-            # asyncio.create_task(self.game_loop(playerId, player["opponentId"]))
 
-
-        
         
