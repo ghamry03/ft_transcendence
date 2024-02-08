@@ -115,10 +115,6 @@ async function addImage(playerId, imgId) {
 	var playerImg = document.getElementById(imgId)
 	playerImg.src = 'http://localhost:3000' + imgUrl;
 	playerImg.setAttribute("data-uid", playerId);
-	// var playerImage = document.createElement('img');
-	// playerImage.setAttribute('src', 'http://localhost:3000' + imgUrl);
-	// playerImage.setAttribute('id', playerId);
-	// document.querySelector("#queue").appendChild(playerImage);
 }
 
 async function addPlayerImages(playerList) {
@@ -215,6 +211,14 @@ async function setUpMatch(leftPlayerId, rightPlayerId) {
 	canvasH = canvas.getBoundingClientRect().height;
 	canvas.width = canvasW;
 	canvas.height = canvasH;
+	scaleFactor = canvasH / remoteCanvasH;
+	paddleHeight = canvasH * paddleHScale;
+	paddleWidth = canvasW * paddleWScale;
+	leftPaddleYaxis = canvasH / 2 - paddleHeight / 2;
+	rightPaddleYaxis = canvasH / 2 - paddleHeight / 2;
+	ballXaxis = canvasW / 2;
+	ballYaxis = canvasH / 2;
+	ballRadius = paddleWidth;
 }
 
 const handleWebSocketMessage = (event) => {
@@ -223,12 +227,12 @@ const handleWebSocketMessage = (event) => {
 	switch (messageData.type) {
 		case "stateUpdate":
 			console.log("status update");
-			// ballXaxis = messageData.ballX * scaleFactor;
-			// ballYaxis = messageData.ballY * scaleFactor;
-			// leftPaddleYaxis = messageData.leftPaddle * scaleFactor;
-			// rightPaddleYaxis = messageData.rightPaddle * scaleFactor;
-			// leftPlayerScore = messageData.leftScore;
-			// rightPlayerScore = messageData.rightScore;
+			ballXaxis = messageData.ballX * scaleFactor;
+			ballYaxis = messageData.ballY * scaleFactor;
+			leftPaddleYaxis = messageData.leftPaddle * scaleFactor;
+			rightPaddleYaxis = messageData.rightPaddle * scaleFactor;
+			leftPlayerScore = messageData.leftScore;
+			rightPlayerScore = messageData.rightScore;
 			break;
 		case "roundStarting":
 			console.log("Round starting... Left = ", messageData.leftPlayer, " Right = ", messageData.rightPlayer);
@@ -236,7 +240,6 @@ const handleWebSocketMessage = (event) => {
 			break;
 		case "tournamentStarted":
 			console.log("Tournament starting... Player list = ");
-			// printNames(messageData.playerList);
 			break;
 		case "tournamentFound":
 			console.log("tournament found! player list = ", messageData.playerList);
@@ -248,7 +251,7 @@ const handleWebSocketMessage = (event) => {
 			addImage(newPlayerId, messageData.imgId);
 			break;
 		case "inGame":
-			console.log("you're queued or have another ongoing tournament on another tab or computer", playerId);
+			console.log("You're queued or have another ongoing tournament on another tab or computer", playerId);
 			ws.close(3001, "Player already in-game");
 			// show error pop up and redirect them back to home page 
 			break;
