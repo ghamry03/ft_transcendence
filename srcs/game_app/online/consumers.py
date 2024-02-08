@@ -157,21 +157,25 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         if not player:
             self.logger.info("not a player")
             return
-        
+        opponent = self.players[player["opponentId"]]
         if msg_type == "keypress":
             key = clientData.get("key")
             keyDown = clientData.get("keyDown")
-            if key == "w":
-                player["upPressed"] = keyDown
-            elif key == "s":
-                player["downPressed"] = keyDown
-            player["ready"] = keyDown
+            await self.channel_layer.group_send(
+                player["groupOwner"],
+                { 
+                    "type": "keyUpdate",
+                    "key": key,
+                    "keyDown": keyDown,
+                    "isLeft": playerId == player["groupOwner"],
+                },
+            )
 
         elif msg_type == "playerScored":
             player["score"] += 1
             leftScore = 0
             rightScore = 0
-            opponent = self.players[player["opponentId"]]
+            # opponent = self.players[player["opponentId"]]
             if playerId == player["groupOwner"]: # this player is the left
                 self.logger.info("left player scored %d", player["score"])
                 leftScore = player["score"]
@@ -192,15 +196,15 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 
         elif msg_type == "ready":
             player["ready"] = True
-            opponent = self.players[player["opponentId"]]
+            # opponent = self.players[player["opponentId"]]
             if opponent["ready"] == True:
                 player["ready"] = False
                 opponent["ready"] = False
-                await asyncio.sleep(6)
-                if playerId == player["groupOwner"]:
-                    asyncio.create_task(self.game_loop(playerId, player["opponentId"]))
-                else:
-                    asyncio.create_task(self.game_loop(player["groupOwner"], playerId))
+                # await asyncio.sleep(6)
+                # if playerId == player["groupOwner"]:
+                #     asyncio.create_task(self.game_loop(playerId, player["opponentId"]))
+                # else:
+                #     asyncio.create_task(self.game_loop(player["groupOwner"], playerId))
 
     async def state_update(self, event):
         # self.logger.info("sending a status update!!")
@@ -248,6 +252,18 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     "type": "scoreUpdate",
                     "leftScore": event["leftScore"],
                     "rightScore": event["rightScore"]
+                }
+            )
+        )
+    
+    async def keyUpdate(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "keyUpdate",
+                    "key": event["key"],
+                    "keyDown": event["keyDown"],
+                    "isLeft": event["isLeft"],
                 }
             )
         )

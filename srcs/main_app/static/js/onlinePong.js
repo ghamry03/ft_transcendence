@@ -25,6 +25,7 @@
 	var paddleWidth = canvasW * paddleWScale;
 	var leftPaddleYaxis = canvasH / 2 - paddleHeight / 2;
 	var rightPaddleYaxis = canvasH / 2 - paddleHeight / 2;
+	var paddleSpeed = 5;
 	
 	// Ball
 	var ballXaxis = canvasW / 2;
@@ -48,8 +49,11 @@
 	var rightPlayerId;
 	var leftPlayerImg;
 	var rightPlayerImg;
+	var leftWPressed = false;
+	var leftSPressed = false;
+	var rightWPressed = false;
+	var rightSPressed = false;
 	var paused = false;
-	var scoreUpdated = false;
 
 	function getCookie(cname) {
 		let name = cname + "=";
@@ -147,6 +151,20 @@
 
 	const handleWebSocketMessage = (event) => {
 		const messageData = JSON.parse(event.data);
+		if (messageData.type === "keyUpdate") {
+			if (messageData.isLeft) {
+				if (messageData.key == "w")
+					leftWPressed = messageData.keyDown;
+				else
+					leftSPressed = messageData.keyDown;
+			}
+			else {
+				if (messageData.key == "w")
+					rightWPressed = messageData.keyDown;
+				else
+					rightSPressed = messageData.keyDown;
+			}
+		}
 		if (messageData.type === "stateUpdate") {
 			// console.log("status update");
 			// ballXaxis = messageData.ballX * scaleFactor;
@@ -161,7 +179,6 @@
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
 			paused = false;
-			scoreUpdated = true;
 			reset();
 			// animateGame();
 		}
@@ -259,10 +276,23 @@
 
 	function update()
 	{
-		if (paused) {
-			console.log("game is paused");
-			return;
-		}
+		// if (paused) {
+		// 	// console.log("game is paused");
+		// 	return;
+		// }
+
+		// Left paddle movement
+		if (leftWPressed && leftPaddleYaxis > padding)
+			leftPaddleYaxis -= paddleSpeed;
+		else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvas.height)
+			leftPaddleYaxis += paddleSpeed;
+		
+			// Right paddle movement
+		if (rightWPressed && rightPaddleYaxis > padding)
+			rightPaddleYaxis -= paddleSpeed;
+		else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvas.height - padding)
+			rightPaddleYaxis += paddleSpeed;
+
 		// Move ball
 		ballXaxis += ballSpeedXaxis;
 		ballYaxis += ballSpeedYaxis;
@@ -290,7 +320,7 @@
 			console.log("right scored!");
 			if (playerId == rightPlayerId)
 				sendScoredEvent();
-			paused = true;
+			// paused = true;
 			// cancelAnimationFrame(animationId);
 			// reset();
 			// rightPlayerScore++;
@@ -300,16 +330,11 @@
 			console.log("left scored!");
 			if (playerId == leftPlayerId)
 				sendScoredEvent();
-			paused = true;
+			// paused = true;
 			// cancelAnimationFrame(animationId);
 			// reset();
 			// leftPlayerScore++;
 		}
-		// if (scoreUpdated == true)
-		// {
-		// 	reset();
-		// 	console.log("someone scored, resetting..");
-		// }
 	}
 
 	const animateGame = (time) => {
