@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from rest_framework.views import APIView
 from rest_framework import exceptions
 from rest_framework.response import Response
@@ -35,6 +35,7 @@ class UsersListApiView(APIView):
 
 class UserDetailApiView(APIView):
     permission_classes = (IsRequestedUser,)
+    # authentication_classes = ()
 
     def getObjectById(self, user_id):
         try:
@@ -60,7 +61,6 @@ class UserDetailApiView(APIView):
                     return Response(e.messages, status=status.HTTP_400_BAD_REQUEST)
             else:
                 raise Http404
-
         serializer = UserSerializer(user_query)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -89,3 +89,6 @@ class UserDetailApiView(APIView):
         user_query = self.getObjectById(user_id)
         user_query.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+def health_check(request):
+    return JsonResponse({'status': 'ok'})

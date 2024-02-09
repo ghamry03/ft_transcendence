@@ -18,5 +18,10 @@ function fetchPage(pageUrl , injectionPoint) {
           gamescript.setAttribute('src','/static/js/canvas.js');
           document.querySelector(injectionPoint).appendChild(gamescript);
         }
+        else if (pageUrl == '/offline') {
+          var gamescript = document.createElement('script');
+          gamescript.setAttribute('src','/static/js/offlinePong.js');
+          document.querySelector(injectionPoint).appendChild(gamescript);
+        }
       });
 }

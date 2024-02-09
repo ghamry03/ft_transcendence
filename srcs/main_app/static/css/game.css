@@ -1,0 +1,120 @@
+@font-face {
+    font-family: 'ps2p';
+    src: local('Ps2p'),
+         url('../fonts/ps2p.ttf') format("truetype");
+}
+
+.onlineGame .container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.onlineGame .button{
+	display: flex;
+	justify-content: center;
+	margin-top: 15px;
+}
+
+.onlineGame .btn {
+	background-color: #1B102E;
+	border: none;
+	color: #0abdc6;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	margin: 10px;
+	cursor: pointer;
+	border-radius: 5px;
+}
+  
+.onlineGame .btn:hover {
+	background-color:none;
+}
+  
+.onlineGame canvas {
+	background: #1B102E;
+	border-radius: 5%;
+	padding: 20px;
+}
+
+.onlineGame #readyGo {
+    display: table;
+}
+
+@keyframes count {
+    0% { transform: scale(1.5); }
+    100% { transform: scale(1); }
+}
+
+.onlineGame .nums {
+	opacity:    0.5; 
+	background: #000; 
+    color: white;
+	width:      100%;
+	height:     100%; 
+	z-index:    10;
+	position:   fixed;
+    font-size: 5rem;
+	font-family:'Courier New', Courier, monospace;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    text-align: center;
+	display: table-cell;
+	vertical-align: middle;
+    animation: count 0.1s cubic-bezier(0.1,0.1,1,1) 1;
+}
+
+.column {
+	float: left;
+	width: 47%;
+	padding: 10px;
+	display: flex;
+}
+
+#separator {
+	float: left;
+	width: 6%;
+	font-family: 'ps2p';
+	color: #57f2e5;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 70px;
+	padding: 10px;
+	text-align: center;
+}
+
+.image-cropper {
+	width: 70px;
+	height: 70px;
+	position: relative;
+	overflow: hidden;
+	border-radius: 50%;
+	margin-left: auto;
+	margin-right: auto;
+	float: left;
+}
+
+.playerpfp {
+	display: inline;
+	margin: 0 auto;
+	margin-left: -15%;
+	height: 100%;
+	width: auto;
+}
+
+p.score {
+	font-family: 'ps2p';
+	font-size: 30px;
+	float: right;
+	color: #acacac;
+	line-height: 70px;
+	/* display: table-cell;
+  	vertical-align: middle; */
+}

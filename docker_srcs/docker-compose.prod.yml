@@ -1,37 +1,48 @@
 version: "3"
 services:
+    server:
+        build: ./server
+        image: nginx
+        container_name: nginx
+        restart: on-failure
+        volumes:
+            - ./server/conf.d:/etc/nginx/conf.d
+        ports:
+            - "80:80"
+        depends_on:
+            - mainapp
+            - userapp
+        networks:
+            - user_app_network
+
     mainapp:
-        build: ./main_app
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/main_app/Dockerfile.prod
         image: mainapp
         container_name: mainapp
         restart: on-failure
-        ports:
-            - "8000:8000"
-        networks:
-            - user_app_network
-        volumes:
-            - ../srcs/main_app/:/home/main_app
-            # - main_app_data:/home/main_app
+        expose:
+          - 8000
+        command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
         depends_on:
-            userapp:
-                condition: service_started
-            gameapp:
-                condition: service_started
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
-
+        networks:
+            - user_app_network
+    
     gameapp:
-        build: ./game_app
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/game_app/Dockerfile.prod
         image: gameapp
         container_name: gameapp
         restart: on-failure
-        ports:
-            - "2000:2000"
-        volumes:
-            - ../srcs/game_app/:/home/game_app
-            # - game_app_data:/home/game_app
+        expose:
+          - 2000
+        # command: gunicorn game_app.wsgi:application --bind 0.0.0.0:2000
         depends_on:
             userapp:
                 condition: service_healthy
@@ -39,16 +50,17 @@ services:
             - ./.env
         networks:
             - user_app_network
-            
+
     userapp:
-        build: ./user_app
+        build:
+          context: ../
+          dockerfile: ./docker_srcs/user_app/Dockerfile.prod
         image: userapp
         container_name: userapp
         restart: on-failure
-        ports:
-            - "3000:3000"
-        volumes:
-            - ../srcs/user_app/:/home/user_app
+        expose:
+          - 3000
+        command: gunicorn userapp.wsgi:application --bind 0.0.0.0:3000
         depends_on:
             postgres:
                 condition: service_healthy
@@ -56,11 +68,6 @@ services:
             - ./.env
         networks:
             - user_app_network
-        healthcheck:
-            test: ["CMD", "curl", "--fail", "http://localhost:3000/users/health"]
-            interval: 5s
-            timeout: 5s
-            retries: 5
 
     postgres:
         build: ./postgres
@@ -81,26 +88,12 @@ services:
             - user_app_network
 
 # volumes:
-#     main_app_data:
+#     postgres_data:
 #         driver: local
 #         driver_opts:
 #             o: bind
 #             type: none
-#             device: ../srcs/main_app/
-
-#     user_app_data:
-#         driver: local
-#         driver_opts:
-#             o: bind
-#             type: none
-#             device: ../srcs/user_app/
-
-    # postgres_data:
-    #     driver: local
-    #     driver_opts:
-    #         o: bind
-    #         type: none
-    #         device: ../srcs/postgres/data
+#             device: ../srcs/postgres/data
 
 networks:
     user_app_network:

@@ -3,6 +3,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 import requests
 import environ
 import os
+from django.template.loader import render_to_string
 
 # Create your views here.
 
@@ -48,7 +49,6 @@ def login(request):
             headers = {
                 'X-UID': UID,
                 'X-TOKEN': access_token
-
             }
             user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/' + UID, headers=headers)
             print(user_api_response.json())
@@ -75,7 +75,7 @@ def homeLoggedIn(request):
     }
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
-    # httpResponse.set_cookie('uid' , request.session['uid'])
+    httpResponse.set_cookie('uid' , request.session['userData']['uid'])
     httpResponse.set_cookie('token' , request.session['access_token'])
     return httpResponse
 
@@ -101,3 +101,36 @@ def refreshUserToken(request):
         { 'message': "Can't refresh_token" },
         status=response.status_code
     )
+
+
+# def joinQueue(request):
+    
+
+#This will render the template for the logged in state
+#This should be called from the main template
+
+def onlineGame(request):
+    context = {
+        # 'uid': request.session['uid'],
+        # 'token': request.session['access_token'],
+        # 'userData' : request.session['userData']
+    }
+    x = render_to_string('game.html', context)
+    return HttpResponse(x)
+
+def offlineGame(request):
+    context = {
+    }
+    x = render_to_string('offline.html', context)
+    return HttpResponse(x)
+
+def getOpponentInfo(request):
+    ownerUid = request.GET.get('ownerUid')
+    targetUid = request.GET.get('targetUid')
+    token = request.GET.get('token')
+    headers = {
+        'X-UID': ownerUid,
+        'X-TOKEN': token
+    }
+    opponentInfo = requests.get('http://userapp:3000/users/api/' + targetUid, headers=headers)
+    return JsonResponse(opponentInfo.json())

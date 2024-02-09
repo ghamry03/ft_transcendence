@@ -6,7 +6,7 @@
     font-family: 'bpdots';
     src: local('Bpdots'),
          url('../fonts/BPdotsSquares-Bold.ttf') format("truetype");
-  }
+}
 
 :root{
     --beach-bunny: #FCF9F4;
@@ -67,6 +67,7 @@ body{
     /* background-color: red; */
     padding: 24px;
 }
+
 .profilePic{
     border-radius: 100%;
     max-width: 64px;
@@ -76,6 +77,7 @@ body{
 }
 
 #userName{
+    color: #FEFFCF;
     margin-right: 16px;
     font-family: 'ps2p';
     font-size: 12px;
@@ -88,12 +90,12 @@ body{
     color: #FEFFCF;
     text-transform: uppercase;
     text-align: center;
-text-shadow: 0px 4px 0px #59322B;
-font-family: 'ps2p';
-font-size: 12px;
-font-style: normal;
-font-weight: 400;
-line-height: normal;
+    text-shadow: 0px 4px 0px #59322B;
+    font-family: 'ps2p';
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .pixelCard {
