@@ -54,6 +54,18 @@ tour-sh		:
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
 
+main-logs		:
+					docker logs -f mainapp
+
+user-logs		:
+					docker logs -f userapp
+
+game-logs		:
+					docker logs -f gameapp
+
+tour-logs		:
+					docker logs -f tourapp
+					
 psql		:
 					$(DOCKER_CMD) exec postgres psql --username=postgres --dbname=usermanagement
 

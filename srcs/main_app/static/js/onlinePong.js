@@ -21,18 +21,19 @@
 	var scaleFactor = canvasH / remoteCanvasH;
 	
 	// Paddles
-	var paddleHeight = canvasH * paddleHScale;
-	var paddleWidth = canvasW * paddleWScale;
-	var leftPaddleYaxis = canvasH / 2 - paddleHeight / 2;
-	var rightPaddleYaxis = canvasH / 2 - paddleHeight / 2;
+	var paddleHeight = Math.floor(canvasH * paddleHScale);
+	var paddleWidth = Math.floor(canvasW * paddleWScale);
+	console.log("paddleHeight = ", paddleHeight, "paddleWidth = ", paddleWidth);
+	var leftPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
+	var rightPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
 	var paddleSpeed = 5;
 	
 	// Ball
-	var ballXaxis = canvasW / 2;
-	var ballYaxis = canvasH / 2;
+	var ballXaxis = Math.floor(canvasW / 2);
+	var ballYaxis = Math.floor(canvasH / 2);
 	var ballRadius = paddleWidth;
-	var ballSpeedXaxis = 4;
-	var ballSpeedYaxis = 4;
+	var ballSpeedXaxis = 5;
+	var ballSpeedYaxis = 5;
 
 	console.log("canvas height and width = ", canvasH, canvasW);
 	// Score
@@ -94,7 +95,8 @@
 	}
 	
 	function countdown(parent, callback) {
-		var texts = ['Match found!', '3', '2', '1', 'GO'];
+		// var texts = ['Match found!', '3', '2', '1', 'GO'];
+		var texts = ['Match found!'];
 		
 		// This will store the paragraph we are currently displaying
 		var paragraph = null;
@@ -282,15 +284,15 @@
 		// }
 
 		// Left paddle movement
-		if (leftWPressed && leftPaddleYaxis > padding)
+		if (leftWPressed && leftPaddleYaxis > 0)
 			leftPaddleYaxis -= paddleSpeed;
-		else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvas.height)
+		else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvasH)
 			leftPaddleYaxis += paddleSpeed;
 		
-			// Right paddle movement
-		if (rightWPressed && rightPaddleYaxis > padding)
+		// Right paddle movement
+		if (rightWPressed && rightPaddleYaxis > 0)
 			rightPaddleYaxis -= paddleSpeed;
-		else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvas.height - padding)
+		else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvasH)
 			rightPaddleYaxis += paddleSpeed;
 
 		// Move ball
@@ -298,42 +300,32 @@
 		ballYaxis += ballSpeedYaxis;
 
 		// Top & bottom collision
-		if (ballYaxis - ballRadius <= padding ||
-			ballYaxis + ballRadius >= canvasH - padding)
+		if (ballYaxis - ballRadius <= 0 ||
+			ballYaxis + ballRadius >= canvasH)
 			ballSpeedYaxis = -ballSpeedYaxis;
 
 		// Left paddle collision
-		if (ballXaxis - ballRadius <= paddleWidth + padding &&
+		if (ballXaxis - ballRadius <= paddleWidth &&
 			ballYaxis >= leftPaddleYaxis &&
 			ballYaxis <= leftPaddleYaxis + paddleHeight)
-			ballSpeedXaxis = -ballSpeedXaxis;
+			if (ballSpeedXaxis < 0)
+				ballSpeedXaxis = -ballSpeedXaxis;
 
 		// Right paddle collision
-		if (ballXaxis + ballRadius >= canvasW - paddleWidth - padding &&
+		if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
 			ballYaxis >= rightPaddleYaxis &&
 			ballYaxis <= rightPaddleYaxis + paddleHeight)
-			ballSpeedXaxis = -ballSpeedXaxis;
+			if (ballSpeedXaxis > 0)
+				ballSpeedXaxis = -ballSpeedXaxis;
 
 		// Check if ball goes out of bounds on left or right side of canvas
-		if (ballXaxis <= padding) 
-		{
-			console.log("right scored!");
+		if (ballXaxis - ballRadius <= 0) {
 			if (playerId == rightPlayerId)
 				sendScoredEvent();
-			// paused = true;
-			// cancelAnimationFrame(animationId);
-			// reset();
-			// rightPlayerScore++;
 		}
-		else if (ballXaxis >= canvas.width - padding)
-		{
-			console.log("left scored!");
+		else if (ballXaxis + ballRadius >= canvasW) {
 			if (playerId == leftPlayerId)
 				sendScoredEvent();
-			// paused = true;
-			// cancelAnimationFrame(animationId);
-			// reset();
-			// leftPlayerScore++;
 		}
 	}
 
