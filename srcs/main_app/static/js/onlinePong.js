@@ -312,7 +312,7 @@
 				ballSpeedXaxis = -ballSpeedXaxis;
 
 		// Right paddle collision
-		if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
+		if (ballXaxis + ballRadius >= canvasW - paddleWidth - padding &&
 			ballYaxis >= rightPaddleYaxis &&
 			ballYaxis <= rightPaddleYaxis + paddleHeight)
 			if (ballSpeedXaxis > 0)
