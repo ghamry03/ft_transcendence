@@ -36,7 +36,8 @@ class oauth_42:
     def fetch_image(self):
         response = requests.get(self.image_url)
         if response.status_code != 200:
-            raise exceptions.AuthenticationFailed('Failed to connect to intra')
+            response = requests.get('http://localhost:3000/media/johndoe.png')
+        #     raise exceptions.AuthenticationFailed('Failed to connect to intra')
         image_file = open('media/' + self.image_name, 'wb')
         image_file.write(response.content)
         image_file.close()

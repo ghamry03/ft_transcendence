@@ -151,12 +151,12 @@ function update()
 // Reset ball
 function reset()
 {
-  ballXaxis = canvas.width / 2;
-  ballYaxis = canvas.height / 2;
-  ballSpeedXaxis = -ballSpeedXaxis;
-  // ballSpeedYaxis = Math.random();
+    ballXaxis = canvas.width / 2;
+    ballYaxis = canvas.height / 2;
+    ballSpeedXaxis = -ballSpeedXaxis;
+    // ballSpeedYaxis = Math.random();
 
-  ballSpeedYaxis = -ballSpeedYaxis;
+    ballSpeedYaxis = -ballSpeedYaxis;
 }
 
 // Draw objects on canvas
