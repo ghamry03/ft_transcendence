@@ -9,4 +9,8 @@ urlpatterns = [
     path('topbar/', views.topBar, name='topBar'),
     path('token/', views.token, name='token'),
     path('renew_token/', views.renew_token, name='renew_token')
+    path('online/', views.onlineGame, name="onlineGame"),
+    path('offline/', views.offlineGame, name="offlineGame"),
+	path('playerInfo/', views.getOpponentInfo, name='getOpponentInfo'),
+
 ]

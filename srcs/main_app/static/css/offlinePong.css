@@ -1,0 +1,40 @@
+body {
+  background-color:#2A1948;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.button{
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.btn {
+  background-color: #1B102E;
+  border: none;
+  color: #0abdc6;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.btn:hover {
+  background-color:none;
+}
+
+canvas {
+  background: #1B102E;
+  border-radius: 5%;
+  padding: 30px;
+}

@@ -91,13 +91,14 @@ body {
   min-height: 64px;
 }
 
-#userName {
-  margin-right: 16px;
-  font-family: 'ps2p';
-  font-size: 12px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
+#userName{
+    color: #FEFFCF;
+    margin-right: 16px;
+    font-family: 'ps2p';
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .pongping {

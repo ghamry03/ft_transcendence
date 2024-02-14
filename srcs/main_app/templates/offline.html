@@ -1,0 +1,41 @@
+{% comment %} <!DOCTYPE html>
+<html>
+  <head>
+    <title>Pong Ping Game</title>
+    <!-- Add the Bootstrap CSS file -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <!-- Add additional CSS in static file -->
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/pong.css' %}" />
+</head> {% endcomment %}
+
+{% comment %} <body> {% endcomment %}
+  <div class="container">
+    <canvas id="canvas" width="1024" height="580"></canvas>
+  </div>
+  <div class="button">
+    <button id="start-btn" class="btn">Start</button>
+    <button id="pause-btn" class="btn">Stop</button>
+    <button id="restart-btn" class="btn">Restart</button>
+  </div>
+  <!-- Add a modal element with an ID -->
+  <div class="modal" tabindex="-1" role="dialog" id="message-modal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-body">
+          <h5 id="message"></h5>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="message-modal-close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>  
+      </div>
+    </div>
+  </div>
+
+  {% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {% endcomment %}
+  {% comment %} <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> {% endcomment %}
+  {% comment %} {% load static %} {% endcomment %}
+  {% comment %} <script src="{% static 'js/pong.js' %}"></script> {% endcomment %}
+
+{% comment %} </body>
+</html> {% endcomment %}
