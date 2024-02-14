@@ -1,0 +1,11 @@
+<div>
+  {% include "loginButton.html" with title="Logout" onClick="engine('/login','false',0)" %}
+  <!-- <a onclick="engine('/login','false',0)" >logout</a> -->
+</div>
+<h1 id="userName" class="align-self-center align-middle">
+  {{ userData.username }}
+</h1>
+<img
+  src="http://localhost:8001/{{userData.image}}"
+  class="profilePic align-middle"
+/>

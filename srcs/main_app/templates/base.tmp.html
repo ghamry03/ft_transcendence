@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}PongPing{% endblock %}</title>
     {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
     <script type="text/javascript" src="{% static 'js/utils.js' %}"></script>
@@ -12,8 +12,22 @@
         if (isLoggedin == "true") {
           fetchPage("/home", "#mainContentArea");
           setInterval(() => {
-            fetch("/token");
+            console.log("renewing thingy");
+            fetch("/token")
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+              })
+              .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                fetchPage("/login", "#mainContentArea");
+              });
           }, 1000 * 60 * 60);
+          // }, 1000 * 60 * 60);
+        } else {
+          console.log('THE ELSE')
+          fetchPage("/login", "#mainContentArea");
         }
       });
     </script>
@@ -27,9 +41,9 @@
             <h1 class="pongping align-self-center">pong<br />ping</h1>
           </div>
           <div class="col-6 d-flex justify-content-end">
-            {% if isLoggedIn == False %}
-            <a href="{{authUrl}}">Login Here</a>
-            {% endif %}
+            <!-- {% if isLoggedIn == False %} -->
+            <!-- <a href="{{authUrl}}">Login Here</a> -->
+            <!-- {% endif %} -->
             <h1 id="userName" class="align-self-center align-middle">
               {{ userData.username }}
             </h1>

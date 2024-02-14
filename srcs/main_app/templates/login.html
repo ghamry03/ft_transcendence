@@ -1,0 +1,10 @@
+{% load static %}
+<!-- <div class="loginPage"> -->
+<div class="row g-5 m-0 loginPage">
+    <p>PONGPING</p>
+    <a href="{{authUrl}}">LOGIN</a>
+    <img src="{% static 'imgs/arcade.png' %}">
+    <div class="col-4">
+        {% include "loginButton.html" with title="Login" onClick="location.href='authUrl'" %}
+    </div>
+</div
