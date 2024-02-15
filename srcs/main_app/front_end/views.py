@@ -14,6 +14,14 @@ def loginPage(request):
     }
     return render(request, 'login.html', context)
 
+def logout(request):
+    context = {
+        'authUrl': environ.Env()('AUTH_URL')
+    }
+    request.session.flush()
+    return render(request, 'login.html', context)
+
+
 def topBar(request):
     if 'logged_in' not in request.session or request.session['logged_in'] == False:
         return render(request, 'topBar.html')

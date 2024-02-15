@@ -48,11 +48,14 @@ const injections = {
   },
   '/login': () => {
     fetchMainContent("/login", 'mainContainer');
+  },
+  '/logout': () => {
+    fetchMainContent("/logout", 'mainContainer');
     clearInterval(pid);
     removeScript('token');
     removeScript('offline')
     removeScript('online')
-  },
+  }
 }
 
 function engine(pageUrl) {
