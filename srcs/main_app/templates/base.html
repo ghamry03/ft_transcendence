@@ -9,9 +9,13 @@
     <link rel="stylesheet" href="{% static 'css/offlinePong.css' %}" />
     <script type="text/javascript" src="{% static 'js/engine.js' %}"></script>
     <script>
-      isLoggedIn = "{{request.session.logged_in |yesno:'true,false'}}";
+      isLoggedIn = "{{request.session.logged_in | yesno:'true,false'}}";
       document.addEventListener("DOMContentLoaded", () => {
-        engine('/home', isLoggedIn, 0);
+        if (isLoggedIn === 'true') {
+          engine('/home');
+        } else {
+          engine('/login');
+        }
       });
     </script>
   </head>

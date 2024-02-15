@@ -1,22 +1,14 @@
 from django.shortcuts import render,redirect
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 import requests
 import environ
 import os
-import logging
-from django.template.loader import render_to_string
 
-logger = logging.getLogger(__name__)
 # Create your views here.
-
 def index(request):
     return render(request, 'base.html')
 
 def loginPage(request):
-    logging.info("LOGIN PAGE")
-    if 'logged_in' in request.session and request.session['logged_in'] == True:
-        request.session['logged_in'] = False
-        request.session.flush()
     context = {
         'authUrl': environ.Env()('AUTH_URL')
     }
@@ -40,7 +32,6 @@ def token(request):
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
     if response.status_code == 200:
-        # logger.info('came back from intra')
         json_response = response.json()
         access_token = json_response.get('access_token', None)
         refresh_token = json_response.get('refresh_token', None)
@@ -60,29 +51,16 @@ def token(request):
             }
             user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/' + UID, headers=headers)
             request.session['userData'] = user_api_response.json()
-            # logger.info('got token successfully')
             request.session['logged_in'] = True
-            return redirect("/")
-        else:
-            logger.info('failed to get token')
-    else:
-        logger.info('failed to redirect from intra')
+            return redirect('/')
     try:
-        del request.session["logged_in"]
+        request.session.flush()
     except KeyError:
         pass
-    request.session.flush()
-    raise Http404
+    return redirect('/')
 
 
-from django.core.exceptions import BadRequest
 def renew_token(request):
-    raise BadRequest('Invalid request.')
-    return JsonResponse({
-        'message': "Can't refresh_token"
-    }, status=404)
-    logger.info('loggedin exists')
-    logger.info('already logged in')
     files = {
         'grant_type': (None, 'refresh_token'),
         'refresh_token': (None, request.session['refresh_token']),
@@ -90,44 +68,34 @@ def renew_token(request):
         'client_secret': (None, os.environ['INTRA_SECRET'])
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
-    logger.info(response.reason)
     if response.status_code == 200:
         json_response = response.json()
         request.session['access_token'] = json_response.get('access_token', None)
         request.session['refresh_token'] = json_response.get('refresh_token', None)
-        logger.info('renewd successfully')
-        return HttpResponse()
-    request.session.flush()
+    else:
+        request.session.flush()
+    return HttpResponse(status=response.status_code)
 
 
 def homePage(request):
     context = {
         'userData' : request.session['userData'],
-        'logged_in': True
     }
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
     httpResponse.set_cookie('uid' , request.session['userData']['uid'])
     httpResponse.set_cookie('token' , request.session['access_token'])
     return httpResponse
-    return render(request, 'home.html', {
-        'userData': request.session['userData'],
-        'logged_in': True
-    })
+    # return render(request, 'home.html', {
+    #     'userData': request.session['userData'],
+    # })
 
 def homeCards(request):
     context = {
         'userData': request.session['userData'],
-        'logged_in': True
     }
     return render(request, 'homeCards.html', context)
 
-
-# def joinQueue(request):
-    
-
-#This will render the template for the logged in state
-#This should be called from the main template
 
 def onlineGame(request):
     context = {

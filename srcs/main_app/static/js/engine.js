@@ -26,24 +26,17 @@ function removeScript(id) {
   }
 }
 
-function isStillLoggedIn(isLoggedIn, expiryTime) {
-    // TODO: check time
-  if (isLoggedIn == "true")
-    return true
-  else
-    return false
-}
-
 const injections = {
   '/home': () => {
     fetchMainContent('/home', 'mainContentArea')
       .then(() => fetchMainContent('/topbar', 'topBar'))
-      .then(() => fetchMainContent('/cards', 'homeContentArea'));
-    // injectScript('static/js/token.js', 'scripts', 'token');
+      .then(() => fetchMainContent('/cards', 'homeContentArea'))
+      .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'));
   },
   '/cards': () => {
     fetchMainContent('/cards', 'homeContentArea');
     removeScript('online');
+    removeScript('offline')
   },
   '/offline': () => {
     fetchMainContent('/offline', 'homeContentArea')
@@ -55,16 +48,15 @@ const injections = {
   },
   '/login': () => {
     fetchMainContent("/login", 'mainContainer');
-    // clearInterval(pid)
+    clearInterval(pid);
+    removeScript('token');
+    removeScript('offline')
+    removeScript('online')
   },
 }
 
-function engine(pageUrl, isLoggedIn, expiryTime) {
-  if (isStillLoggedIn(isLoggedIn, expiryTime)) {
+function engine(pageUrl) {
     injections[pageUrl]();
-  } else {
-    injections['/login']();
-  }
 }
 
 function getTopBar() {
