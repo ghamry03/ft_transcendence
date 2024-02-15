@@ -10,17 +10,7 @@ logger = logging.getLogger(__name__)
 # Create your views here.
 
 def index(request):
-    if 'logged_in' not in request.session:
-        # logger.info('index: LOGGED IN')
-        request.session['logged_in'] = False
-        context = {}
-    else:
-        # logger.info('index: NOT LOGGED IN')
-        context = {
-            'userData':request.session['userData'],
-        }
-    logging.info('INSIDE INDEX')
-    return render(request, 'base.html', context)
+    return render(request, 'base.html')
 
 def loginPage(request):
     logging.info("LOGIN PAGE")
@@ -110,11 +100,27 @@ def renew_token(request):
     request.session.flush()
 
 
-def homeLoggedIn(request):
+def homePage(request):
+    context = {
+        'userData' : request.session['userData'],
+        'logged_in': True
+    }
+
+    httpResponse = HttpResponse(render(request, 'home.html', context))
+    httpResponse.set_cookie('uid' , request.session['userData']['uid'])
+    httpResponse.set_cookie('token' , request.session['access_token'])
+    return httpResponse
     return render(request, 'home.html', {
         'userData': request.session['userData'],
         'logged_in': True
     })
+
+def homeCards(request):
+    context = {
+        'userData': request.session['userData'],
+        'logged_in': True
+    }
+    return render(request, 'homeCards.html', context)
 
 
 # def joinQueue(request):
@@ -125,18 +131,13 @@ def homeLoggedIn(request):
 
 def onlineGame(request):
     context = {
-        # 'uid': request.session['uid'],
-        # 'token': request.session['access_token'],
-        # 'userData' : request.session['userData']
     }
-    x = render_to_string('game.html', context)
-    return HttpResponse(x)
+    return render(request, 'game.html', context)
 
 def offlineGame(request):
     context = {
     }
-    x = render_to_string('offline.html', context)
-    return HttpResponse(x)
+    return render(request, 'offline.html', context)
 
 def getOpponentInfo(request):
     ownerUid = request.GET.get('ownerUid')

@@ -5,25 +5,19 @@
     <title>{% block title %}PongPing{% endblock %}</title>
     {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
     <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/game.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/offlinePong.css' %}" />
     <script type="text/javascript" src="{% static 'js/engine.js' %}"></script>
     <script>
-      let isLoggedIn = "{{request.session.logged_in |yesno:'true,false'}}";
-      document.addEventListener("DOMContentLoaded", () => {engine('/home', isLoggedIn, 0)});
+      isLoggedIn = "{{request.session.logged_in |yesno:'true,false'}}";
+      document.addEventListener("DOMContentLoaded", () => {
+        engine('/home', isLoggedIn, 0);
+      });
     </script>
-    <script type="text/javascript" src="{% static 'js/utils.js' %}"></script>
   </head>
 
   <body>
     <div class="mainContainer" id="mainContainer">
-      <div class="topBar">
-        <div class="row">
-          <div class="col-6 d-flex justify-content-start align-middle">
-            <h1 class="pongping align-self-center">pong<br />ping</h1>
-          </div>
-          <div class="col-6 d-flex justify-content-end" id="topBar"></div>
-        </div>
-      </div>
-      <div id="scripts"></div>
       <div id="mainContentArea"></div>
     </div>
   </body>
