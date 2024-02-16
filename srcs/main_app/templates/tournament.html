@@ -1,5 +1,5 @@
 {% load static %}
-<div class="outer-container" id="bracketContainer">
+<div class="outer-container" id="bracket">
 	<div class="image-container" id="queue">
 		<div class="img-cir round">
 			<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player0">
@@ -26,6 +26,12 @@
 			<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 7" id="player7">
 		</div>
 		{% comment %} <img src="https://i.imgur.com/BPukfZQ.png" alt="Image 2" id="player2"> {% endcomment %}
+	</div>
+</div>
+<div class="outer-container" id="matchReadyBox">
+	<div class="form-check">
+		<input class="form-check-input" type="checkbox" value="" id="readyToStart">
+		<label class="form-check-label" for="readyToStart" style="color: white;">Ready</label>
 	</div>
 </div>
 {% comment %} <button onclick="toggleBracket()">Click Me</button> {% endcomment %}

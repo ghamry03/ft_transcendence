@@ -10,7 +10,7 @@ from .PlayerQueue import PlayerQueue
 
 class TournamentConsumer(AsyncWebsocketConsumer):
 
-    PLAYER_MAX = 8
+    PLAYER_MAX = 4
     PADDING = 20
     SPEED = 13
     update_lock = asyncio.Lock()
@@ -18,15 +18,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     queue = PlayerQueue()
     players = {}
     tournaments = [] # list of group names of all active tournaments
-    
-    paddleHScale = 0.2
-    paddleWScale = 0.015
-    canvasHeight = 510
-    canvasWidth = 960
-    paddleHeight = canvasHeight * paddleHScale
-    paddleWidth = canvasWidth * paddleWScale
-    ballRadius = paddleWidth
-    paddleSpeed = SPEED
 
 	# Called when the websocket is handshaking as part of the connection process
     async def connect(self):
@@ -94,21 +85,87 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 elif len(self.tournaments) > 0:
                     self.tournaments.pop()
             elif self.playerId in self.players:
-                tourGroupName = self.players[self.playerId]["groupName"]
+                tourName = self.players[self.playerId]["tourName"]       
+                groupName = self.players[self.playerId]["groupName"]       
+                opponentId = self.players[self.playerId]["opponentId"]
+                score1 = self.players[self.playerId]["score"]
+                score2 = self.players[opponentId]["score"]
+                gid = self.players[self.playerId]['gid']
+
                 del self.players[self.playerId]
-                # send it to the match instead of the whole tournament
-                # await self.channel_layer.group_send(
-                #         tourGroupName,
-                #         {
-                #             "type": "playerLeftQueue",
-                #             "playerId": self.playerId,
-                #         }
-                #     )
+                del self.players[opponentId]
+                await self.endGame(gid, self.playerId, opponentId, score1, score2)
+                await self.channel_layer.group_discard(
+                    self.playerId, self.channel_name
+                )
+                await self.channel_layer.group_send(
+                    groupName,
+                    {"type": "disconnected"}
+                )
 
 	# Called when the server receives a message from the WebSocket
     async def receive(self, text_data):
-        await self.send(text_data=json.dumps({'message': text_data}))
+        clientData = json.loads(text_data)
+        msg_type = clientData.get("type")
 
+        playerId = int(clientData.get("playerId"))
+        player = self.players.get(playerId, None)
+        if not player:
+            self.logger.info("not a player")
+            return
+        opponent = self.players[player["opponentId"]]
+        if msg_type == "keypress":
+            key = clientData.get("key")
+            keyDown = clientData.get("keyDown")
+            await self.channel_layer.group_send(
+                player["groupName"],
+                { 
+                    "type": "keyUpdate",
+                    "key": key,
+                    "keyDown": keyDown,
+                    "isLeft": player["playerPos"] < opponent["playerPos"],
+                },
+            )
+
+        elif msg_type == "playerScored":
+            player["score"] += 1
+            leftScore = 0
+            rightScore = 0
+            ballDir = 1
+            # left scored
+            if player["playerPos"] < opponent["playerPos"]: # this player is the left
+                leftScore = player["score"]
+                rightScore = opponent["score"]
+                ballDir = -1
+            # right scored
+            else:
+                leftScore = opponent["score"]
+                rightScore = player["score"]
+            await self.channel_layer.group_send(
+                player["groupName"], 
+                {
+                    "type": "scoreUpdate",
+                    "leftScore": leftScore,
+                    "rightScore": rightScore,
+                    "ballDir": ballDir
+                }
+            )
+            self.logger.info("Sent score update back %d %d", player["score"], opponent["score"])
+        
+        elif msg_type == "matchEnded":
+            tourName = player["tourName"]       
+            groupName = player["groupName"]       
+            opponentId = player["opponentId"]
+            score1 = player["score"]
+            score2 = self.players[opponentId]["score"]
+            gid = player['gid']
+
+            del self.players[self.playerId]
+            del self.players[opponentId]
+            await self.endGame(gid, self.playerId, opponentId, score1, score2)
+            await self.channel_layer.group_discard(
+                self.playerId, self.channel_name
+            )
     async def newPlayerJoined(self, event):
         await self.send(
             text_data=json.dumps(
@@ -139,23 +196,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }
             )
         )
-
-    async def state_update(self, event):
-        # self.logger.info("sending a status update!!")
+    
+    async def scoreUpdate(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "stateUpdate",
-                    "leftPaddle": event["leftPaddle"],
-                    "rightPaddle": event["rightPaddle"],
+                    "type": "scoreUpdate",
                     "leftScore": event["leftScore"],
-                    "rightScore": event["rightScore"], 
-                    "ballX": event["ballX"],
-                    "ballY": event["ballY"],
+                    "rightScore": event["rightScore"],
+                    "ballDir": event["ballDir"]
                 }
             )
         )
-    
+
     async def roundStarting(self, event):
         await self.send(
             text_data=json.dumps(
@@ -168,83 +221,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         )
 
-    async def game_loop(self, pid1, pid2, groupName):
-        await asyncio.sleep(6)
-        ballXaxis = self.canvasWidth / 2
-        ballYaxis = self.canvasHeight / 2
-        ballSpeedXaxis = self.SPEED
-        ballSpeedYaxis = self.SPEED
-        while pid1 in self.players and pid2 in self.players:
-            async with self.update_lock:
-            # consider changing the while condition to terminate 
-                player1 = self.players[pid1]
-                player2 = self.players[pid2]
-                if player1["upPressed"] and player1["paddlePosition"] > self.PADDING:
-                    player1["paddlePosition"] -= self.paddleSpeed
-                elif player1["downPressed"] and player1["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
-                    player1["paddlePosition"] += self.paddleSpeed    
-                if player2["upPressed"] and player2["paddlePosition"] > self.PADDING:
-                    player2["paddlePosition"] -= self.paddleSpeed
-                elif player2["downPressed"] and player2["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
-                    player2["paddlePosition"] += self.paddleSpeed    
+    async def keyUpdate(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "keyUpdate",
+                    "key": event["key"],
+                    "keyDown": event["keyDown"],
+                    "isLeft": event["isLeft"],
+                }
+            )
+        )
 
-                # ball pos calc - move to a sync function later
-                ballXaxis += ballSpeedXaxis
-                ballYaxis += ballSpeedYaxis
-
-                # Top & bottom collision
-                if ballYaxis - self.ballRadius < self.PADDING or ballYaxis + self.ballRadius > self.canvasHeight - self.PADDING:
-                    ballSpeedYaxis = -ballSpeedYaxis
-
-                # Left paddle collision
-                if (
-                    ballXaxis - self.ballRadius < self.paddleWidth
-                    and player1["paddlePosition"] < ballYaxis < player1["paddlePosition"] + self.paddleHeight
-                ):
-                    ballSpeedXaxis = -ballSpeedXaxis
-
-                # Right paddle collision
-                if (
-                    ballXaxis + self.ballRadius > self.canvasWidth - self.paddleWidth - self.PADDING
-                    and player2["paddlePosition"] < ballYaxis < player2["paddlePosition"] + self.paddleHeight
-                ):
-                    ballSpeedXaxis = -ballSpeedXaxis
-
-                # Check if ball goes out of bounds on left or right side of canvas
-                if ballXaxis < 0:
-                    player2["score"] += 1
-                    ballXaxis = self.canvasWidth / 2
-                    ballYaxis = self.canvasHeight / 2
-                    ballSpeedXaxis = -ballSpeedXaxis
-                    ballSpeedYaxis = -ballSpeedYaxis
-
-                elif ballXaxis > self.canvasWidth - self.PADDING:
-                    player1["score"] += 1
-                    ballXaxis = self.canvasWidth / 2
-                    ballYaxis = self.canvasHeight / 2
-                    ballSpeedXaxis = -ballSpeedXaxis
-                    ballSpeedYaxis = -ballSpeedYaxis
-
-                await self.channel_layer.group_send(
-                    groupName,
-                    { 
-                        "type": "state_update", 
-                        "leftPaddle": player1["paddlePosition"], 
-                        "rightPaddle": player2["paddlePosition"],
-                        "leftScore": player1["score"],
-                        "rightScore": player2["score"], 
-                        "ballX": ballXaxis,
-                        "ballY": ballYaxis 
-                    },
-                )
-                if player1["score"] == 11 or player2["score"] == 11:
-                    gid = player1["gid"]
-                    score1 = player1["score"]
-                    score2 = player2["score"]
-                    requests.get('http://gameapp:2000/game/endGame/' + str(gid) + '/' + str(pid1) + '/' + str(pid2) + '/' + str(score1) + '/' + str(score2) + '/')
-                    break
-            await asyncio.sleep(0.05)
-
+    
         # player {playerId, opponentId, gid, groupName, tid, score}
         # ---------------- SET UP ----------------
         # tid = create db record
@@ -289,10 +278,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 "tid": tid,
                 "gid": gid,
                 "groupName": groupName,
+                "tourName": tourName,
                 "score": 0,
-                "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
-                "upPressed": False,
-                "downPressed": False,
+                # "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
+                # "upPressed": False,
+                # "downPressed": False,
                 "playerPos": i,
             }
             self.players[pid2] = {
@@ -301,12 +291,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 "tid": tid,
                 "gid": gid,
                 "groupName": groupName,
+                "tourName": tourName,
                 "score": 0,
-                "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
-                "upPressed": False,
-                "downPressed": False,
-                "playerPos": i,
+                # "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
+                # "upPressed": False,
+                # "downPressed": False,
+                "playerPos": i + 1,
             }
+            self.logger.info("run tour players len = %d", len(self.players))
             await self.channel_layer.group_send(
                 groupName,
                 {
@@ -316,9 +308,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     "rightPlayer": pid2,
                 },
             )
-            matches.append(asyncio.create_task(self.game_loop(pid1, pid2, groupName)))
-        round1Results = await asyncio.gather(*matches)
-        self.logger.info("round 1 results len = %d, type = %s", len(round1Results), type(round1Results))
+            # matches.append(asyncio.create_task(self.game_loop(pid1, pid2, groupName)))
+        # round1Results = await asyncio.gather(*matches)
+        # self.logger.info("round 1 results len = %d, type = %s", len(round1Results), type(round1Results))
 
 
         

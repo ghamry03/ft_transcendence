@@ -38,7 +38,7 @@ const paddleHScale = 0.2
 const paddleWScale = 0.015
 const remoteCanvasH = 510;
 
-var animationId;
+var animationId = 0;
 
 var canvasW;
 var canvasH;
@@ -56,6 +56,11 @@ var maxScore = 10;
 
 var wPressed = false;
 var sPressed = false;
+
+var leftWPressed = false;
+var leftSPressed = false;
+var rightWPressed = false;
+var rightSPressed = false;
 
 async function toggleBracket() {
 	bracketContainer = document.getElementById("bracketContainer");
@@ -75,14 +80,14 @@ function getCookie(cname) {
 	let name = cname + "=";
 	let decodedCookie = decodeURIComponent(document.cookie);
 	let ca = decodedCookie.split(';');
-	for(let i = 0; i < ca.length; i++) {
-	  let c = ca[i];
-	  while (c.charAt(0) == ' ') {
-		c = c.substring(1);
-	  }
-	  if (c.indexOf(name) == 0) {
-		return c.substring(name.length, c.length);
-	  }
+	for (let i = 0; i < ca.length; i++) {
+		let c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+		if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
 	}
 	return "";
 }
@@ -156,7 +161,8 @@ async function printNames(playerList) {
 }
 
 function countdown(parent, callback) {
-	var texts = ['Match found!', '3', '2', '1', 'GO'];
+	var texts = ['Match found!'];
+	// var texts = ['Match found!', '3', '2', '1', 'GO'];
 	
 	// This will store the paragraph we are currently displaying
 	var paragraph = null;
@@ -211,31 +217,58 @@ async function setUpMatch(leftPlayerId, rightPlayerId) {
 	canvasH = canvas.getBoundingClientRect().height;
 	canvas.width = canvasW;
 	canvas.height = canvasH;
-	scaleFactor = canvasH / remoteCanvasH;
-	paddleHeight = canvasH * paddleHScale;
-	paddleWidth = canvasW * paddleWScale;
-	leftPaddleYaxis = canvasH / 2 - paddleHeight / 2;
-	rightPaddleYaxis = canvasH / 2 - paddleHeight / 2;
-	ballXaxis = canvasW / 2;
-	ballYaxis = canvasH / 2;
+
+	// Paddle
+	paddleHeight = Math.floor(canvasH * paddleHScale);
+	paddleWidth = Math.floor(canvasW * paddleWScale);
+	leftPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
+	rightPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
+	paddleSpeed = canvasH * 0.01;
+	
+	// Ball
+	ballXaxis = Math.floor(canvasW / 2);
+	ballYaxis = Math.floor(canvasH / 2);
 	ballRadius = paddleWidth;
+	ballSpeed = canvasW * 0.006;
+	ballSpeedXaxis = ballSpeed;
+	ballSpeedYaxis = ballSpeed;
+	leftWPressed = false;
+	leftSPressed = false;
+	rightWPressed = false;
+	rightSPressed = false;
+	draw();
 }
 
 const handleWebSocketMessage = (event) => {
 	const messageData = JSON.parse(event.data);
 	
 	switch (messageData.type) {
-		case "stateUpdate":
-			console.log("status update");
-			ballXaxis = messageData.ballX * scaleFactor;
-			ballYaxis = messageData.ballY * scaleFactor;
-			leftPaddleYaxis = messageData.leftPaddle * scaleFactor;
-			rightPaddleYaxis = messageData.rightPaddle * scaleFactor;
+		case "keyUpdate":
+			if (messageData.isLeft) {
+				if (messageData.key == "w")
+					leftWPressed = messageData.keyDown;
+				else
+					leftSPressed = messageData.keyDown;
+			}
+			else {
+				if (messageData.key == "w")
+					rightWPressed = messageData.keyDown;
+				else
+					rightSPressed = messageData.keyDown;
+			}
+			break;
+		case "scoreUpdate":
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
+			reset(ballSpeed * messageData.ballDir);
+			if (leftPlayerScore == 11 || rightPlayerScore == 11) {
+				endMatch();
+			}
 			break;
 		case "roundStarting":
 			console.log("Round starting... Left = ", messageData.leftPlayer, " Right = ", messageData.rightPlayer);
+			leftPlayerId = messageData.leftPlayer;
+			rightPlayerId = messageData.rightPlayer;
 			setUpMatch(messageData.leftPlayer, messageData.rightPlayer);
 			break;
 		case "tournamentStarted":
@@ -259,6 +292,9 @@ const handleWebSocketMessage = (event) => {
 			console.log("Player ", messageData.playerId, " has left the queue");
 			removePlayer(messageData.playerId);
 			break;
+		case "disconnected":
+			console.log("Opponent has disconnected");
+
 		default:
 			// Handle default case if needed
 			break;
@@ -277,6 +313,35 @@ function sendKeyUpdate(key, keyDown)
 			})
 		);
 	}
+	else {
+		alert("Lost connection with server");
+		cancelAnimationFrame(animationId);
+	}
+}
+
+function sendScoredEvent()
+{
+	if (isOpen(ws)) {
+		ws.send(
+			JSON.stringify({
+				type: "playerScored",
+				playerId: playerId
+			})
+		);
+	}
+	else {
+		alert("Lost connection with server");
+		cancelAnimationFrame(animationId);
+	}
+}
+
+function endMatch()
+{
+	if (animationId != 0) {
+		cancelAnimationFrame(animationId);
+		animationId = 0;
+	}
+	toggleBracket()
 }
 
 function keyDownHandler(e)
@@ -308,7 +373,64 @@ function keyUpHandler(e)
 	}
 }
 
+// Reset ball
+const reset = (newBallSpeed) => {
+	ballXaxis = canvasW / 2;
+	ballYaxis = canvasH / 2;
+	ballSpeedXaxis = newBallSpeed;
+	ballSpeedYaxis = newBallSpeed;
+}
+
+function update()
+{
+	// Left paddle movement
+	if (leftWPressed && leftPaddleYaxis > 0)
+		leftPaddleYaxis -= paddleSpeed;
+	else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvasH)
+		leftPaddleYaxis += paddleSpeed;
+	
+	// Right paddle movement
+	if (rightWPressed && rightPaddleYaxis > 0)
+		rightPaddleYaxis -= paddleSpeed;
+	else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvasH)
+		rightPaddleYaxis += paddleSpeed;
+
+	// Move ball
+	ballXaxis += ballSpeedXaxis;
+	ballYaxis += ballSpeedYaxis;
+
+	// Top & bottom collision
+	if (ballYaxis - ballRadius <= 0 ||
+		ballYaxis + ballRadius >= canvasH)
+		ballSpeedYaxis = -ballSpeedYaxis;
+
+	// Left paddle collision
+	if (ballXaxis - ballRadius <= paddleWidth &&
+		ballYaxis >= leftPaddleYaxis &&
+		ballYaxis <= leftPaddleYaxis + paddleHeight)
+		if (ballSpeedXaxis < 0)
+			ballSpeedXaxis = -ballSpeedXaxis;
+
+	// Right paddle collision
+	if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
+		ballYaxis >= rightPaddleYaxis &&
+		ballYaxis <= rightPaddleYaxis + paddleHeight)
+		if (ballSpeedXaxis > 0)
+			ballSpeedXaxis = -ballSpeedXaxis;
+
+	// Check if ball goes out of bounds on left or right side of canvas
+	if (ballXaxis - ballRadius <= 0) {
+		if (playerId == rightPlayerId)
+			sendScoredEvent();
+	}
+	else if (ballXaxis + ballRadius >= canvasW) {
+		if (playerId == leftPlayerId)
+			sendScoredEvent();
+	}
+}
+
 const animateGame = (time) => {
+	update();
 	draw();
 	animationId = requestAnimationFrame(animateGame);
 };
@@ -364,8 +486,6 @@ const joinQueue = () => {
 	console.log("uid = ", playerId, " token = ", token);
 	ws = new WebSocket("ws://localhost:4000/ws/tour/?uid=" + playerId);
 	ws.onmessage = handleWebSocketMessage;
-	console.log("ws is ", ws);
-	console.log("connecting to server with uid ", playerId);
 };
 
 joinQueue();

@@ -140,10 +140,6 @@
 					rightSPressed = messageData.keyDown;
 			}
 		}
-		if (messageData.type === "stateUpdate") {
-			leftPaddleYaxis = messageData.leftPaddle * scaleFactor;
-			rightPaddleYaxis = messageData.rightPaddle * scaleFactor;
-		}
 		if (messageData.type === "scoreUpdate") {
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
