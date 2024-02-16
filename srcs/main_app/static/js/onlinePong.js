@@ -42,7 +42,7 @@
 	var sPressed = false;
 
 	// socket info 
-	var ws;
+	// var ws;
 	var leftPlayerId;
 	var rightPlayerId;
 	var leftPlayerImg;
@@ -121,8 +121,6 @@
 			// }
 		// });	
 	}
-
-	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
 	const handleWebSocketMessage = (event) => {
 		const messageData = JSON.parse(event.data);

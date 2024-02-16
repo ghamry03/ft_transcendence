@@ -1,3 +1,5 @@
+var ws = null;
+
 function fetchMainContent(pageUrl, container) {
   return new Promise((resolve) => {
     fetch(pageUrl)
@@ -21,10 +23,12 @@ function injectScript(script, container, id) {
 function removeScript(id) {
   script = document.getElementById(id);
   if (script) {
-    console.log('removed the thing')
+    console.log('removed script ', id);
     script.remove();
   }
 }
+
+function isOpen(ws) { return ws.readyState === ws.OPEN }
 
 const injections = {
   '/home': () => {
@@ -34,9 +38,15 @@ const injections = {
       .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'));
   },
   '/cards': () => {
+    if (ws && isOpen(ws)) {
+      console.log("Closing game connection");
+      ws.close();
+
+    }
     fetchMainContent('/cards', 'homeContentArea');
     removeScript('online');
-    removeScript('offline')
+    removeScript('offline');
+    removeScript('tournament');
   },
   '/offline': () => {
     fetchMainContent('/offline', 'homeContentArea')
@@ -49,6 +59,9 @@ const injections = {
   '/tournament': () => {
     fetchMainContent('/tournament', 'homeContentArea')
       .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'));
+  },
+  '/tourGame': () => {
+    return fetchMainContent('/online', 'gameBox');
   },
   '/login': () => {
     fetchMainContent("/login", 'mainContainer');
@@ -63,7 +76,7 @@ const injections = {
 }
 
 function engine(pageUrl) {
-    injections[pageUrl]();
+    return injections[pageUrl]();
 }
 
 function getTopBar() {

@@ -72,7 +72,8 @@ async function toggleBracket() {
 	}
 	else {
 		bracketContainer.style.display = "none";
-		await fetchPage('/tourGame', "#gameBox");
+		await engine('/tourGame');
+		console.log("fetched tour game template");
 	}
 }
 
