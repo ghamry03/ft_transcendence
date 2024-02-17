@@ -34,9 +34,9 @@ const injections = {
       .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'));
   },
   '/cards': () => {
-    fetchMainContent('/cards', 'homeContentArea');
     removeScript('online');
-    removeScript('offline')
+    removeScript('offline');
+    fetchMainContent('/cards', 'homeContentArea');
   },
   '/offline': () => {
     fetchMainContent('/offline', 'homeContentArea')
@@ -58,10 +58,21 @@ const injections = {
   }
 }
 
-function engine(pageUrl) {
-    injections[pageUrl]();
+function engine(pageUrl, addToHistory=true) {
+  injections[pageUrl]();
+  if (addToHistory) {
+    if (pageUrl == '/home') {
+      pageUrl = '/cards';
+    } else if (pageUrl == '/login') {
+      pageUrl = '/logout';
+    }
+    history.pushState({ pageUrl: pageUrl }, '');
+  }
 }
 
-function getTopBar() {
-  fetchMainContent("/topbar", 'topBar');
-}
+window.addEventListener('popstate', (event) => {
+  var state = event.state;
+  if (state) {
+    engine(state.pageUrl, false);
+  }
+});
