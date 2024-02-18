@@ -1,40 +1,49 @@
 version: "3"
 services:
-    server:
-        build: ./server
-        restart: always
-        ports:
-            - "80:80"
-        depends_on:
-            - mainapp
-            - postgres
-
     mainapp:
         build: ./main_app
+        image: mainapp
+        container_name: mainapp
         restart: always
         ports:
             - "8000:8000"
         networks:
             - user_app_network
-        # command:
-        # - sh
-        # - -c
-        # - |
-        #   python manage.py makemigrations
-        #   python manage.py migrate --noinput
-        #   python manage.py runserver 0.0.0.0:8000
         volumes:
-            - main_app_data:/home/main_app
+            - ../srcs/main_app/:/home/main_app
+            # - main_app_data:/home/main_app
         depends_on:
             userapp:
+                condition: service_started
+            gameapp:
                 condition: service_started
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
 
+    gameapp:
+        build: ./game_app
+        image: gameapp
+        container_name: gameapp
+        restart: on-failure
+        ports:
+            - "2000:2000"
+        volumes:
+            - ../srcs/game_app/:/home/game_app
+            # - game_app_data:/home/game_app
+        depends_on:
+            userapp:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+            
     userapp:
         build: ./user_app
+        image: userapp
+        container_name: userapp
         restart: always
         ports:
             - "8001:8000"
@@ -48,27 +57,14 @@ services:
         networks:
             - user_app_network
 
-    friendsapp:
-        build: ./friends_app
-        restart: always
-        ports:
-            - "8002:8000"
-        volumes:
-            - friends_app_data:/home/friends_app
-            - user_app_data:/home/user_app
-        depends_on:
-            postgres:
-                condition: service_healthy
-        env_file:
-            - ./.env
-        networks:
-            - user_app_network
-
     postgres:
         build: ./postgres
+        image: postgres
+        container_name: postgres
         restart: always
         volumes:
-            - postgres_data:/var/lib/postgresql/data
+            - ../srcs/postgres/data:/var/lib/postgresql/data
+            # - postgres_data:/var/lib/postgresql/data
         healthcheck:
             test: pg_isready -U postgres
             interval: 5s
@@ -83,13 +79,13 @@ services:
         networks:
             - user_app_network
 
-volumes:
-    main_app_data:
-        driver: local
-        driver_opts:
-            o: bind
-            type: none
-            device: ../srcs/main_app/
+# volumes:
+#     main_app_data:
+#         driver: local
+#         driver_opts:
+#             o: bind
+#             type: none
+#             device: ../srcs/main_app/
 
     user_app_data:
         driver: local
@@ -105,12 +101,12 @@ volumes:
             type: none
             device: ../srcs/friends_app/
 
-    postgres_data:
-        driver: local
-        driver_opts:
-            o: bind
-            type: none
-            device: ../srcs/postgres/data
+    # postgres_data:
+    #     driver: local
+    #     driver_opts:
+    #         o: bind
+    #         type: none
+    #         device: ../srcs/postgres/data
 
 networks:
     user_app_network:

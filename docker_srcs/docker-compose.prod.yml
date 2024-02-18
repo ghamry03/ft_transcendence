@@ -1,0 +1,100 @@
+version: "3"
+services:
+    server:
+        build: ./server
+        image: nginx
+        container_name: nginx
+        restart: on-failure
+        volumes:
+            - ./server/conf.d:/etc/nginx/conf.d
+        ports:
+            - "80:80"
+        depends_on:
+            - mainapp
+            - userapp
+        networks:
+            - user_app_network
+
+    mainapp:
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/main_app/Dockerfile.prod
+        image: mainapp
+        container_name: mainapp
+        restart: on-failure
+        expose:
+          - 8000
+        command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+    
+    gameapp:
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/game_app/Dockerfile.prod
+        image: gameapp
+        container_name: gameapp
+        restart: on-failure
+        expose:
+          - 2000
+        # command: gunicorn game_app.wsgi:application --bind 0.0.0.0:2000
+        depends_on:
+            userapp:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+
+    userapp:
+        build:
+          context: ../
+          dockerfile: ./docker_srcs/user_app/Dockerfile.prod
+        image: userapp
+        container_name: userapp
+        restart: on-failure
+        expose:
+          - 3000
+        command: gunicorn userapp.wsgi:application --bind 0.0.0.0:3000
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+
+    postgres:
+        build: ./postgres
+        image: postgres
+        container_name: postgres
+        restart: on-failure
+        volumes:
+            - ../srcs/postgres/data:/var/lib/postgresql/data
+            # - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: pg_isready -U postgres
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+
+# volumes:
+#     postgres_data:
+#         driver: local
+#         driver_opts:
+#             o: bind
+#             type: none
+#             device: ../srcs/postgres/data
+
+networks:
+    user_app_network:
+        driver: bridge

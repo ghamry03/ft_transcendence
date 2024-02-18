@@ -1,0 +1,22 @@
+<div class="onlineGame row">
+  <div class="container-fluid col-12">
+    <canvas id="gameCanvas" class="w-100"></canvas>
+  </div>
+  <div id="readyGo"></div>
+  <div class="container-fluid col-12">
+    <div class="column">
+      <div class="image-cropper">
+        <img id="leftImage" class="playerpfp" src="https://i.imgur.com/L7wVzx6.jpeg" alt="Player1"/>
+      </div>
+      <p id="leftScore" class="score">0</p>
+    </div>
+    <p id="separator">-</p>
+    <div class="column">
+      <p id="rightScore" class="score">0</p>
+      <div class="image-cropper">
+        <img id="rightImage" class="playerpfp" src="https://i.imgur.com/L7wVzx6.jpeg" alt="Player2"/>
+      </div>
+    </div>
+  </div>
+  {% comment %} <p style="color: white;">{{uid}}</p> {% endcomment %}
+</div>

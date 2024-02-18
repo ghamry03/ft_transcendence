@@ -1,10 +1,7 @@
 FROM python:3.12.0-bullseye
 
-
-# RUN mkdir -p /home/ft_transcendence
-WORKDIR /home/user_app
-
-
+WORKDIR /home/game_app
+                                                         
 COPY requirements.txt ./
 # RUN pip install virtualenv
 # RUN virtualenv venv
@@ -12,16 +9,16 @@ COPY requirements.txt ./
 
 # RUN python -m venv django-env
 # RUN source venv/bin/activate
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir -r requirements.txt
-# RUN django-admin startproject mysite
 
-EXPOSE 3000
+EXPOSE 2000
 
-# COPY . .
-
-# CMD python3 manage.py makemigrations && python3 manage.py migrate
-
-# CMD [ "python", "./your-daemon-or-script.py" ]
 COPY entrypoint.sh /
 RUN chmod a+x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh"]
+
+# CMD python manage.py runserver 0.0.0.0:2000
+# CMD [ "/bin/bash" ]
