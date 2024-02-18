@@ -5,7 +5,7 @@ function fetchMainContent(pageUrl, container) {
       .then(data => {
         var parser = new DOMParser();
         var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
-        document.getElementById(container).innerHTML = data;
+        document.getElementById(container).innerHTML = doc;
         resolve();
       });
   });
@@ -18,11 +18,25 @@ function injectScript(script, container, id) {
   document.getElementById(container).appendChild(scriptElement);
 }
 
+const cleanScript = {
+  'token': () => {
+    clearInterval(pid);
+  },
+  'offline': () => {
+    offlineGame.destroy();
+    delete(offlineGame);
+  },
+  'online': () => {
+    onlineGame.destroy();
+    delete(onlineGame);
+  },
+}
+
 function removeScript(id) {
   script = document.getElementById(id);
   if (script) {
-    console.log('removed the thing')
     script.remove();
+    cleanScript[id]();
   }
 }
 
@@ -51,7 +65,6 @@ const injections = {
   },
   '/logout': () => {
     fetchMainContent("/logout", 'mainContainer');
-    clearInterval(pid);
     removeScript('token');
     removeScript('offline')
     removeScript('online')
