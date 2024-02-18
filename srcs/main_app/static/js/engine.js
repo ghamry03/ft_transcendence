@@ -11,9 +11,9 @@ function fetchMainContent(pageUrl, container) {
   });
 }
 
-function injectScript(script, container, id) {
+function injectScript(src, container, id) {
   var scriptElement = document.createElement('script');
-  scriptElement.src = script;
+  scriptElement.src = src;
   scriptElement.id = id;
   document.getElementById(container).appendChild(scriptElement);
 }
