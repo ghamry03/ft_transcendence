@@ -3,6 +3,7 @@ from django.http import HttpResponse
 import requests
 import environ
 import os
+from . import AUTH_URL, USER_API_URL
 
 # Create your views here.
 
@@ -15,7 +16,7 @@ def index(request):
     else:
         context = {
             'isLoggedIn': False,
-            'authUrl': environ.Env()('AUTH_URL')
+            'authUrl': AUTH_URL
         }
     return (render(request, 'main.html' , context))
 
@@ -48,8 +49,8 @@ def login(request):
                 'X-TOKEN': access_token
 
             }
-            user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/' + UID, headers=headers)
-            print(user_api_response.json())
+            user_api_response = requests.get(USER_API_URL + '/users/api/' + UID, headers=headers)
+            print(user_api_response.status_code)
             request.session['userData'] = user_api_response.json()
             request.session['access_token'] = access_token
             print("Received access token:", access_token)
@@ -72,6 +73,6 @@ def homeLoggedIn(request):
     }
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
-    httpResponse.set_cookie('uid' , request.session['uid'])
+    # httpResponse.set_cookie('uid' , request.session['uid'])
     httpResponse.set_cookie('token' , request.session['access_token'])
     return httpResponse

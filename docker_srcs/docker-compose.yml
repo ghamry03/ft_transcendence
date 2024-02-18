@@ -2,7 +2,7 @@ version: "3"
 services:
     server:
         build: ./server
-        restart: on-failure
+        restart: always
         ports:
             - "80:80"
         depends_on:
@@ -11,7 +11,7 @@ services:
 
     mainapp:
         build: ./main_app
-        restart: on-failure
+        restart: always
         ports:
             - "8000:8000"
         networks:
@@ -35,7 +35,7 @@ services:
 
     userapp:
         build: ./user_app
-        restart: on-failure
+        restart: always
         ports:
             - "8001:8000"
         volumes:
@@ -48,9 +48,25 @@ services:
         networks:
             - user_app_network
 
+    friendsapp:
+        build: ./friends_app
+        restart: always
+        ports:
+            - "8002:8000"
+        volumes:
+            - friends_app_data:/home/friends_app
+            - user_app_data:/home/user_app
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+
     postgres:
         build: ./postgres
-        restart: on-failure
+        restart: always
         volumes:
             - postgres_data:/var/lib/postgresql/data
         healthcheck:
@@ -58,6 +74,10 @@ services:
             interval: 5s
             timeout: 5s
             retries: 5
+        environment:
+            - POSTGRES_DB=${USER_DB_NAME}
+            - POSTGRES_USER=${USER_DB_USER}
+            - POSTGRES_PASSWORD=${USER_DB_PASS}
         env_file:
             - ./.env
         networks:
@@ -77,6 +97,13 @@ volumes:
             o: bind
             type: none
             device: ../srcs/user_app/
+    
+    friends_app_data:
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: ../srcs/friends_app/
 
     postgres_data:
         driver: local

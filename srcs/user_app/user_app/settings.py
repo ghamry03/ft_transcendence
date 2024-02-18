@@ -28,6 +28,7 @@ SECRET_KEY = 'django-insecure-ey4%ad=sv*d6z_h)gh0=rfm4hlp7w=au-qbo#26an(e)9r@&mf
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+AUTH_URL = ""
 
 
 # Application definition
@@ -78,14 +79,14 @@ WSGI_APPLICATION = 'user_app.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-        'default': {
-            'ENGINE': getenv('SQL_ENGINE'),
-            'NAME': getenv('POSTGRES_DB'),
-            'USER': getenv('POSTGRES_USER'),
-            'PASSWORD': getenv('POSTGRES_PASSWORD'),
-            'HOST': getenv('SQL_HOST'),
-            'PORT': getenv('SQL_PORT'),
-        },
+        "default": {
+        "ENGINE": 'django.db.backends.postgresql',
+        "NAME": getenv("USER_DB_NAME"),
+        "USER": getenv("USER_DB_USER"),
+        "PASSWORD": getenv("USER_DB_PASS"),
+        "HOST": getenv("DB_HOST"),
+        "PORT": getenv("DB_PORT"),
+    }
 }
 
 

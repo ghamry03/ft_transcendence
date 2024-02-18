@@ -37,7 +37,9 @@ main-sh		:
 					$(DOCKER_CMD) exec -it main_app /bin/bash
 
 user-sh		:
-					$(DOCKER_CMD) exec -it user_app /bin/bash
+					$(DOCKER_CMD) exec -it userapp /bin/bash
+friends-sh		:
+					$(DOCKER_CMD) exec -it friendsapp /bin/bash
 
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
@@ -52,6 +54,7 @@ clean			:	down
 
 fclean			:
 					$(DOCKER_CMD) down -v --rmi all
+					rm -rf srcs/postgres/data
 
 re				: fclean all
 
