@@ -82,34 +82,3 @@ def delete_related_player_match(sender, instance, **kwargs):
     playerMatches = OnlinePlayermatch.objects.filter(player=instance)
     gids = playerMatches.values_list('game_id', flat=True)
     OnlineGame.objects.filter(id__in=gids).delete()
-class TourGameTournament(models.Model):
-    starttime = models.DateTimeField()
-    endtime = models.DateTimeField()
-
-    class Meta:
-        managed = False
-        db_table = 'tour_game_tournament'
-
-class OnlineGame(models.Model):
-    starttime = models.DateTimeField()
-    endtime = models.DateTimeField()
-    tournament = models.ForeignKey(TourGameTournament, models.CASCADE, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'online_game'
-
-class OnlinePlayermatch(models.Model):
-    score = models.IntegerField(blank=True, null=True)
-    game = models.ForeignKey(OnlineGame, models.CASCADE, blank=True, null=True)
-    player = models.ForeignKey(User, models.CASCADE, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'online_playermatch'
-        
-@receiver(pre_delete, sender=User)
-def delete_related_player_match(sender, instance, **kwargs):
-    playerMatches = OnlinePlayermatch.objects.filter(player=instance)
-    gids = playerMatches.values_list('game_id', flat=True)
-    OnlineGame.objects.filter(id__in=gids).delete()

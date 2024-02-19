@@ -1,5 +1,3 @@
-var ws = null;
-
 function fetchMainContent(pageUrl, container) {
   return new Promise((resolve) => {
     fetch(pageUrl)
@@ -7,28 +5,40 @@ function fetchMainContent(pageUrl, container) {
       .then(data => {
         var parser = new DOMParser();
         var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
-        document.getElementById(container).innerHTML = data;
+        document.getElementById(container).innerHTML = doc;
         resolve();
       });
   });
 }
 
-function injectScript(script, container, id) {
+function injectScript(src, container, id) {
   var scriptElement = document.createElement('script');
-  scriptElement.src = script;
+  scriptElement.src = src;
   scriptElement.id = id;
   document.getElementById(container).appendChild(scriptElement);
+}
+
+const cleanScript = {
+  'token': () => {
+    clearInterval(pid);
+  },
+  'offline': () => {
+    offlineGame.destroy();
+    delete(offlineGame);
+  },
+  'online': () => {
+    onlineGame.destroy();
+    delete(onlineGame);
+  },
 }
 
 function removeScript(id) {
   script = document.getElementById(id);
   if (script) {
-    console.log('removed script ', id);
     script.remove();
+    cleanScript[id]();
   }
 }
-
-function isOpen(ws) { return ws.readyState === ws.OPEN }
 
 const injections = {
   '/home': () => {
@@ -38,15 +48,9 @@ const injections = {
       .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'));
   },
   '/cards': () => {
-    if (ws && isOpen(ws)) {
-      console.log("Closing game connection");
-      ws.close();
-
-    }
-    fetchMainContent('/cards', 'homeContentArea');
     removeScript('online');
     removeScript('offline');
-    removeScript('tournament');
+    fetchMainContent('/cards', 'homeContentArea');
   },
   '/offline': () => {
     fetchMainContent('/offline', 'homeContentArea')
@@ -54,7 +58,7 @@ const injections = {
   },
   '/online': () => {
     fetchMainContent('/online', 'homeContentArea')
-      .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'));
+      .then(() => injectScript('/static/js/canvas.js', 'homeContentArea', 'online'));
   },
   '/tournament': () => {
     fetchMainContent('/tournament', 'homeContentArea')
@@ -68,17 +72,27 @@ const injections = {
   },
   '/logout': () => {
     fetchMainContent("/logout", 'mainContainer');
-    clearInterval(pid);
     removeScript('token');
     removeScript('offline')
     removeScript('online')
   }
 }
 
-function engine(pageUrl) {
-    return injections[pageUrl]();
+function engine(pageUrl, addToHistory=true) {
+  if (addToHistory) {
+    if (pageUrl == '/home') {
+      pageUrl = '/cards';
+    } else if (pageUrl == '/login') {
+      pageUrl = '/logout';
+    }
+    history.pushState({ pageUrl: pageUrl }, '');
+  }
+  return injections[pageUrl]();
 }
 
-function getTopBar() {
-  fetchMainContent("/topbar", 'topBar');
-}
+window.addEventListener('popstate', (event) => {
+  var state = event.state;
+  if (state) {
+    engine(state.pageUrl, false);
+  }
+});

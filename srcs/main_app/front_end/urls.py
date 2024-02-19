@@ -7,6 +7,5 @@ urlpatterns = [
     path('home/', views.homePage, name='home'),
     path('cards/', views.homeCards, name='home_cards'),
     path('topbar/', views.topBar, name='topBar'),
-    # path('tournament/', views.tournament, name="tournament"),
     path('playerInfo/', views.getOpponentInfo, name='getOpponentInfo'),
 ]
