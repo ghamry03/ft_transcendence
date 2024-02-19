@@ -8,11 +8,23 @@ RELATIONSHIP_CHOICE = [
     (1, 'pending')
 ]
 class Friend(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    first_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='first_friends')
-    second_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='second_friends')
-    first_id = models.BigIntegerField()
-    second_id = models.BigIntegerField()
+    id = models.BigAutoField(
+            primary_key=True,
+            unique=True,
+    )
+
+    first_id = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='first_friends',
+        db_constraint=False)
+    
+    second_id = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='second_friends',
+        db_constraint=False)
+    
     relationship = models.SmallIntegerField(
         choices=RELATIONSHIP_CHOICE,
         default=1

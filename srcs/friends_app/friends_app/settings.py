@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-70d4j5&(mswtr6pdrg*9az!loq!en*ctmwgzky&9ne3qi-josm'
+SECRET_KEY = env('FAPI_DJANGO_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,26 +84,27 @@ WSGI_APPLICATION = 'friends_app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DATABASE_ROUTERS = ['friends_app.router.FriendRouter' , 'friends_app.router.UserRouter']
+
 DATABASES = {
         "default": {
         "ENGINE": 'django.db.backends.postgresql',
         "NAME": env("FRIEND_DB_NAME"),
-        "USER": env("FRIEND_DB_USER"),
-        "PASSWORD": env("FRIEND_DB_PASS"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASS"),
         "HOST": env("DB_HOST"),
         "PORT": env("DB_PORT"),
-    },
-    "users": {
-        "ENGINE": 'django.db.backends.postgresql',
-        "NAME": env("USER_DB_NAME"),
-        "USER": env("USER_DB_USER"),
-        "PASSWORD": env("USER_DB_PASS"),
-        "HOST": env("DB_HOST"),
-        "PORT": env("DB_PORT"),
-    }
+        },
+        "users": {
+            "ENGINE": 'django.db.backends.postgresql',
+            "NAME": env("USER_DB_NAME"),
+            "USER": env("DB_USER"),
+            "PASSWORD": env("DB_PASS"),
+            "HOST": env("DB_HOST"),
+            "PORT": env("DB_PORT"),
+        }
 }
 
-# DATABASE_ROUTERS = ['friends_app.db_router.UserAppRouter']
 
 
 

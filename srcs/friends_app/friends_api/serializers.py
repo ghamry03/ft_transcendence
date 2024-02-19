@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from friends_api.models import Friend, RELATIONSHIP_CHOICE
+from friends_api.models import Friend
+from user_api.models import User
 
 class FriendSerializer(serializers.ModelSerializer):
     class Meta:

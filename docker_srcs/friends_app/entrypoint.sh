@@ -1,5 +1,6 @@
 #!/bin/bash
-
+python3 manage.py migrate --database=users
+python3 manage.py makemigrations friends_api
 python3 manage.py makemigrations
 python3 manage.py migrate --noinput
 DJANGO_SUPERUSER_USERNAME=$SQL_USER \
