@@ -79,6 +79,7 @@ const injections = {
 }
 
 function engine(pageUrl, addToHistory=true) {
+  let promise = injections[pageUrl]();
   if (addToHistory) {
     if (pageUrl == '/home') {
       pageUrl = '/cards';
@@ -87,7 +88,7 @@ function engine(pageUrl, addToHistory=true) {
     }
     history.pushState({ pageUrl: pageUrl }, '');
   }
-  return injections[pageUrl]();
+  return promise;
 }
 
 window.addEventListener('popstate', (event) => {
