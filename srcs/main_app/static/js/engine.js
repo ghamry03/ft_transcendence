@@ -50,6 +50,7 @@ const injections = {
   '/cards': () => {
     removeScript('online');
     removeScript('offline');
+    removeScript('tournament');
     fetchMainContent('/cards', 'homeContentArea');
   },
   '/offline': () => {
@@ -58,7 +59,7 @@ const injections = {
   },
   '/online': () => {
     fetchMainContent('/online', 'homeContentArea')
-      .then(() => injectScript('/static/js/canvas.js', 'homeContentArea', 'online'));
+      .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'));
   },
   '/tournament': () => {
     fetchMainContent('/tournament', 'homeContentArea')
@@ -75,6 +76,7 @@ const injections = {
     removeScript('token');
     removeScript('offline')
     removeScript('online')
+    removeScript('tournament');
   }
 }
 

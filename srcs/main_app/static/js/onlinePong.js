@@ -1,3 +1,4 @@
+onlineGame = () => {	
 	const canvas = document.getElementById("gameCanvas");
 	const leftScore = document.getElementById("leftScore");
 	const rightScore = document.getElementById("rightScore");
@@ -122,6 +123,8 @@
 		// });	
 	}
 
+	function isOpen(ws) { return ws.readyState === ws.OPEN }
+	
 	const handleWebSocketMessage = (event) => {
 		const messageData = JSON.parse(event.data);
 		if (messageData.type === "keyUpdate") {
@@ -351,3 +354,14 @@
 	draw();
 	joinQueue();
 
+	onlineGame.destroy = () => {
+		document.removeEventListener("keydown", keyDownHandler);
+		document.removeEventListener("keyup", keyUpHandler);
+		if (ws) {
+			ws.close();
+			}
+			cancelAnimationFrame(animationId);
+			console.log('DESTROYED');
+	};
+}
+onlineGame();
