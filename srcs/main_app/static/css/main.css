@@ -1,79 +1,94 @@
 @font-face {
-    font-family: 'ps2p';
-    src: url('../fonts/ps2p.ttf') format("truetype");
-  }
+  font-family: 'ps2p';
+  src: url('../fonts/ps2p.ttf') format("truetype");
+}
+
 @font-face {
-    font-family: 'bpdots';
-    src: local('Bpdots'),
-         url('../fonts/BPdotsSquares-Bold.ttf') format("truetype");
+  font-family: 'bpdots';
+  src: local('Bpdots'),
+    url('../fonts/BPdotsSquares-Bold.ttf') format("truetype");
 }
 
-:root{
-    --beach-bunny: #FCF9F4;
-    --beach-bunny-red: #EF6E7F;
-    --beach-bunny-lavendar: #E9DCFF;
-    --beach-bunny-lavendar-dark: #D4BBFE;
-    --dark-purple-bg: #2A1948;
-    --text-bright: #FFFDE1;
-    --card-font-pink: #C185BA;
-    --chat-text: #80629D;
+@font-face {
+  font-family: 'ntbricksans';
+  src: local('NTBrickSans'),
+    url('../fonts/NTBrickSans.ttf') format("truetype");
 }
 
-h1,h2,h3,h4,h5,h6{
-    font-family: 'ps2p';
-    padding: 0;
-    margin: 0;
+:root {
+  --beach-bunny: #FCF9F4;
+  --beach-bunny-red: #EF6E7F;
+  --beach-bunny-lavendar: #E9DCFF;
+  --beach-bunny-lavendar-dark: #D4BBFE;
+  --dark-purple-bg: #2A1948;
+  --text-bright: #FFFDE1;
+  --card-font-pink: #C185BA;
+  --chat-text: #80629D;
+  --login-text: #FFFCC7;
 }
 
-*, html{
-    padding: 0;
-    margin: 0;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'ps2p';
+  padding: 0;
+  margin: 0;
 }
 
-body{
-    display: flex;
-    justify-content: center;
-    background-color: black;
+*,
+html {
+  padding: 0;
+  margin: 0;
 }
 
-.mainContainer{
-    max-width: 1440px;
-    background-color: var(--dark-purple-bg);
-    min-height: 100vh;
-}
-.navigationBar{
-    position: relative;
-    z-index: 99;
-    left: 0;
-    height: 100vh;
-    min-width: 20%;
-    max-height: 80vh;
-    width: 50px;
-    background-color: var(--beach-bunny-lavendar-dark);
-    border-radius: 0px 13px 13px 0px;
-    transition: width ease-out 0.3s;
+body {
+  display: flex;
+  justify-content: center;
+  background-color: black;
 }
 
-.navigationBar:hover{
-    width: 80%;
-    cursor: pointer;
+.mainContainer {
+  max-width: 1440px;
+  background-color: var(--dark-purple-bg);
+  min-height: 100vh;
 }
 
-.topBar{
-    position: relative;
-    height: 100;
-    z-index: 90;
-    width: 100%;
-    /* background-color: red; */
-    padding: 24px;
+.navigationBar {
+  position: relative;
+  z-index: 99;
+  left: 0;
+  height: 100vh;
+  min-width: 20%;
+  max-height: 80vh;
+  width: 50px;
+  background-color: var(--beach-bunny-lavendar-dark);
+  border-radius: 0px 13px 13px 0px;
+  transition: width ease-out 0.3s;
 }
 
-.profilePic{
-    border-radius: 100%;
-    max-width: 64px;
-    max-height: 64px;
-    min-width: 64px;
-    min-height: 64px;
+.navigationBar:hover {
+  width: 80%;
+  cursor: pointer;
+}
+
+.topBar {
+  position: relative;
+  height: 100;
+  z-index: 90;
+  width: 100%;
+  /* background-color: red; */
+  padding: 24px;
+}
+
+.profilePic {
+  border-radius: 100%;
+  max-width: 64px;
+  max-height: 64px;
+  min-width: 64px;
+  min-height: 64px;
 }
 
 #userName{
@@ -86,211 +101,286 @@ body{
     line-height: normal;
 }
 
-.pongping{
-    color: #FEFFCF;
-    text-transform: uppercase;
-    text-align: center;
-    text-shadow: 0px 4px 0px #59322B;
-    font-family: 'ps2p';
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
+.pongping {
+  color: #FEFFCF;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 0px 4px 0px #59322B;
+  font-family: 'ps2p';
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 }
 
 .pixelCard {
-    width: 100%;
-    margin: 2em auto;
-    background-color: var(--beach-bunny);
-    box-shadow: 
-    
-    /*top left & top right border*/
-    -10px 0px 0px var(--beach-bunny), 
-    -5px -5px 0px var(--beach-bunny), 
-    0px -10px 0px var(--beach-bunny), 
-    -10px -5px 0px black, 
-    -5px -10px 0px black, 
-    0px -15px 0 0 black, 
+  width: 100%;
+  margin: 2em auto;
+  background-color: var(--beach-bunny);
+  box-shadow:
 
-    10px 0px 0px var(--beach-bunny), 
-    5px -5px 0px var(--beach-bunny), 
+    /*top left & top right border*/
+    -10px 0px 0px var(--beach-bunny),
+    -5px -5px 0px var(--beach-bunny),
     0px -10px 0px var(--beach-bunny),
-    10px -5px 0px black, 
-    5px -10px 0px black, 
-    0px -15px 0 0 black, 
+    -10px -5px 0px black,
+    -5px -10px 0px black,
+    0px -15px 0 0 black,
+
+    10px 0px 0px var(--beach-bunny),
+    5px -5px 0px var(--beach-bunny),
+    0px -10px 0px var(--beach-bunny),
+    10px -5px 0px black,
+    5px -10px 0px black,
+    0px -15px 0 0 black,
 
     /*bottom left & bottom right borders*/
-    -10px 0px 0px var(--beach-bunny), 
-    -5px 5px 0px var(--beach-bunny), 
+    -10px 0px 0px var(--beach-bunny),
+    -5px 5px 0px var(--beach-bunny),
     0px 10px 0px var(--beach-bunny),
-    -10px 5px 0px black, 
-    -5px 10px 0px black, 
-    0px 15px 0 0 black, 
+    -10px 5px 0px black,
+    -5px 10px 0px black,
+    0px 15px 0 0 black,
 
-    10px 0px 0px var(--beach-bunny), 
-    5px 5px 0px var(--beach-bunny), 
+    10px 0px 0px var(--beach-bunny),
+    5px 5px 0px var(--beach-bunny),
     0px 10px 0px var(--beach-bunny),
-    10px 5px 0px black, 
-    5px 10px 0px black, 
-    0px 15px 0 0 black, 
+    10px 5px 0px black,
+    5px 10px 0px black,
+    0px 15px 0 0 black,
     /*left & right black border*/
     -15px 0 0 0 black,
     15px 0 0 0 black,
 
     /*card highlight*/
-    10px 0px 0px var(--beach-bunny), 
-    5px 5px 0px var(--beach-bunny), 
+    10px 0px 0px var(--beach-bunny),
+    5px 5px 0px var(--beach-bunny),
     0px 10px 0px var(--beach-bunny),
     20px 5px 0px var(--beach-bunny-red),
-    20px 10px 0px var(--beach-bunny-red), 
-    15px 15px 0px var(--beach-bunny-red), 
+    20px 10px 0px var(--beach-bunny-red),
+    15px 15px 0px var(--beach-bunny-red),
     10px 20px 0 0 var(--beach-bunny-red),
-    5px 20px 0 0 var(--beach-bunny-red)
-    ;
+    5px 20px 0 0 var(--beach-bunny-red);
 
-    transition: all ease-out 0.3s;
-  }
-
-.pixelHover:hover{
-    cursor: pointer;
-    background-color: var(--beach-bunny-lavendar);
-
-    box-shadow: 
-    
-    /*top left & top right border*/
-    -10px 0px 0px var(--beach-bunny-lavendar), 
-    -5px -5px 0px var(--beach-bunny-lavendar), 
-    0px -10px 0px var(--beach-bunny-lavendar), 
-    -10px -5px 0px var(--beach-bunny-lavendar-dark), 
-    -5px -10px 0px var(--beach-bunny-lavendar-dark), 
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark), 
-
-    10px 0px 0px var(--beach-bunny-lavendar), 
-    5px -5px 0px var(--beach-bunny-lavendar), 
-    0px -10px 0px var(--beach-bunny-lavendar),
-    10px -5px 0px var(--beach-bunny-lavendar-dark), 
-    5px -10px 0px var(--beach-bunny-lavendar-dark), 
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark), 
-
-    /*bottom left & bottom right borders*/
-    -10px 0px 0px var(--beach-bunny-lavendar), 
-    -5px 5px 0px var(--beach-bunny-lavendar), 
-    0px 10px 0px var(--beach-bunny-lavendar),
-    -10px 5px 0px var(--beach-bunny-lavendar-dark), 
-    -5px 10px 0px var(--beach-bunny-lavendar-dark), 
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark), 
-
-    10px 0px 0px var(--beach-bunny-lavendar), 
-    5px 5px 0px var(--beach-bunny-lavendar), 
-    0px 10px 0px var(--beach-bunny-lavendar),
-    10px 5px 0px var(--beach-bunny-lavendar-dark), 
-    5px 10px 0px var(--beach-bunny-lavendar-dark), 
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark), 
-    /*left & right black border*/
-    -15px 0 0 0 var(--beach-bunny-lavendar-dark),
-    15px 0 0 0 var(--beach-bunny-lavendar-dark),
-
-    /*card highlight*/
-    10px 0px 0px var(--beach-bunny-lavendar), 
-    5px 5px 0px var(--beach-bunny-lavendar), 
-    0px 10px 0px var(--beach-bunny-lavendar),
-    20px 5px 0px var(--beach-bunny-red),
-    20px 10px 0px var(--beach-bunny-red), 
-    15px 15px 0px var(--beach-bunny-red), 
-    0px 20px 0 0 black,
-    10px 20px 0 0 var(--beach-bunny-red),
-    5px 20px 0 0 black
-    ;
+  transition: all ease-out 0.3s;
 }
 
-  .welcomeBar #welcome{
-    font-family: 'bpdots';
-    font-size: 20px;
-    color: var(--text-bright);
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    -webkit-text-stroke-width: 1;
-    -webkit-text-stroke-color: var(--Chat-Chat-text, #000);
-  }
+.pixelHover:hover {
+  cursor: pointer;
+  background-color: var(--beach-bunny-lavendar);
 
-  .pixelCard h3{
-    text-align: center;
-    font-family: 'ps2p';
-    font-size: 18px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 138%; /* 24.84px */
-    color: var(--card-font-pink);
-  }
+  box-shadow:
 
-  #matchHistoryDash .content , #tournamentHistoryDash .content{
-    background-color: whitesmoke;
-    box-shadow: 
-    
     /*top left & top right border*/
-    /*top left & top right border*/
-    -10px 0px 0px whitesmoke, 
-    -5px -5px 0px whitesmoke, 
-    0px -10px 0px whitesmoke, 
-    -10px -5px 0px var(--beach-bunny-lavendar-dark), 
-    -5px -10px 0px var(--beach-bunny-lavendar-dark), 
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark), 
+    -10px 0px 0px var(--beach-bunny-lavendar),
+    -5px -5px 0px var(--beach-bunny-lavendar),
+    0px -10px 0px var(--beach-bunny-lavendar),
+    -10px -5px 0px var(--beach-bunny-lavendar-dark),
+    -5px -10px 0px var(--beach-bunny-lavendar-dark),
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
 
-    10px 0px 0px whitesmoke, 
-    5px -5px 0px whitesmoke, 
-    0px -10px 0px whitesmoke,
-    10px -5px 0px var(--beach-bunny-lavendar-dark), 
-    5px -10px 0px var(--beach-bunny-lavendar-dark), 
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark), 
+    10px 0px 0px var(--beach-bunny-lavendar),
+    5px -5px 0px var(--beach-bunny-lavendar),
+    0px -10px 0px var(--beach-bunny-lavendar),
+    10px -5px 0px var(--beach-bunny-lavendar-dark),
+    5px -10px 0px var(--beach-bunny-lavendar-dark),
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
 
     /*bottom left & bottom right borders*/
-    -10px 0px 0px whitesmoke, 
-    -5px 5px 0px whitesmoke, 
-    0px 10px 0px whitesmoke,
-    -10px 5px 0px var(--beach-bunny-lavendar-dark), 
-    -5px 10px 0px var(--beach-bunny-lavendar-dark), 
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark), 
+    -10px 0px 0px var(--beach-bunny-lavendar),
+    -5px 5px 0px var(--beach-bunny-lavendar),
+    0px 10px 0px var(--beach-bunny-lavendar),
+    -10px 5px 0px var(--beach-bunny-lavendar-dark),
+    -5px 10px 0px var(--beach-bunny-lavendar-dark),
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
 
-    10px 0px 0px whitesmoke, 
-    5px 5px 0px whitesmoke, 
-    0px 10px 0px whitesmoke,
-    10px 5px 0px var(--beach-bunny-lavendar-dark), 
-    5px 10px 0px var(--beach-bunny-lavendar-dark), 
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark), 
+    10px 0px 0px var(--beach-bunny-lavendar),
+    5px 5px 0px var(--beach-bunny-lavendar),
+    0px 10px 0px var(--beach-bunny-lavendar),
+    10px 5px 0px var(--beach-bunny-lavendar-dark),
+    5px 10px 0px var(--beach-bunny-lavendar-dark),
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
     /*left & right black border*/
     -15px 0 0 0 var(--beach-bunny-lavendar-dark),
     15px 0 0 0 var(--beach-bunny-lavendar-dark),
 
     /*card highlight*/
-    10px 0px 0px whitesmoke, 
-    5px 5px 0px whitesmoke, 
+    10px 0px 0px var(--beach-bunny-lavendar),
+    5px 5px 0px var(--beach-bunny-lavendar),
+    0px 10px 0px var(--beach-bunny-lavendar),
+    20px 5px 0px var(--beach-bunny-red),
+    20px 10px 0px var(--beach-bunny-red),
+    15px 15px 0px var(--beach-bunny-red),
+    0px 20px 0 0 black,
+    10px 20px 0 0 var(--beach-bunny-red),
+    5px 20px 0 0 black;
+}
+
+.welcomeBar #welcome {
+  font-family: 'bpdots';
+  font-size: 20px;
+  color: var(--text-bright);
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  -webkit-text-stroke-width: 1;
+  -webkit-text-stroke-color: var(--Chat-Chat-text, #000);
+}
+
+.pixelCard h3 {
+  text-align: center;
+  font-family: 'ps2p';
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 138%;
+  /* 24.84px */
+  color: var(--card-font-pink);
+}
+
+#matchHistoryDash .content,
+#tournamentHistoryDash .content {
+  background-color: whitesmoke;
+  box-shadow:
+
+    /*top left & top right border*/
+    /*top left & top right border*/
+    -10px 0px 0px whitesmoke,
+    -5px -5px 0px whitesmoke,
+    0px -10px 0px whitesmoke,
+    -10px -5px 0px var(--beach-bunny-lavendar-dark),
+    -5px -10px 0px var(--beach-bunny-lavendar-dark),
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
+
+    10px 0px 0px whitesmoke,
+    5px -5px 0px whitesmoke,
+    0px -10px 0px whitesmoke,
+    10px -5px 0px var(--beach-bunny-lavendar-dark),
+    5px -10px 0px var(--beach-bunny-lavendar-dark),
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
+
+    /*bottom left & bottom right borders*/
+    -10px 0px 0px whitesmoke,
+    -5px 5px 0px whitesmoke,
+    0px 10px 0px whitesmoke,
+    -10px 5px 0px var(--beach-bunny-lavendar-dark),
+    -5px 10px 0px var(--beach-bunny-lavendar-dark),
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
+
+    10px 0px 0px whitesmoke,
+    5px 5px 0px whitesmoke,
+    0px 10px 0px whitesmoke,
+    10px 5px 0px var(--beach-bunny-lavendar-dark),
+    5px 10px 0px var(--beach-bunny-lavendar-dark),
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
+    /*left & right black border*/
+    -15px 0 0 0 var(--beach-bunny-lavendar-dark),
+    15px 0 0 0 var(--beach-bunny-lavendar-dark),
+
+    /*card highlight*/
+    10px 0px 0px whitesmoke,
+    5px 5px 0px whitesmoke,
     0px 10px 0px whitesmoke,
     0px 20px 0 0 black,
-    5px 20px 0 0 black
-    ;
-  }
+    5px 20px 0 0 black;
+}
 
-  #matchHistoryDash .titleSection, #tournamentHistoryDash .titleSection{
-    
-    box-shadow: 
+#matchHistoryDash .titleSection,
+#tournamentHistoryDash .titleSection {
+
+  box-shadow:
     -10px 0px 0px whitesmoke,
     10px 0px 0px whitesmoke,
     -10px 5px 0px var(--beach-bunny-lavendar-dark),
-    10px 5px 0px var(--beach-bunny-lavendar-dark)
-    ;
-  }
+    10px 5px 0px var(--beach-bunny-lavendar-dark);
+}
 
-  #matchHistoryDash .title, #tournamentHistoryDash .title {
-    font-family: 'ps2p';
-    color: var(--chat-text);
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    text-transform: uppercase;
+#matchHistoryDash .title,
+#tournamentHistoryDash .title {
+  font-family: 'ps2p';
+  color: var(--chat-text);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-transform: uppercase;
+}
 
+.loginPage h3 {
+  /* background: #4DA394; */
+  font-family: "ps2p";
+  font-size: 24px;
+}
 
-  }
+.loginPage p {
+  /* background: #4DA394; */
+  font-family: 'ntbricksans';
+  color: var(--login-text);
+  text-align: center;
+  text-shadow: 0px 8px 0px #59322B;
+  font-size: 128px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
 
-  
+.loginPage img {
+  width: 533px;
+  height: 837.344px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  /* width: 50%; */
+}
+
+.roundedButton {
+  width: 100%;
+  margin: 2em auto;
+  background-color: var(--beach-bunny);
+  box-shadow:
+
+    /*top left & top right border*/
+    -10px 0px 0px var(--beach-bunny),
+    -5px -5px 0px var(--beach-bunny),
+    0px -10px 0px var(--beach-bunny),
+    -10px -5px 0px black,
+    -5px -10px 0px black,
+    0px -15px 0 0 black,
+
+    10px 0px 0px var(--beach-bunny),
+    5px -5px 0px var(--beach-bunny),
+    0px -10px 0px var(--beach-bunny),
+    10px -5px 0px black,
+    5px -10px 0px black,
+    0px -15px 0 0 black,
+
+    /*bottom left & bottom right borders*/
+    -10px 0px 0px var(--beach-bunny),
+    -5px 5px 0px var(--beach-bunny),
+    0px 10px 0px var(--beach-bunny),
+    -10px 5px 0px black,
+    -5px 10px 0px black,
+    0px 15px 0 0 black,
+
+    10px 0px 0px var(--beach-bunny),
+    5px 5px 0px var(--beach-bunny),
+    0px 10px 0px var(--beach-bunny),
+    10px 5px 0px black,
+    5px 10px 0px black,
+    0px 15px 0 0 black,
+    /*left & right black border*/
+    -15px 0 0 0 black,
+    15px 0 0 0 black,
+
+    /*card highlight*/
+    10px 0px 0px var(--beach-bunny),
+    5px 5px 0px var(--beach-bunny),
+    0px 10px 0px var(--beach-bunny),
+    20px 5px 0px var(--beach-bunny-red),
+    20px 10px 0px var(--beach-bunny-red),
+    15px 15px 0px var(--beach-bunny-red),
+    10px 20px 0 0 var(--beach-bunny-red),
+    5px 20px 0 0 var(--beach-bunny-red);
+
+  transition: all ease-out 0.3s;
+}
