@@ -359,9 +359,10 @@ onlineGame = () => {
 		document.removeEventListener("keyup", keyUpHandler);
 		if (ws) {
 			ws.close();
-			}
-			cancelAnimationFrame(animationId);
-			console.log('DESTROYED');
+			console.log("Closing connection with server");
+		}
+		cancelAnimationFrame(animationId);
+		console.log('DESTROYED');
 	};
 }
 onlineGame();

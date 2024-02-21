@@ -30,6 +30,10 @@ const cleanScript = {
     onlineGame.destroy();
     delete(onlineGame);
   },
+  'tournament': () => {
+    tournament.destroy();
+    delete(tournament);
+  },
 }
 
 function removeScript(id) {

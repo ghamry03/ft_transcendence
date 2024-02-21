@@ -1,9 +1,21 @@
+@font-face {
+    font-family: 'ps2p';
+    src: local('Ps2p'),
+         url('../fonts/ps2p.ttf') format("truetype");
+}
+
 .outer-container {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	height: 25%;
+}
 
-	height: 50%;
+.status-container {
+    display: block;
+	justify-content: center;
+	align-items: center;
+	height: 25%;
 }
 
 .image-container {
@@ -39,4 +51,11 @@
     width: auto;
     height: 70px;
     transform: translateX(-50%);
+ }
+
+ #tournamentStatus {
+    font-family: 'ps2p';
+    font-size: medium;
+    color: var(--login-text);
+    /* color: var(--beach-bunny-lavendar-dark); */
  }
