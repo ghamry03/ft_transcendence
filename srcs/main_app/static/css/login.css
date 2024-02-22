@@ -1,0 +1,136 @@
+:root {
+  --login-text: #FFFCC7;
+  --loginbtn-bg: #E09F9F;
+  --loginbtn-hl: #EEEDED;
+  --loginbtn-shadow: #B86666;
+  --loginbtn-border: #000000;
+  --test-color: #00FF7F;
+}
+
+.loginPage h1 {
+  /* background: #4DA394; */
+  font-family: 'ntbricksans';
+  color: var(--login-text);
+  text-align: center;
+  text-shadow: 0px 8px 0px #59322B;
+  /* font-size: 128px; */
+  font-size: 8vw;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.loginPage h2 {
+  position: relative;
+}
+
+
+.loginButton {
+  /* width: 100%; */
+  width: 30px;
+  margin: 2em auto;
+  background-color: var(--loginbtn-bg);
+  box-shadow:
+
+    /*top left & top right border*/
+    -10px 0px 0px var(--loginbtn-bg),
+    -5px -5px 0px var(--loginbtn-bg),
+    0px -10px 0px var(--loginbtn-bg),
+    -10px -5px 0px black,
+    -5px -10px 0px black,
+    0px -15px 0 0 black,
+
+    10px 0px 0px var(--loginbtn-bg),
+    5px -5px 0px var(--loginbtn-bg),
+    0px -10px 0px var(--loginbtn-bg),
+    10px -5px 0px black,
+    5px -10px 0px black,
+    0px -15px 0 0 black,
+
+    /*bottom left & bottom right borders*/
+    -10px 0px 0px var(--loginbtn-bg),
+    -5px 5px 0px var(--loginbtn-bg),
+    0px 10px 0px var(--loginbtn-bg),
+    -10px 5px 0px white,
+    -5px 10px 0px white,
+    0px 15px 0 0 white,
+
+    10px 0px 0px white,
+    5px 5px 0px white,
+    0px 10px 0px white,
+    10px 5px 0px white,
+    5px 10px 0px white,
+    0px 15px 0 0 white,
+    /*left & right black border*/
+    -15px 0 0 0 black,
+    15px 0 0 0 black,
+
+    /*card highlight*/
+    10px 0px 0px var(--loginbtn-shadow),
+    5px 5px 0px var(--loginbtn-shadow),
+    0px 10px 0px var(--loginbtn-shadow),
+    20px 5px 0px var(--loginbtn-shadow),
+    20px 10px 0px var(--loginbtn-shadow),
+    15px 15px 0px var(--loginbtn-shadow),
+    10px 20px 0 0 var(--loginbtn-shadow),
+    5px 20px 0 0 var(--loginbtn-shadow);
+
+  transition: all ease-out 0.3s;
+}
+
+.loginButton:hover {
+  cursor: pointer;
+  background-color: var(--beach-bunny-lavendar);
+
+  box-shadow:
+
+    /*top left & top right border*/
+    -10px 0px 0px var(--beach-bunny-lavendar),
+    -5px -5px 0px var(--beach-bunny-lavendar),
+    0px -10px 0px var(--beach-bunny-lavendar),
+    -10px -5px 0px var(--beach-bunny-lavendar-dark),
+    -5px -10px 0px var(--beach-bunny-lavendar-dark),
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
+
+    10px 0px 0px var(--beach-bunny-lavendar),
+    5px -5px 0px var(--beach-bunny-lavendar),
+    0px -10px 0px var(--beach-bunny-lavendar),
+    10px -5px 0px var(--beach-bunny-lavendar-dark),
+    5px -10px 0px var(--beach-bunny-lavendar-dark),
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
+
+    /*bottom left & bottom right borders*/
+    -10px 0px 0px var(--beach-bunny-lavendar),
+    -5px 5px 0px var(--beach-bunny-lavendar),
+    0px 10px 0px var(--beach-bunny-lavendar),
+    -10px 5px 0px var(--beach-bunny-lavendar-dark),
+    -5px 10px 0px var(--beach-bunny-lavendar-dark),
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
+
+    10px 0px 0px var(--beach-bunny-lavendar),
+    5px 5px 0px var(--beach-bunny-lavendar),
+    0px 10px 0px var(--beach-bunny-lavendar),
+    10px 5px 0px var(--beach-bunny-lavendar-dark),
+    5px 10px 0px var(--beach-bunny-lavendar-dark),
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
+    /*left & right black border*/
+    -15px 0 0 0 var(--beach-bunny-lavendar-dark),
+    15px 0 0 0 var(--beach-bunny-lavendar-dark),
+
+    /*card highlight*/
+    10px 0px 0px var(--beach-bunny-lavendar),
+    5px 5px 0px var(--beach-bunny-lavendar),
+    0px 10px 0px var(--beach-bunny-lavendar),
+    20px 5px 0px var(--beach-bunny-red),
+    20px 10px 0px var(--beach-bunny-red),
+    15px 15px 0px var(--beach-bunny-red),
+    0px 20px 0 0 black,
+    10px 20px 0 0 var(--beach-bunny-red),
+    5px 20px 0 0 black;
+}
+
+.loginButton h3 {
+  color: #854D4D;
+  font-family: 'ps2p';
+  font-size: 12px;
+},

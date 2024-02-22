@@ -24,7 +24,6 @@
   --text-bright: #FFFDE1;
   --card-font-pink: #C185BA;
   --chat-text: #80629D;
-  --login-text: #FFFCC7;
 }
 
 h1,
@@ -51,7 +50,7 @@ body {
 }
 
 .mainContainer {
-  max-width: 1440px;
+  /* max-width: 1440px; */
   background-color: var(--dark-purple-bg);
   min-height: 100vh;
 }
@@ -304,83 +303,4 @@ body {
   font-weight: 400;
   line-height: normal;
   text-transform: uppercase;
-}
-
-.loginPage h3 {
-  /* background: #4DA394; */
-  font-family: "ps2p";
-  font-size: 24px;
-}
-
-.loginPage p {
-  /* background: #4DA394; */
-  font-family: 'ntbricksans';
-  color: var(--login-text);
-  text-align: center;
-  text-shadow: 0px 8px 0px #59322B;
-  font-size: 128px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-}
-
-.loginPage img {
-  width: 533px;
-  height: 837.344px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  /* width: 50%; */
-}
-
-.roundedButton {
-  width: 100%;
-  margin: 2em auto;
-  background-color: var(--beach-bunny);
-  box-shadow:
-
-    /*top left & top right border*/
-    -10px 0px 0px var(--beach-bunny),
-    -5px -5px 0px var(--beach-bunny),
-    0px -10px 0px var(--beach-bunny),
-    -10px -5px 0px black,
-    -5px -10px 0px black,
-    0px -15px 0 0 black,
-
-    10px 0px 0px var(--beach-bunny),
-    5px -5px 0px var(--beach-bunny),
-    0px -10px 0px var(--beach-bunny),
-    10px -5px 0px black,
-    5px -10px 0px black,
-    0px -15px 0 0 black,
-
-    /*bottom left & bottom right borders*/
-    -10px 0px 0px var(--beach-bunny),
-    -5px 5px 0px var(--beach-bunny),
-    0px 10px 0px var(--beach-bunny),
-    -10px 5px 0px black,
-    -5px 10px 0px black,
-    0px 15px 0 0 black,
-
-    10px 0px 0px var(--beach-bunny),
-    5px 5px 0px var(--beach-bunny),
-    0px 10px 0px var(--beach-bunny),
-    10px 5px 0px black,
-    5px 10px 0px black,
-    0px 15px 0 0 black,
-    /*left & right black border*/
-    -15px 0 0 0 black,
-    15px 0 0 0 black,
-
-    /*card highlight*/
-    10px 0px 0px var(--beach-bunny),
-    5px 5px 0px var(--beach-bunny),
-    0px 10px 0px var(--beach-bunny),
-    20px 5px 0px var(--beach-bunny-red),
-    20px 10px 0px var(--beach-bunny-red),
-    15px 15px 0px var(--beach-bunny-red),
-    10px 20px 0 0 var(--beach-bunny-red),
-    5px 20px 0 0 var(--beach-bunny-red);
-
-  transition: all ease-out 0.3s;
 }

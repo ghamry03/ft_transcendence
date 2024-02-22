@@ -1,10 +1,15 @@
 {% load static %}
-<!-- <div class="loginPage"> -->
-<div class="row g-5 m-0 loginPage">
-    <p>PONGPING</p>
+<div class="container row g-5 m-0 loginPage">
+    <h1>PONGPING</h1>
     <a href="{{authUrl}}">LOGIN</a>
-    <img src="{% static 'imgs/arcade.png' %}">
-    <div class="col-4">
-        {% include "loginButton.html" with title="Login" onClick="location.href='authUrl'" %}
+</div>
+<div class="container border loginPage">
+    <div class="row justify-content-center position-relative">
+        <div class="col-12 col-md-6">
+            <img src="{% static 'imgs/arcade.png' %}" class="img-fluid"/>
+            {% include "loginButton.html" with title="Login" onClick="location.href='authUrl'" %}
+            <!-- {% include "loginButton.html" with title="Login" onClick="location.href='authUrl'"  class="position-absolute top-50 start-0 translate-middle"%} -->
+        </div>
+        <!-- <h2 class="position-absolute top-50 start-50 left-50 translate-middle">abcd</h2> -->
     </div>
-</div
+</div>
