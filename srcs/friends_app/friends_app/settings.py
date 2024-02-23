@@ -57,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'friends_app.urls'
@@ -90,16 +90,16 @@ DATABASES = {
         "default": {
         "ENGINE": 'django.db.backends.postgresql',
         "NAME": env("FRIEND_DB_NAME"),
-        "USER": env("DB_USER"),
-        "PASSWORD": env("DB_PASS"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
         "HOST": env("DB_HOST"),
         "PORT": env("DB_PORT"),
         },
         "users": {
             "ENGINE": 'django.db.backends.postgresql',
-            "NAME": env("USER_DB_NAME"),
-            "USER": env("DB_USER"),
-            "PASSWORD": env("DB_PASS"),
+            "NAME": env("POSTGRES_DB"),
+            "USER": env("POSTGRES_USER"),
+            "PASSWORD": env("POSTGRES_PASSWORD"),
             "HOST": env("DB_HOST"),
             "PORT": env("DB_PORT"),
         }
