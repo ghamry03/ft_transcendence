@@ -8,19 +8,27 @@ from .models import Tournament
 import requests
 from .PlayerQueue import PlayerQueue
 
+def getMaxPos(playerMax):
+    maxPos = 0
+    while playerMax > 1:
+        maxPos += playerMax
+        playerMax //= 2
+    return maxPos
+
 class TournamentConsumer(AsyncWebsocketConsumer):
 
     PLAYER_MAX = 8
-    PADDING = 20
-    SPEED = 13
     WIN_SCORE = 6
     update_lock = asyncio.Lock()
     logger = logging.getLogger(__name__)
-    queue = PlayerQueue()
+    maxPos = getMaxPos(PLAYER_MAX)
+    queue = PlayerQueue(maxPos)
     players = {}
     tournaments = [] # list of group names of all active tournaments
     activeTournaments = {}
+    waitingPlayers = {}
 
+    logger.info("playermax = %d, maxPos = %d", PLAYER_MAX, maxPos)
 	# Called when the websocket is handshaking as part of the connection process
     async def connect(self):
         await self.accept()
@@ -62,14 +70,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 if self.queue.size() == self.PLAYER_MAX:
                     tourName = self.tournaments[-1]
                     playerUids, channelNames = self.queue.getCopy()
-                    self.activeTournaments[tourName] = {
-                        "tourName": tourName,
-                        "playerUids": playerUids,
-                        "channels": channelNames,
-                    }
                     tid = await tour_db.createTournament()
                     self.logger.info("created tournament with id = %d", tid)
-                    asyncio.create_task(self.runTournament(tourName, tid))
+                    self.activeTournaments[tourName] = {
+                        "tourName": tourName,
+                        "tid": tid,
+                        "playerUids": playerUids,
+                        "channels": channelNames,
+                        "countReady": self.PLAYER_MAX,
+                        "countPlayers": self.PLAYER_MAX,
+                    }
+                    asyncio.create_task(self.runTournament(tourName))
                     self.queue.clear()
 
     # Called when the WebSocket closes for any reason
@@ -94,41 +105,71 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     )
                 elif len(self.tournaments) > 0:
                     self.tournaments.pop()
+
             elif self.playerId in self.players:
                 player = self.players[self.playerId]
                 opponent = self.players[player["opponentId"]]
-                
-                leftPos = player["playerPos"] if player["playerPos"] < opponent["playerPos"] else opponent["playerPos"]
-                newPlayerPos = int((leftPos / 2) + self.PLAYER_MAX)
-                requests.get('http://gameapp:2000/game/endGame/' 
-                            + str(player['gid']) + '/' 
-                            + str(player["id"]) + '/' 
-                            + str(opponent["id"]) + '/'
-                            + str(player["score"]) + '/'
-                            + str(self.WIN_SCORE) + '/')
-                self.logger.info("Ended game in db");
+
+                # Clearing disconnected player's channel from all groups
                 await self.channel_layer.group_discard(
                     player["groupName"], self.channel_name
                 )
                 await self.channel_layer.group_discard(
                     player["tourName"], self.channel_name
                 )
+
+                # Let the other player know that their op disconnected
                 await self.channel_layer.group_send(
-                    player["tourName"], 
+                    player["groupName"],
+                    {"type": "disconnected"}
+                )
+                await self.channel_layer.group_discard(
+                    player["groupName"], opponent["channel"]
+                )
+            
+                # Save game results to db
+                requests.get('http://gameapp:2000/game/endGame/' 
+                            + str(player['gid']) + '/' 
+                            + str(player["id"]) + '/' 
+                            + str(opponent["id"]) + '/'
+                            + str(player["score"]) + '/'
+                            + str(self.WIN_SCORE) + '/')
+                
+                # End the tournament here and cleanup if this is the last round
+
+                # Auto assign the remaining player as the winner and broadcast winner info 
+                leftPos = player["playerPos"] if player["playerPos"] < opponent["playerPos"] else opponent["playerPos"]
+                newPlayerPos = (leftPos // 2) + self.PLAYER_MAX
+                await self.channel_layer.group_send(
+                    opponent["tourName"], 
                     {
                         "type": "newPlayerJoined", 
                         "newPlayerId": opponent["id"],
                         "imgId": "player" + str(newPlayerPos)
                     }
                 )
-                await self.channel_layer.group_send(
-                    player["groupName"],
-                    {"type": "disconnected"}
-                )
-                await self.channel_layer.group_discard(
-                    player["groupName"], player["channel"]
-                )
+
+                # Add winner info to tournament in prep for next round
+                tour = self.activeTournaments[opponent["tourName"]]
+                tour["playerUids"][newPlayerPos] = opponent["id"]
+                tour["channels"][newPlayerPos] = opponent["channel"]
+                tour["countReady"] += 1
+            
+                # Add winner to waitingPlayer pool
+                self.waitingPlayers[opponent["id"]] = {
+                    "id": opponent["id"],
+                    "channel": opponent["channel"],
+                    "tourName": opponent["tourName"],
+                }
+
+                # Remove both players from active player pool
                 del self.players[self.playerId]
+                del self.players[opponent["id"]]
+
+                # Start next round if everyone else is ready now
+                if tour["countReady"] == tour["countPlayers"]:
+                    asyncio.create_task(self.runTournament(tour["tourName"]))
+
             else:
                 await self.channel_layer.group_discard(
                     player["tourName"], self.channel_name
@@ -173,6 +214,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 leftScore = opponent["score"]
                 rightScore = player["score"]
             if leftScore == self.WIN_SCORE or rightScore == self.WIN_SCORE:
+                # Broadcast match end message with final scores
                 await self.channel_layer.group_send(
                     player["groupName"], 
                     {
@@ -181,25 +223,28 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         "rightScore": rightScore
                     }
                 )
-                self.logger.info("someone won with %d %d", leftScore, rightScore)
-                leftPos = player["playerPos"] if player["playerPos"] < opponent["playerPos"] else opponent["playerPos"]
-                # winnerId = player["id"] if player["score"] == self.WIN_SCORE else opponent["id"]
-                winnerId = player["id"]
-                newPlayerPos = int((leftPos / 2) + self.PLAYER_MAX)
-                requests.get('http://gameapp:2000/game/endGame/' 
-                            + str(player['gid']) + '/' 
-                            + str(player["id"]) + '/' 
-                            + str(opponent["id"]) + '/'
-                            + str(player["score"]) + '/'
-                            + str(opponent["score"]) + '/')
-                self.logger.info("ended game in db");
-                # await self.endGame( player['gid'], player["id"], opponent["id"], player["score"], opponent["score"])
+
+                # Clear both players channels from their group
                 await self.channel_layer.group_discard(
                     player["groupName"], self.channel_name
                 )
                 await self.channel_layer.group_discard(
                     player["groupName"], opponent["channel"]
                 )
+
+                # Save game results to db
+                requests.get('http://gameapp:2000/game/endGame/' 
+                            + str(player['gid']) + '/' 
+                            + str(player["id"]) + '/' 
+                            + str(opponent["id"]) + '/'
+                            + str(player["score"]) + '/'
+                            + str(opponent["score"]) + '/')
+                
+                # End the tournament here and cleanup if this is the last round
+
+                # Find winner position on the bracket and broadcast to tournament
+                leftPos = player["playerPos"] if player["playerPos"] < opponent["playerPos"] else opponent["playerPos"]
+                newPlayerPos = (leftPos // 2) + self.PLAYER_MAX
                 await self.channel_layer.group_send(
                     player["tourName"], 
                     {
@@ -208,7 +253,27 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         "imgId": "player" + str(newPlayerPos)
                     }
                 )
-                self.logger.info("sent winner info to client %d", player["id"]);
+
+                # Add winner info to tournament in prep for next round
+                tour = self.activeTournaments[player["tourName"]]
+                tour["playerUids"][newPlayerPos] = player["id"]
+                tour["channels"][newPlayerPos] = self.channel_name
+                tour["countReady"] += 1
+                
+                # Add winner to waitingPlayer pool
+                self.waitingPlayers[player["id"]] = {
+                    "id": player["id"],
+                    "channel": player["channel"],
+                    "tourName": player["tourName"],
+                }
+
+                # Remove both players from active player pool
+                del self.players[player["id"]]
+                del self.players[opponent["id"]]
+
+                # Start next round if everyone else is ready now
+                if tour["countReady"] == tour["countPlayers"]:
+                    asyncio.create_task(self.runTournament(tour["tourName"]))
             else:
                 await self.channel_layer.group_send(
                     player["groupName"], 
@@ -235,7 +300,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     player["groupName"],
                     {
                         "type": "roundStarting",
-                        "roundNo": 1,
                         "leftPlayer": left, 
                         "rightPlayer": right,
                     },
@@ -309,7 +373,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             text_data=json.dumps(
                 {
                     "type": "roundStarting",
-                    "roundNo": event["roundNo"],
                     "leftPlayer": event["leftPlayer"],
                     "rightPlayer": event["rightPlayer"],
                 }
@@ -328,12 +391,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         )
 
-    async def runTournament(self, tourName, tid):
-        playerUids = self.activeTournaments[tourName]["playerUids"]
-        channels = self.activeTournaments[tourName]["channels"]
+    async def runTournament(self, tourName):
+        tour = self.activeTournaments[tourName]
+        playerUids = tour["playerUids"]
+        channels = tour["channels"]
+        tid = tour["tid"]
 
         self.logger.info("Starting tournament %s", tourName)
-        for i in range(0, self.PLAYER_MAX, 2):
+        for i in range(0, self.maxPos, 2):
+            if playerUids[i] == 0:
+                continue
+            
             pid1 = playerUids[i]
             channel1 = channels[i]
             pid2 = playerUids[i + 1]
@@ -342,6 +410,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             gid = int(gameIdResponse.text)
             groupName = str(pid1) + "_" + str(pid2)
             self.logger.info("creating group with name = %s, %s", groupName, type(groupName))
+            if pid1 in self.waitingPlayers: 
+                del self.waitingPlayers[pid1]
+            if pid2 in self.waitingPlayers:
+                del self.waitingPlayers[pid2]
             await self.channel_layer.group_add(
                 groupName, channel1
             )
@@ -373,15 +445,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 "playerPos": i + 1,
             }
             self.logger.info("run tour players len = %d", len(self.players))
-            # await self.channel_layer.group_send(
-            #     groupName,
-            #     {
-            #         "type": "roundStarting",
-            #         "roundNo": 1,
-            #         "leftPlayer": pid1, 
-            #         "rightPlayer": pid2,
-            #     },
-            # )
             # matches.append(asyncio.create_task(self.game_loop(pid1, pid2, groupName)))
         # round1Results = await asyncio.gather(*matches)
         # self.logger.info("round 1 results len = %d, type = %s", len(round1Results), type(round1Results))
@@ -389,7 +452,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             tourName,
             {"type": "tournamentStarted", "playerList": playerUids},
         )
-
+        self.logger.info("len playerUids %d, len channels %d", len(tour["playerUids"]), len(tour["channels"]))
+        tour["playerUids"] = [0 for i in range(self.maxPos)]
+        tour["channels"] = [None for i in range(self.maxPos)]
+        tour["countReady"] = 0
+        tour["countPlayers"] //= 2
+        self.logger.info("len playerUids %d, len channels %d", len(tour["playerUids"]), len(tour["channels"]))
 
         
 # round 2+ logic

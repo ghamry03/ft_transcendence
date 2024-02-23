@@ -84,7 +84,7 @@ tournament = () => {
 			round2Container.style.display = "flex";
 			round3Container.style.display = "flex";
 			statusBox.style.display = "block";
-			enableCheckBox();
+			// enableCheckBox();
 		}
 		else {
 			round1Container.style.display = "none";
@@ -214,7 +214,7 @@ tournament = () => {
 		var interval = setInterval( count, 1000 );  
 	}
 
-	async function setUpMatch(leftPlayerId, rightPlayerId) {
+	async function startMatch(leftPlayerId, rightPlayerId) {
 		await toggleBracket();
 		var leftImage = document.getElementById("leftImage");
 		var rightImage = document.getElementById("rightImage");
@@ -320,7 +320,7 @@ tournament = () => {
 				console.log("Round starting... Left = ", messageData.leftPlayer, " Right = ", messageData.rightPlayer);
 				leftPlayerId = messageData.leftPlayer;
 				rightPlayerId = messageData.rightPlayer;
-				setUpMatch(messageData.leftPlayer, messageData.rightPlayer);
+				startMatch(messageData.leftPlayer, messageData.rightPlayer);
 				break;
 			case "tournamentStarted":
 				console.log("Tournament starting... Player list = ");
@@ -346,6 +346,7 @@ tournament = () => {
 				break;
 			case "disconnected":
 				console.log("Opponent has disconnected");
+				// add an modal saying the opponent disconnected and they win by default
 				if (leftPlayerId == playerId)
 					leftPlayerScore = WIN_SCORE;
 				else

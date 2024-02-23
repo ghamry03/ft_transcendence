@@ -1,7 +1,7 @@
 class PlayerQueue:
-    def __init__(self):
-        self.uids = [0 for i in range(8)]
-        self.channelNames = [None for i in range(8)]
+    def __init__(self, maxPos):
+        self.uids = [0 for i in range(maxPos)]
+        self.channelNames = [None for i in range(maxPos)]
         self.length = 0
 
     def isEmpty(self):
@@ -36,8 +36,8 @@ class PlayerQueue:
         return self.uids.copy(), self.channelNames.copy()
 
     def clear(self):
-        self.uids = [0] * 8
-        self.channelNames = [None] * 8
+        self.uids = [0] * 14
+        self.channelNames = [None] * 14
         self.length = 0
 
     def getPlayers(self):
