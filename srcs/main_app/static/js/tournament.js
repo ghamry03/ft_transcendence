@@ -67,9 +67,9 @@ tournament = () => {
 	var rightWPressed = false;
 	var rightSPressed = false;
 
-	var gameRunning = true;
+	var gameRunning = false;
 	const WIN_SCORE = 6;
-	var roundNo = 1;
+	var roundNo = 0;
 
 	async function toggleBracket() {
 		round1Container = document.getElementById("round1Container");
@@ -84,7 +84,7 @@ tournament = () => {
 			round2Container.style.display = "flex";
 			round3Container.style.display = "flex";
 			statusBox.style.display = "block";
-			// enableCheckBox();
+			// startNextRound();
 		}
 		else {
 			round1Container.style.display = "none";
@@ -138,7 +138,6 @@ tournament = () => {
 	async function addImage(playerId, imgId) {
 		const imgUrl = await getImage(playerId);
 		console.log("new player image url = ", imgUrl);
-		console.log("new img id = ", imgId);
 		var playerImg = document.getElementById(imgId);
 		playerImg.src = 'http://localhost:3000' + imgUrl;
 		playerImg.setAttribute("data-uid", playerId);
@@ -268,16 +267,16 @@ tournament = () => {
 		if (checkBox.checked) {
 			console.log('CheckBox is checked!');
 			checkForm.style.display = "none";
-			tournamentStatus.innerText = "Waiting for opponent...";
+			updateTourStatus("Waiting for opponent...");
 			sendReadyEvent();
 		}
 	});
 
-	function enableCheckBox() {
-		tournamentStatus.innerText = "Round " + roundNo + " starting, get ready!";
+	function startNextRound() {
+		roundNo++;
+		updateTourStatus("Round " + roundNo + " starting, get ready!");
 		checkBox.checked = false;
 		checkForm.style.display = "block";
-		roundNo++;
 	}
 
 	const handleWebSocketMessage = (event) => {
@@ -324,7 +323,7 @@ tournament = () => {
 				break;
 			case "tournamentStarted":
 				console.log("Tournament starting... Player list = ");
-				enableCheckBox();
+				startNextRound();
 				break;
 			case "tournamentFound":
 				console.log("tournament found! player list = ", messageData.playerList);
@@ -347,13 +346,20 @@ tournament = () => {
 			case "disconnected":
 				console.log("Opponent has disconnected");
 				// add an modal saying the opponent disconnected and they win by default
-				if (leftPlayerId == playerId)
-					leftPlayerScore = WIN_SCORE;
-				else
-					rightPlayerScore = WIN_SCORE;
-				reset(ballSpeed);
-				draw();
-				requestAnimationFrame(endMatch);
+				if (gameRunning) {
+					if (leftPlayerId == playerId)
+						leftPlayerScore = WIN_SCORE;
+					else
+						rightPlayerScore = WIN_SCORE;
+					reset(ballSpeed);
+					draw();
+					requestAnimationFrame(endMatch);
+				}
+				else {
+					// startNextRound();
+					updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
+					checkForm.style.display = "none";
+				}
 				break;
 			default:
 				// Handle default case if needed
@@ -410,30 +416,34 @@ tournament = () => {
 		}
 	}
 
+	function updateTourStatus(msg) {
+		if (tournamentStatus) {
+			tournamentStatus.innerText = msg;
+		}
+	}
+
 	function endMatch()
 	{
 		if (animationId != 0) {
 			cancelAnimationFrame(animationId);
 			animationId = 0;
 		}
-		matchStatus = document.getElementById("matchStatus");
 		if (leftPlayerScore == WIN_SCORE && leftPlayerId == playerId 
 			|| rightPlayerScore == WIN_SCORE && rightPlayerId == playerId) {
-			// matchStatus.innerText = "You win!";
 			setTimeout(function() {
+				updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
 				alert("You win! Proceed to next round...");
 				toggleBracket();
 			  }, 0)
-			// alert("You win! Proceed to next round...");
 		}
 		else {
-			// matchStatus.innerText = "You lose";
 			setTimeout(function() {
+				updateTourStatus("You lost at round " + roundNo);
 				alert("You lose. Proceed to results...");
 				toggleBracket();
 			  }, 0)
-			// alert("You lose. Proceed to results...");
 		}
+		gameRunning = false;
 	}
 
 	function keyDownHandler(e)

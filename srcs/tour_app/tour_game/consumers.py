@@ -160,6 +160,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     "id": opponent["id"],
                     "channel": opponent["channel"],
                     "tourName": opponent["tourName"],
+                    "bracketPos": newPlayerPos,
                 }
 
                 # Remove both players from active player pool
@@ -170,10 +171,52 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 if tour["countReady"] == tour["countPlayers"]:
                     asyncio.create_task(self.runTournament(tour["tourName"]))
 
-            else:
+            elif self.playerId in self.waitingPlayers:
+                self.logger.info("DISCONNECT: player %d caught in between", self.playerId)
+                tour = self.activeTournaments[self.waitingPlayers["tourName"]]
+                playerPos = self.waitingPlayers["bracketPos"]
+                tour["channels"][playerPos] = None
                 await self.channel_layer.group_discard(
-                    player["tourName"], self.channel_name
+                    tour["tourName"], self.channel_name
                 )
+                del self.waitingPlayers[self.playerId]
+
+    async def endRound(self, winner, loser):
+        # Save game results to db
+        requests.get('http://gameapp:2000/game/endGame/' 
+                    + str(winner['gid']) + '/' 
+                    + str(winner["id"]) + '/' 
+                    + str(loser["id"]) + '/'
+                    + str(winner["score"]) + '/'
+                    + str(loser["score"]) + '/')
+        
+        # End the tournament here and cleanup if this is the last round
+
+        # Find winner position on the bracket and broadcast to tournament
+        leftPos = winner["playerPos"] if winner["playerPos"] < loser["playerPos"] else loser["playerPos"]
+        newPlayerPos = (leftPos // 2) + self.PLAYER_MAX
+        await self.channel_layer.group_send(
+            winner["tourName"], 
+            {
+                "type": "newPlayerJoined", 
+                "newPlayerId": winner["id"],
+                "imgId": "player" + str(newPlayerPos)
+            }
+        )
+
+        # Add winner info to tournament in prep for next round
+        tour = self.activeTournaments[winner["tourName"]]
+        tour["playerUids"][newPlayerPos] = winner["id"]
+        tour["channels"][newPlayerPos] = winner["channel"]
+        tour["countReady"] += 1
+        
+        # Add winner to waitingPlayer pool
+        self.waitingPlayers[winner["id"]] = {
+            "id": winner["id"],
+            "channel": winner["channel"],
+            "tourName": winner["tourName"],
+            "bracketPos": newPlayerPos,
+        }
 
 	# Called when the server receives a message from the WebSocket
     async def receive(self, text_data):
@@ -265,6 +308,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     "id": player["id"],
                     "channel": player["channel"],
                     "tourName": player["tourName"],
+                    "bracketPos": newPlayerPos,
                 }
 
                 # Remove both players from active player pool
@@ -396,6 +440,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         playerUids = tour["playerUids"]
         channels = tour["channels"]
         tid = tour["tid"]
+        tour["countReady"] = 0
+        tour["countPlayers"] //= 2
 
         self.logger.info("Starting tournament %s", tourName)
         for i in range(0, self.maxPos, 2):
@@ -409,7 +455,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             gameIdResponse = requests.get('http://gameapp:2000/game/createGame/' + str(pid1) + '/' + str(pid2) + '/' + str(tid) + '/')
             gid = int(gameIdResponse.text)
             groupName = str(pid1) + "_" + str(pid2)
-            self.logger.info("creating group with name = %s, %s", groupName, type(groupName))
+            self.logger.info("Creating group with name = %s", groupName)
+            
+            # if not channel1 or not channel2
+            # move their op to next round 
+
             if pid1 in self.waitingPlayers: 
                 del self.waitingPlayers[pid1]
             if pid2 in self.waitingPlayers:
@@ -455,8 +505,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.logger.info("len playerUids %d, len channels %d", len(tour["playerUids"]), len(tour["channels"]))
         tour["playerUids"] = [0 for i in range(self.maxPos)]
         tour["channels"] = [None for i in range(self.maxPos)]
-        tour["countReady"] = 0
-        tour["countPlayers"] //= 2
         self.logger.info("len playerUids %d, len channels %d", len(tour["playerUids"]), len(tour["channels"]))
 
         
