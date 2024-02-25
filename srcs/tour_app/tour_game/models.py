@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Tournament(models.Model):
     id = models.AutoField(primary_key=True)
@@ -54,8 +55,8 @@ class OnlinePlayermatch(models.Model):
 
 # create game instance
 
-t_instance = Tournament(starttime='2069-08-01 00:00:00', endtime='2069-08-01 10:10:10')
+t_instance = Tournament(starttime=timezone.now(), endtime=timezone.now())
 t_instance.save()
 
-game2 = OnlineGame(starttime='2069-08-01 00:00:00', endtime='2069-08-01 10:10:10', tournament=t_instance)
+game2 = OnlineGame(starttime=timezone.now(), endtime=timezone.now(), tournament=t_instance)
 game2.save()
