@@ -1,3 +1,4 @@
+onlineGame = () => {	
 	const canvas = document.getElementById("gameCanvas");
 	const leftScore = document.getElementById("leftScore");
 	const rightScore = document.getElementById("rightScore");
@@ -8,9 +9,9 @@
 	const paddleHScale = 0.2
 	const paddleWScale = 0.015
 	const remoteCanvasH = 510;
-
+	const padding = 20;
+	
 	var animationId;
-	// var gameRunning = false;
 
 	const canvasW = canvas.getBoundingClientRect().width;
 	const canvasH = canvas.getBoundingClientRect().height;
@@ -20,17 +21,19 @@
 	var scaleFactor = canvasH / remoteCanvasH;
 	
 	// Paddles
-	var paddleHeight = canvasH * paddleHScale;
-	var paddleWidth = canvasW * paddleWScale;
-	var leftPaddleYaxis = canvasH / 2 - paddleHeight / 2;
-	var rightPaddleYaxis = canvasH / 2 - paddleHeight / 2;
+	var paddleHeight = Math.floor(canvasH * paddleHScale);
+	var paddleWidth = Math.floor(canvasW * paddleWScale);
+	var leftPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
+	var rightPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
+	var paddleSpeed = canvasH * 0.01;
 	
 	// Ball
-	var ballXaxis = canvasW / 2;
-	var ballYaxis = canvasH / 2;
+	var ballXaxis = Math.floor(canvasW / 2);
+	var ballYaxis = Math.floor(canvasH / 2);
 	var ballRadius = paddleWidth;
-
-	console.log("canvas height and width = ", canvasH, canvasW);
+	var ballSpeed = canvasW * 0.006;
+	var ballSpeedXaxis = ballSpeed;
+	var ballSpeedYaxis = ballSpeed;
 	// Score
 	var leftPlayerScore = 0;
 	var rightPlayerScore = 0;
@@ -40,11 +43,15 @@
 	var sPressed = false;
 
 	// socket info 
-	var ws;
+	// var ws;
 	var leftPlayerId;
 	var rightPlayerId;
 	var leftPlayerImg;
 	var rightPlayerImg;
+	var leftWPressed = false;
+	var leftSPressed = false;
+	var rightWPressed = false;
+	var rightSPressed = false;
 
 	function getCookie(cname) {
 		let name = cname + "=";
@@ -62,18 +69,6 @@
 		return "";
 	}
 	
-	// function getImage(uid, token) {
-	// 	var imgUrl;
-	// 	fetch('http://127.0.0.1:8000/playerInfo/?uid=' + uid + "&token=" + token)
-	// 		.then(response => {
-	// 			return response.json();
-	// 		})
-	// 		.then(jsonResponse => {
-	// 			imgUrl = jsonResponse.image;
-	// 		});
-	// 	return imgUrl;
-	// }
-
 	async function getImage(ownerUid, targetUid, token) {
 		try {
 			const response = await fetch('playerInfo/?ownerUid=' + ownerUid + "&targetUid=" + targetUid + "&token=" + token);
@@ -86,6 +81,7 @@
 	
 	function countdown(parent, callback) {
 		var texts = ['Match found!', '3', '2', '1', 'GO'];
+		// var texts = ['Match found!'];
 		
 		// This will store the paragraph we are currently displaying
 		var paragraph = null;
@@ -128,70 +124,57 @@
 	}
 
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
-
-	function getPlayerImages(uid) {
-		fetch('http://localhost:3000/users/api/' + uid, {
-			headers: {
-				'X-UID': uid,
-				'X-TOKEN': token
-			}
-		})
-		.then(response => response.json())
-		.then(data => console.log(JSON.stringify(data)))
-	}
-
+	
 	const handleWebSocketMessage = (event) => {
 		const messageData = JSON.parse(event.data);
-		if (messageData.type === "stateUpdate") {
-			console.log("status update");
-			ballXaxis = messageData.ballX * scaleFactor;
-			ballYaxis = messageData.ballY * scaleFactor;
-			leftPaddleYaxis = messageData.leftPaddle * scaleFactor;
-			rightPaddleYaxis = messageData.rightPaddle * scaleFactor;
+		if (messageData.type === "keyUpdate") {
+			if (messageData.isLeft) {
+				if (messageData.key == "w")
+					leftWPressed = messageData.keyDown;
+				else
+					leftSPressed = messageData.keyDown;
+			}
+			else {
+				if (messageData.key == "w")
+					rightWPressed = messageData.keyDown;
+				else
+					rightSPressed = messageData.keyDown;
+			}
+		}
+		if (messageData.type === "scoreUpdate") {
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
-		} 
+			reset(ballSpeed * messageData.ballDir);
+		}
 		else if (messageData.type === "inGame") {
-			console.log("you're queued or have another ongoing match on another tab or computer", playerId);
+			// console.log("you're queued or have another ongoing match on another tab or computer", playerId);
 			ws.close(3001, "Player already in-game");
+			alert("You have a game running on another session!");
 			// show error pop up and redirect them back to home page 
 		}
 		else if (messageData.type === "matchFound") {
 			leftPlayerId = messageData.left;
 			rightPlayerId = messageData.right;
-			console.log("match found, left = ", leftPlayerId, " right = ", rightPlayerId);
+			console.log("Match found, left = ", leftPlayerId, " right = ", rightPlayerId);
 			
 			countdown(document.getElementById("readyGo"), animateGame);
 			var leftImage = document.getElementById("leftImage");
 			var rightImage = document.getElementById("rightImage");
 			getImage(playerId, leftPlayerId, token)
 				.then(imgUrl => {
-					console.log("Image URL:", imgUrl);
 					leftImage.src = "http://localhost:3000" + imgUrl;
 				});
 			getImage(playerId, rightPlayerId, token)
 				.then(imgUrl => {
-					console.log("Image URL:", imgUrl);
 					rightImage.src = "http://localhost:3000" + imgUrl;
 				});
-			if (isOpen(ws)) {
-				ws.send(
-					JSON.stringify({
-						type: "ready",
-						playerId: playerId,
-					})
-				);
-			}
 		}
-		// else if (messageData.type === "playerImages") {
-		// 	leftImage = document.getElementById("leftImage");
-		// 	rightImage = document.getElementById("rightImage");
-		// 	leftImage.src = "http://localhost:3000/" + messageData.leftImage;
-		// 	rightImage.src = "http://localhost:3000/" + messageData.rightImage;
-		// }
-
-		else if (messageData.type === "disconnected")
-			console.log("opponent has disconnected");
+		else if (messageData.type === "disconnected") {
+			reset();
+			alert("Opponent disconnected from the game");
+			cancelAnimationFrame(animationId);
+			// show error pop up and redirect them back to home page 
+		}
 	};
 
 	function sendKeyUpdate(key, keyDown)
@@ -202,6 +185,18 @@
 					type: "keypress",
 					key: key,
 					keyDown: keyDown,
+					playerId: playerId
+				})
+			);
+		}
+	}
+	
+	function sendScoredEvent(key, keyDown)
+	{
+		if (isOpen(ws)) {
+			ws.send(
+				JSON.stringify({
+					type: "playerScored",
 					playerId: playerId
 				})
 			);
@@ -237,49 +232,67 @@
 		}
 	}
 
+	function update()
+	{
+		// Left paddle movement
+		if (leftWPressed && leftPaddleYaxis > 0)
+			leftPaddleYaxis -= paddleSpeed;
+		else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvasH)
+			leftPaddleYaxis += paddleSpeed;
+		
+		// Right paddle movement
+		if (rightWPressed && rightPaddleYaxis > 0)
+			rightPaddleYaxis -= paddleSpeed;
+		else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvasH)
+			rightPaddleYaxis += paddleSpeed;
+
+		// Move ball
+		ballXaxis += ballSpeedXaxis;
+		ballYaxis += ballSpeedYaxis;
+
+		// Top & bottom collision
+		if (ballYaxis - ballRadius <= 0 ||
+			ballYaxis + ballRadius >= canvasH)
+			ballSpeedYaxis = -ballSpeedYaxis;
+
+		// Left paddle collision
+		if (ballXaxis - ballRadius <= paddleWidth &&
+			ballYaxis >= leftPaddleYaxis &&
+			ballYaxis <= leftPaddleYaxis + paddleHeight)
+			if (ballSpeedXaxis < 0)
+				ballSpeedXaxis = -ballSpeedXaxis;
+
+		// Right paddle collision
+		if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
+			ballYaxis >= rightPaddleYaxis &&
+			ballYaxis <= rightPaddleYaxis + paddleHeight)
+			if (ballSpeedXaxis > 0)
+				ballSpeedXaxis = -ballSpeedXaxis;
+
+		// Check if ball goes out of bounds on left or right side of canvas
+		if (ballXaxis - ballRadius <= 0) {
+			if (playerId == rightPlayerId)
+				sendScoredEvent();
+		}
+		else if (ballXaxis + ballRadius >= canvasW) {
+			if (playerId == leftPlayerId)
+				sendScoredEvent();
+		}
+	}
+
 	const animateGame = (time) => {
-		// update();
+		update();
 		draw();
 		// Start the animation loop
-		// if (gameRunning == true)
-			animationId = requestAnimationFrame(animateGame);
+		animationId = requestAnimationFrame(animateGame);
 	};
 
 	// Reset ball
-	const reset = () => {
+	const reset = (newBallSpeed) => {
 		ballXaxis = canvasW / 2;
 		ballYaxis = canvasH / 2;
-		// ballSpeedXaxis = -ballSpeedXaxis;
-		// ballSpeedYaxis = -ballSpeedYaxis;
-	}
-
-	// Update game state
-	const update = () => {
-		// // Check if ball goes out of bounds on left or right side of canvas
-		if (ballXaxis < 0) 
-		{
-			rightPlayerScore++;
-			// reset();
-		}
-
-		else if (ballXaxis > canvasW)
-		{
-			leftPlayerScore++;
-			// reset();
-		}
-
-		// Check if a player has won
-		// This will be modified to know if you are player one or two and then decide to output win / lose accordingly
-		if (leftPlayerScore === maxScore) {
-			// gameRunning = false;
-			cancelAnimationFrame(animationId);
-			alert("Left wins!")
-		}
-		else if (rightPlayerScore === maxScore) {
-			// gameRunning = false;
-			cancelAnimationFrame(animationId);
-			alert("Right wins!")
-		}
+		ballSpeedXaxis = newBallSpeed;
+		ballSpeedYaxis = newBallSpeed;
 	}
 
 	const draw = () => {
@@ -333,9 +346,7 @@
 		// Set up WebSocket connection
 		console.log("uid = ", playerId, " token = ", token);
 		ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
-		console.log("ws is ", ws);
 		ws.onmessage = handleWebSocketMessage;
-		console.log("connecting to server with uid ", playerId);
 		// Keyboard events
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);
@@ -343,3 +354,15 @@
 	draw();
 	joinQueue();
 
+	onlineGame.destroy = () => {
+		document.removeEventListener("keydown", keyDownHandler);
+		document.removeEventListener("keyup", keyUpHandler);
+		if (ws) {
+			ws.close();
+			console.log("Closing connection with server");
+		}
+		cancelAnimationFrame(animationId);
+		console.log('DESTROYED');
+	};
+}
+onlineGame();

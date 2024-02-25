@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse # Used to generate URLs by reversing the URL patterns
 from rest_framework import serializers
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 class UserApiUser(models.Model):
     uid = models.BigIntegerField(primary_key=True)
@@ -45,7 +47,7 @@ class Game(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular game instance."""
-        return reverse('game-detail', args=[str(self.gid)])
+        return reverse('game-detail', args=[str(self.id)])
 
 # this model stores info pertaining to one player in the game and their score
 # we chose to separate PlayerMatch from Game to make fetching the data easier for one player 
@@ -60,4 +62,4 @@ class PlayerMatch(models.Model):
 
     def get_absolute_url(self):
         """Returns the url to access a particular genre instance."""
-        return reverse('game-detail', args=[str(self.matchId)])
+        return reverse('game-detail', args=[str(self.id)])

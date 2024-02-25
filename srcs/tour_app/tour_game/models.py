@@ -33,7 +33,7 @@ class UserApiUser(models.Model):
 class OnlineGame(models.Model):
     starttime = models.DateTimeField()
     endtime = models.DateTimeField()
-    tournament = models.ForeignKey(Tournament, models.DO_NOTHING, blank=True, null=True)
+    tournament = models.ForeignKey('Tournament', models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -42,8 +42,8 @@ class OnlineGame(models.Model):
 
 class OnlinePlayermatch(models.Model):
     score = models.IntegerField(blank=True, null=True)
-    game = models.ForeignKey(OnlineGame, models.DO_NOTHING, blank=True, null=True)
-    player = models.ForeignKey(UserApiUser, models.DO_NOTHING, blank=True, null=True)
+    game = models.ForeignKey(OnlineGame, models.CASCADE, blank=True, null=True)
+    player = models.ForeignKey('UserApiUser', models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = False

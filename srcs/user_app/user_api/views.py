@@ -6,7 +6,7 @@ from rest_framework import status
 from .models import User
 from .serializers import UserSerializer
 from user_app.permissions import IsRequestedUser
-from os import remove
+from django.core.exceptions import ValidationError
 
 # List view of all Users
 class UsersListApiView(APIView):
@@ -16,10 +16,11 @@ class UsersListApiView(APIView):
                     {URL}/users/api/
         """
         users = User.objects.all().order_by('uid')
-        serlializer = UserSerializer(users, many=True)
-        return Response(serlializer.data, status=status.HTTP_200_OK)
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        print(request.data)
         """
             curl -X POST -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
                     -F "uid={NEW_USER}" -F "username={NEW_USERNAME}"    \
@@ -44,7 +45,7 @@ class UserDetailApiView(APIView):
 
     def get(self, request, user_id):
         """
-            curl -X GET -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}" \
+            curl -X GET -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"         \
                     {URL}/users/api/{TARGET_USER}
         """
         try:
@@ -53,8 +54,11 @@ class UserDetailApiView(APIView):
             req_uid = request.META.get('HTTP_X_UID')
             req_token = request.META.get('HTTP_X_TOKEN')
             if int(req_uid) == user_id:
-                user_query = User()
-                user_query.oaut_42_user(req_token)
+                try:
+                    user_query = User()
+                    user_query.new_42_user(req_token)
+                except ValidationError as e:
+                    return Response(e.messages, status=status.HTTP_400_BAD_REQUEST)
             else:
                 raise Http404
         serializer = UserSerializer(user_query)
@@ -78,13 +82,11 @@ class UserDetailApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, user_id):
-        # TODO: fix a bug where the admin page delete isn't deleting the image, (MOST PROB the MEDIA)
         """
-            curl -X POST -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
+            curl -X DELETE -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
                     {URL}/users/api/{TARGET_USER}
         """
         user_query = self.getObjectById(user_id)
-        remove('media/' + str(user_query.image))
         user_query.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
