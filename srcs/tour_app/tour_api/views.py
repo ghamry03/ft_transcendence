@@ -9,17 +9,11 @@ from rest_framework.views import APIView
 from rest_framework import status
 import logging
 
-from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch
+from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch, TournamentRank
 from tour_api.serializer import TournamentSerializer, GameSerializer
 from django.http import HttpResponseBadRequest
 
 logger = logging.getLogger(__name__)
-
-#//Requirement: Get first game ID for tournament (mostly use gameAPI)
-#implemented tournamenthistory -> from user ID get all tournaments user participated in and return rank and long ago
-#-> call game API for user ID and get the different tournament ids
-#-> use long ago function for these tournament game
-#-> create rank function and return user rank
 
 def calculate_time_passed(self, game_endtime):
 		current_time = now()
@@ -44,15 +38,13 @@ def calculate_time_passed(self, game_endtime):
 				return "1 second"
 			return f"{time_difference.seconds} seconds"
 
-def update_ranks(request, tournament_id, user_id):
+def update_ranks(request, tid, uid, rank):
 	try:
-		tournament = Tournament.objects.get(id=tournament_id)
-		for i in range(len(tournament.ranks)):
-			if tournament.ranks[i] is None:
-				tournament.ranks[i] = user_id
-				tournament.save()
-				return JsonResponse({'message': 'User added to ranks successfully.'})
-		return HttpResponseBadRequest('All ranks are already filled.')
+		tournament = TournamentRank.objects.get(tournament=tid)
+		tournament.playerID = uid
+		tournament.rank = rank
+		tournament.save()
+		return JsonResponse({'message': 'User added to ranks successfully.'})
 
 	except Tournament.DoesNotExist:
 		return HttpResponseBadRequest('Tournament not found.')
@@ -86,10 +78,6 @@ class TournamentHistoryApiView(APIView):
 		
 		return Response(tournament_details.json(), status=status.HTTP_200_OK)
 
-#Game API get all api matches for specific tournament
-#implement tournamentmatches -> all matches for a tid tournament and the scores
-#potentially call other api for all game ids
-
 def get_player_image(self, target_uid, owner_uid, token):
 		headers = {
 			'X-UID': str(owner_uid),
@@ -108,7 +96,7 @@ class TournamentMatchesApiView(APIView):
 			return Response({"message": "No games found for the given tournament."}, status=status.HTTP_404_NOT_FOUND)
 		serializer = GameSerializer(games, many=True)
 
-		game_details - []
+		game_details = []
 		for game in games:
 			players = OnlinePlayermatch.objects.filter(game=game)
 			player1_image_url = get_player_image(self, OnlinePlayermatch.player[0], owner_uid, owner_token)
