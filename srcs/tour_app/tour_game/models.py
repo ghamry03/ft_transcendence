@@ -53,10 +53,17 @@ class OnlinePlayermatch(models.Model):
 # playermatch = OnlinePlayermatch(score=100, game=game, player=1)
 # playermatch.save()
 
-# create game instance
-
 t_instance = Tournament(starttime=timezone.now(), endtime=timezone.now())
 t_instance.save()
 
+onlinePlayerMatch_instance = OnlinePlayermatch(score=100, game=11, player=88507)
+onlinePlayerMatch_instance.save()
+onlinePlayerMatch_instance = OnlinePlayermatch(score=8, game=11, player=88336)
+onlinePlayerMatch_instance.save()
+
 game2 = OnlineGame(starttime=timezone.now(), endtime=timezone.now(), tournament=t_instance)
 game2.save()
+
+
+
+playermatch2 = OnlinePlayermatch(score=69, game=01, player=88507)
