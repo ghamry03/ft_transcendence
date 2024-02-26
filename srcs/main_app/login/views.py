@@ -3,17 +3,18 @@ import os
 import requests
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from . import AUTH_URL, USER_API_URL
 
 # Create your views here.
 def loginPage(request):
     context = {
-        'authUrl': environ.Env()('AUTH_URL')
+        'authUrl': AUTH_URL
     }
     return render(request, 'login.html', context)
 
 def logout(request):
     context = {
-        'authUrl': environ.Env()('AUTH_URL')
+        'authUrl': AUTH_URL
     }
     request.session.flush()
     return render(request, 'login.html', context)
@@ -46,7 +47,7 @@ def authenticate(request):
                 'X-UID': UID,
                 'X-TOKEN': access_token
             }
-            user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/' + UID, headers=headers)
+            user_api_response = requests.get(USER_API_URL + '/users/api/' + UID, headers=headers)
             request.session['userData'] = user_api_response.json()
             request.session['logged_in'] = True
             return redirect('/')

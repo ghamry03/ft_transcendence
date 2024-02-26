@@ -44,18 +44,8 @@ main-sh		:
 
 user-sh		:
 					$(DOCKER_CMD) exec -it userapp /bin/bash
-
-game-sh		:
-					$(DOCKER_CMD) exec -it gameapp /bin/bash
-
-main-logs		:
-					docker logs -f mainapp
-
-user-logs		:
-					docker logs -f userapp
-
-game-logs		:
-					docker logs -f gameapp
+friends-sh		:
+					$(DOCKER_CMD) exec -it friendsapp /bin/bash
 
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
@@ -73,6 +63,11 @@ clean			:	down
 
 fclean			:
 					$(DOCKER_CMD) down -v --rmi all
+					rm -rf srcs/postgres/data
+					rm -rf srcs/friends_app/friends_api/migrations/
+					rm -rf srcs/friends_app/friends_api/__pycache__/
+					rm -rf srcs/user_app/user_api/migrations/
+					rm -rf srcs/user_app/user_api/__pycache__/
 
 re				: fclean all
 
