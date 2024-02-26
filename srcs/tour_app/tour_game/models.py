@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 class Tournament(models.Model):
     id = models.AutoField(primary_key=True)
@@ -19,7 +21,7 @@ class UserApiUser(models.Model):
 class OnlineGame(models.Model):
     starttime = models.DateTimeField()
     endtime = models.DateTimeField()
-    tournament = models.ForeignKey('Tournament', models.CASCADE, blank=True, null=True)
+    tournament = models.ForeignKey(Tournament, models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -29,7 +31,7 @@ class OnlineGame(models.Model):
 class OnlinePlayermatch(models.Model):
     score = models.IntegerField(blank=True, null=True)
     game = models.ForeignKey(OnlineGame, models.CASCADE, blank=True, null=True)
-    player = models.ForeignKey('UserApiUser', models.CASCADE, blank=True, null=True)
+    player = models.ForeignKey(UserApiUser, models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = False

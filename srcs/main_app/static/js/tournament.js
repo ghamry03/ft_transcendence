@@ -68,8 +68,15 @@ tournament = () => {
 	var rightSPressed = false;
 
 	var gameRunning = false;
-	const WIN_SCORE = 6;
+	const WIN_SCORE = 2;
 	var roundNo = 0;
+	var paddleSpeed;
+	var ballXaxis;
+	var ballYaxis;
+	var ballRadius;
+	var ballSpeed;
+	var ballSpeedXaxis;
+	var ballSpeedYaxis;
 
 	async function toggleBracket() {
 		round1Container = document.getElementById("round1Container");
@@ -329,6 +336,9 @@ tournament = () => {
 				console.log("tournament found! player list = ", messageData.playerList);
 				addPlayerImages(messageData.playerList);
 				break;
+			case "tournamentEnded":
+				console.log("Tournament ended! Winner: ", messageData.winnerId);
+				break;
 			case "newPlayerJoined":
 				var newPlayerId = messageData.newPlayerId;
 				console.log("new player joined: ", newPlayerId);
@@ -360,6 +370,10 @@ tournament = () => {
 					updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
 					checkForm.style.display = "none";
 				}
+				break;
+			case "tournamentCanceled":
+				alert("Tournament was canceled, not enough players to continue");
+				ws.close();
 				break;
 			default:
 				// Handle default case if needed
@@ -483,6 +497,7 @@ tournament = () => {
 		ballYaxis = canvasH / 2;
 		ballSpeedXaxis = newBallSpeed;
 		ballSpeedYaxis = newBallSpeed;
+		ballSpeed = newBallSpeed
 	}
 
 	function update()
@@ -528,11 +543,13 @@ tournament = () => {
 		// Check if ball goes out of bounds on left or right side of canvas
 		if (ballXaxis - ballRadius <= 0) {
 			gameRunning = false;
+			// reset(ballSpeed);
 			if (playerId == rightPlayerId)
 				sendScoredEvent();
 		}
 		else if (ballXaxis + ballRadius >= canvasW) {
 			gameRunning = false;
+			// reset(ballSpeed);
 			if (playerId == leftPlayerId)
 				sendScoredEvent();
 		}

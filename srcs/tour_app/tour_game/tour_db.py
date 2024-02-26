@@ -8,3 +8,13 @@ def createTournament():
 		starttime=timezone.now()
 	)
 	return tour.id
+
+@sync_to_async
+def deleteTournament(tid):
+	Tournament.objects.get(id=tid).delete()
+
+@sync_to_async
+def endTournament(tid):
+	tour = Tournament.objects.get(id=tid)
+	tour.endtime = timezone.now()
+	tour.save()
