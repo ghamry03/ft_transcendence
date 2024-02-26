@@ -45,7 +45,8 @@ const injections = {
     fetchMainContent('/home', 'mainContentArea')
       .then(() => fetchMainContent('/topbar', 'topBar'))
       .then(() => fetchMainContent('/cards', 'homeContentArea'))
-      .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'));
+      .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
+      .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'));
   },
   '/cards': () => {
     removeScript('online');

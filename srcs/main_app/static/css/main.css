@@ -17,6 +17,7 @@
 
 :root {
   --beach-bunny: #FCF9F4;
+  --beach-bunny-pink: #EEB3E7;
   --beach-bunny-red: #EF6E7F;
   --beach-bunny-lavendar: #E9DCFF;
   --beach-bunny-lavendar-dark: #D4BBFE;
@@ -25,6 +26,8 @@
   --card-font-pink: #C185BA;
   --chat-text: #80629D;
   --login-text: #FFFCC7;
+  --green-light: #7ECD81;
+  --green-darker: #6BC66F;
 }
 
 h1,
@@ -61,12 +64,13 @@ body {
   z-index: 99;
   left: 0;
   height: 100vh;
-  min-width: 20%;
+  min-width: 62px;
   max-height: 80vh;
   width: 50px;
-  background-color: var(--beach-bunny-lavendar-dark);
+  background-color: var(--beach-bunny-lavendar);
   border-radius: 0px 13px 13px 0px;
   transition: width ease-out 0.3s;
+  padding: 10px;
 }
 
 .navigationBar:hover {
@@ -383,4 +387,185 @@ body {
     5px 20px 0 0 var(--beach-bunny-red);
 
   transition: all ease-out 0.3s;
+}
+
+/*ALL THINGS SIDE BAR*/
+.friendImg{
+  position: relative;
+  width: 25%;
+  z-index: 10;
+}
+
+.friendImg img, .friendRequest img{
+  position: relative;
+  min-width: 42px;
+  min-height: 42px;
+  max-width: 42px;
+  max-height: 42px;
+  border-radius: 100%;
+  aspect-ratio: 1;
+  z-index: 10;
+}
+
+.friendRequest img{
+  border-radius: 0px;
+}
+
+.friendImg:after {
+  content: "";
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  background: red;
+  border-radius:100%;
+  width: 12px;
+  height: 12px;
+  z-index: 11;
+} 
+
+.friendName{
+  display: none;
+  padding-left: 10px;
+  z-index: 9;;
+}
+.friendName p{
+  font-family: ps2p;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  z-index: 9;
+  text-wrap: nowrap;
+}
+
+.friendName.title p{
+  font-family: bpdots!important;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  font-variant: all-small-caps;
+  z-index: 9;
+  text-wrap: nowrap;
+}
+
+.friendRequest{
+  padding-bottom: 10px;
+  border-bottom: solid 2px var(--beach-bunny-lavendar-dark);
+}
+
+.friend {
+  margin-top: 10px!important;
+}
+
+.friend:hover p{
+  text-decoration: underline;
+}
+
+.friendAdd{
+  padding-top: 10px;
+  border-bottom: none;
+  border-top: solid 2px var(--beach-bunny-lavendar-dark);
+  bottom: 0;
+}
+
+.friendInjection{
+  position: relative;
+  height: 80%;
+  max-height: 80%;
+}
+
+.basePopup{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 99;
+  overflow:hidden;
+}
+
+.formBase{
+  position: absolute;
+  width: 50%;
+  height: auto;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99;
+}
+
+.overlay{
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  opacity: 0.9;
+  z-index: 98;
+}
+
+.formIcon{
+  border: none!important;
+}
+
+.formIcon img{
+  height: 26px;
+}
+
+.searchInput input{
+  border: none;
+  font-family: bpdots;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  background-color: transparent;
+}
+
+.searchInput input:focus{
+  background-color: var(--beach-bunny-pink);
+}
+
+.pink-bg{
+  background-color: var(--beach-bunny-pink);
+}
+
+.pill-border-pink{
+  box-shadow: 
+  -8px 0px 0px var(--beach-bunny-pink),
+  -4px -4px 0px var(--beach-bunny-pink),
+    0px -8px 0px var(--beach-bunny-pink),
+    -8px 0px 0px var(--beach-bunny-pink),
+  -4px 4px 0px var(--beach-bunny-pink),
+    0px 8px 0px var(--beach-bunny-pink),
+    8px 0px 0px var(--beach-bunny-pink),
+  4px -4px 0px var(--beach-bunny-pink),
+    0px -8px 0px var(--beach-bunny-pink),
+    8px 0px 0px var(--beach-bunny-pink),
+  4px 4px 0px var(--beach-bunny-pink),
+    0px 8px 0px var(--beach-bunny-pink);
+}
+
+.formDone{
+  border: none;
+  background-color: var(--green-darker);
+  text-align: center;
+  font-family: bpdots;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  box-shadow: 
+  -4px -4px 0px var(--green-darker),
+  -4px 4px 0px var(--green-darker),
+  4px -4px 0px var(--green-darker),
+  4px 4px 0px var(--green-darker),
+  -8px 0px 0px var(--green-light),
+    0px -8px 0px var(--green-light),
+    -8px 0px 0px var(--green-light),
+    0px 8px 0px var(--green-light),
+    8px 0px 0px var(--green-light),
+    0px -8px 0px var(--green-light),
+    8px 0px 0px var(--green-light),
+    0px 8px 0px var(--green-light);
 }
