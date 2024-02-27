@@ -28,7 +28,7 @@ tournament = () => {
 	}
 
 	const playerId = getCookie("uid");
-	const token = getCookie("token");
+	// const token = getCookie("token");
 	const lock = new AsyncLock();
 	const bracket = document.getElementById("queue");
 	const gameContainer = document.getElementById("gameBox");
@@ -121,7 +121,7 @@ tournament = () => {
 
 	async function getImage(targetUid) {
 		try {
-			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid + "&token=" + token);
+			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
 			const jsonResponse = await response.json();
 			return jsonResponse.image;
 		} catch (error) {
@@ -131,7 +131,7 @@ tournament = () => {
 
 	async function getUserName(targetUid) {
 		try {
-			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid + "&token=" + token);
+			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
 			const jsonResponse = await response.json();
 			return jsonResponse.first_name;
 		} catch (error) {
@@ -609,7 +609,7 @@ tournament = () => {
 
 	const joinQueue = () => {
 		// Set up WebSocket connection
-		console.log("uid = ", playerId, " token = ", token);
+		console.log("uid = ", playerId);
 		ws = new WebSocket("ws://localhost:4000/ws/tour/?uid=" + playerId);
 		ws.onmessage = handleWebSocketMessage;
 	};
