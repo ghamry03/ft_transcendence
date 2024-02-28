@@ -28,7 +28,6 @@ tournament = () => {
 	}
 
 	const playerId = getCookie("uid");
-	// const token = getCookie("token");
 	const lock = new AsyncLock();
 	const bracket = document.getElementById("queue");
 	const gameContainer = document.getElementById("gameBox");
@@ -68,7 +67,7 @@ tournament = () => {
 	var rightSPressed = false;
 
 	var gameRunning = false;
-	const WIN_SCORE = 2;
+	const WIN_SCORE = 6;
 	var roundNo = 0;
 	var paddleSpeed;
 	var ballXaxis;
@@ -77,29 +76,41 @@ tournament = () => {
 	var ballSpeed;
 	var ballSpeedXaxis;
 	var ballSpeedYaxis;
+	var lost = false;
+	var pendingScoreUpdate = false;
+	var scoreChanged = false;
 
 	async function toggleBracket() {
-		round1Container = document.getElementById("round1Container");
-		round2Container = document.getElementById("round2Container");
-		round3Container = document.getElementById("round3Container");
-		statusBox = document.getElementById("statusBox");
-		if (round1Container.style.display === "none") {
-			while (gameContainer.firstChild) {
-				gameContainer.firstChild.remove()
+		await lock.acquire()
+		try {
+			round1Container = document.getElementById("round1Container");
+			round2Container = document.getElementById("round2Container");
+			round3Container = document.getElementById("round3Container");
+			statusBox = document.getElementById("statusBox");
+			if (round1Container.style.display === "none") {
+				if (animationId != 0) {
+					cancelAnimationFrame(animationId);
+					animationId = 0;
+				}
+				while (gameContainer.firstChild) {
+					gameContainer.firstChild.remove()
+				}
+				round1Container.style.display = "flex";
+				round2Container.style.display = "flex";
+				round3Container.style.display = "flex";
+				statusBox.style.display = "block";
+				// startNextRound();
 			}
-			round1Container.style.display = "flex";
-			round2Container.style.display = "flex";
-			round3Container.style.display = "flex";
-			statusBox.style.display = "block";
-			// startNextRound();
-		}
-		else {
-			round1Container.style.display = "none";
-			round2Container.style.display = "none";
-			round3Container.style.display = "none";
-			statusBox.style.display = "none";
-			await engine('/tourGame');
-			console.log("fetched tour game template");
+			else {
+				round1Container.style.display = "none";
+				round2Container.style.display = "none";
+				round3Container.style.display = "none";
+				statusBox.style.display = "none";
+				await engine('/tourGame');
+				console.log("fetched tour game template");
+			}
+		} finally {
+			lock.release()
 		}
 	}
 
@@ -172,10 +183,8 @@ tournament = () => {
 	async function removePlayer(playerId) {
 		await lock.acquire()
 		try {
-			// disconnectedPlayer = document.getElementById(playerId)
 			var disconnectedPlayer = document.querySelector('[data-uid="' + playerId + '"]');
 			disconnectedPlayer.src = "https://i.imgur.com/BPukfZQ.png";
-			// document.querySelector("#queue").removeChild(disconnectedPlayer);
 		} finally {
 			lock.release()
 		}
@@ -188,20 +197,37 @@ tournament = () => {
 		}
 	}
 
+	async function showWinner(uid) {
+		userName = await getUserName(uid);
+		const imgUrl = await getImage(uid);
+		checkBox.checked = false;
+		checkForm.style.display = "none";
+		updateTourStatus("Winner of tournament: " + userName);
+		var divElement = document.createElement("div");
+		divElement.className = "img-cir round";
+
+		var imgElement = document.createElement("img");
+		imgElement.src = 'http://localhost:3000' + imgUrl;
+		imgElement.alt = "Winner";
+		imgElement.id = "winnerImg";
+
+		divElement.appendChild(imgElement);
+		statusBox = document.getElementById("statusBox");
+		if (statusBox)
+			statusBox.appendChild(divElement);
+	}
+
 	function countdown(parent, callback) {
-		var texts = ['Match found!'];
+		var texts = ['Match starting!'];
 		// var texts = ['Match found!', '3', '2', '1', 'GO'];
 		
-		// This will store the paragraph we are currently displaying
 		var paragraph = null;
 		
-		// This is the function we will call every 1000 ms using setInterval
 		function count() {
 			if (paragraph) {
 				paragraph.remove();
 			}
 			if (texts.length === 0) {
-				// If we ran out of text, use the callback to get started
 				clearInterval(interval);
 				callback();
 				return;
@@ -209,14 +235,12 @@ tournament = () => {
 			// Trim array
 			var text = texts.shift();
 			
-			// Create a paragraph to add to the DOM
 			// This new paragraph will trigger an animation
 			paragraph = document.createElement("div");
 			paragraph.textContent = text;
 			paragraph.className = text + " nums";
 			parent.appendChild(paragraph);
 		}
-		// Initiate an interval, but store it in a variable so we can remove it later.
 		var interval = setInterval( count, 1000 );  
 	}
 
@@ -265,6 +289,8 @@ tournament = () => {
 		// Scores
 		leftPlayerScore = 0;
 		rightPlayerScore = 0;
+		pendingScoreUpdate = false;
+		scoreChanged = false;
 		draw();
 		gameRunning = true;
 		countdown(document.getElementById("readyGo"), animateGame);
@@ -307,13 +333,11 @@ tournament = () => {
 			case "scoreUpdate":
 				leftPlayerScore = messageData.leftScore;
 				rightPlayerScore = messageData.rightScore;
+				newspeed = ballSpeed * messageData.ballDir;
 				reset(ballSpeed * messageData.ballDir);
+				console.log("score update reset ", newspeed);
 				gameRunning = true;
-				// if (leftPlayerScore == WIN_SCORE || rightPlayerScore == WIN_SCORE) {
-				// 	draw();
-				// 	requestAnimationFrame(endMatch);
-					// endMatch();
-				// }
+				scoreChanged = true;
 				break;
 			case "matchEnded":
 				leftPlayerScore = messageData.leftScore;
@@ -330,14 +354,16 @@ tournament = () => {
 				break;
 			case "tournamentStarted":
 				console.log("Tournament starting... Player list = ");
-				startNextRound();
+				if (!lost)
+					startNextRound();
 				break;
 			case "tournamentFound":
-				console.log("tournament found! player list = ", messageData.playerList);
+				console.log("Tournament found! player list = ", messageData.playerList);
 				addPlayerImages(messageData.playerList);
 				break;
 			case "tournamentEnded":
 				console.log("Tournament ended! Winner: ", messageData.winnerId);
+				showWinner(messageData.winnerId);
 				break;
 			case "newPlayerJoined":
 				var newPlayerId = messageData.newPlayerId;
@@ -366,7 +392,6 @@ tournament = () => {
 					requestAnimationFrame(endMatch);
 				}
 				else {
-					// startNextRound();
 					updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
 					checkForm.style.display = "none";
 				}
@@ -438,10 +463,6 @@ tournament = () => {
 
 	function endMatch()
 	{
-		if (animationId != 0) {
-			cancelAnimationFrame(animationId);
-			animationId = 0;
-		}
 		if (leftPlayerScore == WIN_SCORE && leftPlayerId == playerId 
 			|| rightPlayerScore == WIN_SCORE && rightPlayerId == playerId) {
 			setTimeout(function() {
@@ -456,6 +477,7 @@ tournament = () => {
 				alert("You lose. Proceed to results...");
 				toggleBracket();
 			  }, 0)
+			lost = true;
 		}
 		gameRunning = false;
 	}
@@ -490,21 +512,22 @@ tournament = () => {
 	}
 
 	// Reset ball
-	const reset = (newBallSpeed) => {
-		// ballXaxis = (canvasW - paddleWidth) / 2;
-		// ballYaxis = (canvasH - paddleWidth) / 2;
+	async function reset (newBallSpeed) {
 		ballXaxis = canvasW / 2;
 		ballYaxis = canvasH / 2;
 		ballSpeedXaxis = newBallSpeed;
 		ballSpeedYaxis = newBallSpeed;
-		ballSpeed = newBallSpeed
 	}
 
 	function update()
 	{
-		if (gameRunning == false) {
+		if (pendingScoreUpdate) {
+			console.log("scoreChanged = ", scoreChanged);
 			return ;
 		}
+		// if (gameRunning == false) {
+		// 	return ;
+		// }
 		// Left paddle movement
 		if (leftWPressed && leftPaddleYaxis > 0)
 			leftPaddleYaxis -= paddleSpeed;
@@ -542,14 +565,21 @@ tournament = () => {
 
 		// Check if ball goes out of bounds on left or right side of canvas
 		if (ballXaxis - ballRadius <= 0) {
-			gameRunning = false;
+			// gameRunning = false;
 			// reset(ballSpeed);
+			pendingScoreUpdate = true;
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
 			if (playerId == rightPlayerId)
 				sendScoredEvent();
 		}
 		else if (ballXaxis + ballRadius >= canvasW) {
-			gameRunning = false;
+			// gameRunning = false;
 			// reset(ballSpeed);
+			pendingScoreUpdate = true;
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+
 			if (playerId == leftPlayerId)
 				sendScoredEvent();
 		}
@@ -568,7 +598,7 @@ tournament = () => {
 		//Draw middle line
 		const color2 = "#57f2e5"
 		const color1 = "#FFB3CB"
-
+		
 		ctx.strokeStyle = color1;
 		ctx.beginPath();
 		ctx.moveTo(canvasW / 2, 0);
@@ -588,7 +618,7 @@ tournament = () => {
 		//Draw left paddle
 		ctx.fillStyle = color1;
 		ctx.fillRect(0, leftPaddleYaxis, paddleWidth, paddleHeight);
-
+		
 		//Draw right paddle
 		ctx.fillRect(canvasW - paddleWidth, rightPaddleYaxis, paddleWidth, paddleHeight);
 
@@ -605,8 +635,12 @@ tournament = () => {
 			leftScore.style.color = "#C5FFC0";
 			rightScore.style.color = "#C5FFC0";
 		}
+		if (pendingScoreUpdate && scoreChanged) {
+			pendingScoreUpdate = false;
+			scoreChanged = false;
+		}
 	}
-
+	
 	const joinQueue = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId);

@@ -18,7 +18,7 @@ def getMaxPos(playerMax):
 class TournamentConsumer(AsyncWebsocketConsumer):
 
     PLAYER_MAX = 8
-    WIN_SCORE = 2
+    WIN_SCORE = 6
     update_lock = asyncio.Lock()
     logger = logging.getLogger(__name__)
     maxPos = getMaxPos(PLAYER_MAX)
@@ -287,7 +287,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         "ballDir": ballDir
                     }
                 )
-            self.logger.info("Sent score update back %d %d", player["score"], opponent["score"])
         
         elif msg_type == "playerReady":
             player["ready"] = True
@@ -388,7 +387,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             tour["end"] = tour["end"] + tour["countPlayers"]
             if canceled:
                 break
-            self.logger.info("players len = %d", len(self.players))
         if canceled:
             await self.channel_layer.group_send(
                 tourName,
