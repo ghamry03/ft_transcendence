@@ -13,12 +13,29 @@
   background-repeat: no-repeat;
 }
 
+.loginButtonPos {
+  font-size: 5%;
+  position: absolute;
+  width: 25%;
+  height: 6%;
+  max-width:100%;
+  max-height: 100%;
+  bottom: 42%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.loginButton h3 {
+  color: #854D4D;
+  font-family: 'ps2p';
+  font-size: 12px;
+}
+
 .loginPage h1 {
-  /* background: #4DA394; */
   font-family: 'ntbricksans';
   color: var(--login-text);
-  font-size: 8vw;
   text-align: center;
+  font-size: 1vw + 1vh;
   text-shadow: 0px 0.06em 0px #59322B;
   font-style: normal;
   font-weight: 400;
@@ -29,112 +46,56 @@
   position: relative;
 }
 
+.loginHeader {
+  position: relative;
+  min-width: 100vw;
+}
+
+.img-container {
+  flex: 1;
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 0;
+}
+
+.img-wrapper {
+  display: inline-block;
+  position: relative;
+  max-height: 100%;
+}
+
+.centered-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+}
+
+.loginPageContent {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.art {
+  width: 4px;
+  height: 4px;
+  box-shadow:
+    -8px 0 red;
+}
 
 .loginButton {
-  /* width: 100px; */
-  margin: 2em auto;
   background-color: var(--loginbtn-bg);
-  box-shadow:
 
-    /*top left & top right border*/
-    -10px 0px 0px var(--loginbtn-bg),
-    -5px -5px 0px var(--loginbtn-bg),
-    0px -10px 0px var(--loginbtn-bg),
-    -10px -5px 0px black,
-    -5px -10px 0px black,
-    0px -15px 0 0 black,
-
-    10px 0px 0px var(--loginbtn-bg),
-    5px -5px 0px var(--loginbtn-bg),
-    0px -10px 0px var(--loginbtn-bg),
-    10px -5px 0px black,
-    5px -10px 0px black,
-    0px -15px 0 0 black,
-
-    /*bottom left & bottom right borders*/
-    -10px 0px 0px var(--loginbtn-bg),
-    -5px 5px 0px var(--loginbtn-bg),
-    0px 10px 0px var(--loginbtn-bg),
-    -10px 5px 0px white,
-    -5px 10px 0px white,
-    0px 15px 0 0 white,
-
-    10px 0px 0px white,
-    5px 5px 0px white,
-    0px 10px 0px white,
-    10px 5px 0px white,
-    5px 10px 0px white,
-    0px 15px 0 0 white,
-    /*left & right black border*/
-    -15px 0 0 0 black,
-    15px 0 0 0 black,
-
-    /*card highlight*/
-    10px 0px 0px var(--loginbtn-shadow),
-    5px 5px 0px var(--loginbtn-shadow),
-    0px 10px 0px var(--loginbtn-shadow),
-    20px 5px 0px var(--loginbtn-shadow),
-    20px 10px 0px var(--loginbtn-shadow),
-    15px 15px 0px var(--loginbtn-shadow),
-    10px 20px 0 0 var(--loginbtn-shadow),
-    5px 20px 0 0 var(--loginbtn-shadow);
 
   transition: all ease-out 0.3s;
 }
 
-.loginButton h3 {
-  color: #854D4D;
-  font-family: 'ps2p';
-  font-size: 12px;
+.loginButton:hover {
 }
-
-/* .loginButton:hover { */
-/*   cursor: pointer; */
-/*   background-color: var(--beach-bunny-lavendar); */
-/**/
-/*   box-shadow: */
-/**/
-/*     /*top left & top right border*/ */
-/*     -10px 0px 0px var(--beach-bunny-lavendar), */
-/*     -5px -5px 0px var(--beach-bunny-lavendar), */
-/*     0px -10px 0px var(--beach-bunny-lavendar), */
-/*     -10px -5px 0px var(--beach-bunny-lavendar-dark), */
-/*     -5px -10px 0px var(--beach-bunny-lavendar-dark), */
-/*     0px -15px 0 0 var(--beach-bunny-lavendar-dark), */
-/**/
-/*     10px 0px 0px var(--beach-bunny-lavendar), */
-/*     5px -5px 0px var(--beach-bunny-lavendar), */
-/*     0px -10px 0px var(--beach-bunny-lavendar), */
-/*     10px -5px 0px var(--beach-bunny-lavendar-dark), */
-/*     5px -10px 0px var(--beach-bunny-lavendar-dark), */
-/*     0px -15px 0 0 var(--beach-bunny-lavendar-dark), */
-/**/
-/*     /*bottom left & bottom right borders*/ */
-/*     -10px 0px 0px var(--beach-bunny-lavendar), */
-/*     -5px 5px 0px var(--beach-bunny-lavendar), */
-/*     0px 10px 0px var(--beach-bunny-lavendar), */
-/*     -10px 5px 0px var(--beach-bunny-lavendar-dark), */
-/*     -5px 10px 0px var(--beach-bunny-lavendar-dark), */
-/*     0px 15px 0 0 var(--beach-bunny-lavendar-dark), */
-/**/
-/*     10px 0px 0px var(--beach-bunny-lavendar), */
-/*     5px 5px 0px var(--beach-bunny-lavendar), */
-/*     0px 10px 0px var(--beach-bunny-lavendar), */
-/*     10px 5px 0px var(--beach-bunny-lavendar-dark), */
-/*     5px 10px 0px var(--beach-bunny-lavendar-dark), */
-/*     0px 15px 0 0 var(--beach-bunny-lavendar-dark), */
-/*     /*left & right black border*/ */
-/*     -15px 0 0 0 var(--beach-bunny-lavendar-dark), */
-/*     15px 0 0 0 var(--beach-bunny-lavendar-dark), */
-/**/
-/*     /*card highlight*/ */
-/*     10px 0px 0px var(--beach-bunny-lavendar), */
-/*     5px 5px 0px var(--beach-bunny-lavendar), */
-/*     0px 10px 0px var(--beach-bunny-lavendar), */
-/*     20px 5px 0px var(--beach-bunny-red), */
-/*     20px 10px 0px var(--beach-bunny-red), */
-/*     15px 15px 0px var(--beach-bunny-red), */
-/*     0px 20px 0 0 black, */
-/*     10px 20px 0 0 var(--beach-bunny-red), */
-/*     5px 20px 0 0 black; */
-/* } */

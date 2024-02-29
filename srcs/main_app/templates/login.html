@@ -1,12 +1,15 @@
 {% load static %}
-<div class="g-5 m-0 loginPage border">
-    <h1>PONGPING</h1>
-</div>
+<div class="loginPageContent">
+    <div class="loginHeader">
+        <div class="loginPage border">
+            <h1>PONGPING</h1>
+        </div>
+    </div>
 
-<div
-    style="background-image: url('{% static "imgs/arcade.png" %}');"
-    class="container-fluid border loginPage d-flex flex-grow-1"
-    id="bg-image"
->
-    <!-- {% include "loginButton.html" with title="Login" link=authUrl %} -->
+    <div class="img-container border">
+        <div class="img-wrapper">
+            <img src="/static/imgs/arcade.png" alt="Arcade" class="centered-img">
+            {% include "loginButton.html" with title="Login" link=authUrl %}
+        </div>
+    </div>
 </div>
