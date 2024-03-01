@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from online.models import Game, Tournament, PlayerMatch
+from online.models import Game, TourGameTournament, PlayerMatch
 
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,10 +8,12 @@ class GameSerializer(serializers.ModelSerializer):
 
 class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Tournament
+        model = TourGameTournament
         fields = ['id', 'starttime']
 
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlayerMatch
         fields = ['id', 'game', 'player', 'score']
+
+        

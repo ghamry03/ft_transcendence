@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse # Used to generate URLs by reversing the URL patterns
 from rest_framework import serializers
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 class UserApiUser(models.Model):
     uid = models.BigIntegerField(primary_key=True)
@@ -13,24 +15,20 @@ class UserApiUser(models.Model):
         managed = False
         db_table = 'user_api_user'
 
-class Tournament(models.Model):
-    id = models.AutoField(primary_key=True)
-    starttime = models.DateTimeField(auto_now_add=True)
+class TourGameTournament(models.Model):
+    starttime = models.DateTimeField()
+    endtime = models.DateTimeField()
 
-# class TourAppTournament(models.Model):
-#     starttime = models.DateTimeField(db_column='starttime')  # Field name made lowercase.
-#     endtime = models.DateTimeField(db_column='endtime')  # Field name made lowercase.
-
-#     class Meta:
-#         managed = False
-#         db_table = 'tour_app_tournament'
+    class Meta:
+        managed = False
+        db_table = 'tour_game_tournament'
 
 # this model stores game info that relates to the game overall and not one specific player
 class Game(models.Model):
     id = models.AutoField(primary_key=True)
     starttime = models.DateTimeField(auto_now_add=True)
     endtime = models.DateTimeField(auto_now=True)
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=True)
+    tournament = models.ForeignKey(TourGameTournament, on_delete=models.CASCADE, null=True)
     def __str__(self):
         """String for representing the Model object."""
         return self.id

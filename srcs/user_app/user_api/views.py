@@ -1,4 +1,4 @@
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponse
 from rest_framework.views import APIView
 from rest_framework import exceptions
 from rest_framework.response import Response
@@ -89,6 +89,12 @@ class UserDetailApiView(APIView):
         user_query = self.getObjectById(user_id)
         user_query.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class Testing(APIView):
+    authentication_classes = ()
+    def get(self, request, user_id):
+        user = User.objects.get(uid=user_id)
+        return HttpResponse(user.first_name)
 
 def health_check(request):
     return JsonResponse({'status': 'ok'})

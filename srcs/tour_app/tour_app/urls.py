@@ -1,5 +1,5 @@
 """
-URL configuration for game_app project.
+URL configuration for tour_app project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -16,15 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-# from game_api import urls as game_urls
-from online import urls as online_urls
+from tour_game import urls as tour_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('game/', include('game_api.urls')),
-    # path('online/', include(online_urls)),
+    path('tour/', include(tour_urls)),
 ]
-
-# urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-
-
