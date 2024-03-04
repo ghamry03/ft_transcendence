@@ -55,6 +55,7 @@ body {
 
 .mainContainer {
   max-width: 1440px;
+  width: 100vw;
   background-color: var(--dark-purple-bg);
   min-height: 100vh;
 }

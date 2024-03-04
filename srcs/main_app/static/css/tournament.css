@@ -25,37 +25,183 @@
 
 }
 
-/* .image-container img {
-	width: 70px;
-	height: 70px;
-	border-radius: 50%;
-	margin: 0 10px;
-} */
+.quarterFinal table:first-child::before{
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: calc(50% + 1rem);
+    background-color: transparent;
+    top: 50%;
+    left: 100%;
+    border: none;
+    border-top: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-radius: 0px;
+    border-top-right-radius: 8px;
+ }
 
-.img-cir {
-    border-radius: 50%;
+ .quarterFinal table:nth-child(2)::before{
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: calc(50% + 1rem);
+    background-color: transparent;
+    top: -1rem;
+    left: 100%;
+    border: none;
+    border-bottom: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-radius: 0px;
+    border-bottom-right-radius: 8px;
+ }
+
+ .quarterFinal table:first-child::after{
+    content: '';
+    position: absolute;
+    width: calc(25% + 24px);
+    height: calc(50% + 1rem);
+    background-color: transparent;
+    top: calc(50% + 0.5rem);
+    left: calc(100% + 23px);
+    border: none;
+    border-bottom: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    border-radius: 0px;
+    border-bottom-left-radius: 0.6rem;
+ }
+
+ .quarterFinal table:nth-child(2)::after{
+    content: '';
+    position: absolute;
+    width: calc(25% + 24px);
+    height: calc(50% + 1rem);
+    background-color: transparent;
+    top: -1.5rem;
+    left: calc(100% + 23px);
+    border: none;
+    border-top: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    border-radius: 0px;
+    border-top-left-radius: 0.6rem;
+ }
+
+
+ .semiFinal .matchOne::before{
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: calc(100% + 2.5rem);
+    background-color: transparent;
+    top: 50%;
+    left: 100%;
+    border: none;
+    border-top: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-radius: 0px;
+    border-top-right-radius: 8px;
+ }
+
+ .semiFinal .matchOne::after{
+    content: '';
+    position: absolute;
+    width: calc(25% + 24px);
+    height: calc(100% + 2.5rem);
+    background-color: transparent;
+    top: calc(50% + 0.5rem);
+    left: calc(100% + 23px);
+    border: none;
+    border-bottom: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    border-radius: 0px;
+    border-bottom-left-radius: 8px;
+ }
+
+ .semiFinal .matchTwo::before{
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: calc(100% + 2.5rem);
+    background-color: transparent;
+    top: calc(-50% - 2.5rem);
+    left: 100%;
+    border: none;
+    border-bottom: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    border-radius: 0px;
+    border-bottom-right-radius: 8px;
+ }
+
+ .semiFinal .matchTwo::after{
+    content: '';
+    position: absolute;
+    width: calc(25% + 24px);
+    height: calc(100% + 2.5rem);
+    background-color: transparent;
+    top: calc(-3rem - 50%);
+    left: calc(100% + 23px);
+    border: none;
+    border-top: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+    border-radius: 0px;
+    border-top-left-radius: 8px;
+ }
+
+table{
     position: relative;
-    height: 70px;
-    width: 70px;
-    overflow: hidden;
-    /* rename this */
-	/* margin-left: auto;
-	margin-right: auto; */
-    float: left;
-    margin-right: 10px;
+    display: block;
+    background-color: #E9DCFF;
+    border-radius: 12px;
+    padding: 0px 12px;
 }
 
-.img-cir.round img {
-    position: absolute;
-    left: 50%;
-    width: auto;
-    height: 70px;
-    transform: translateX(-50%);
+table:not(:first-child){
+    margin-top: 3rem;
+}
+
+.playerPill{
+    display: flex;
+    align-items: center;
+}
+.playerPill img {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    height: 100%;
+    width: 100%;
+    max-width: 42px;
+    max-height: 42px;
+    width: 100%;
+    margin: 12px 0px;
+ }
+tbody{
+    display: table;
+    width: 100%;
+}
+ tr:first-child{
+    border-bottom: 1px solid lightgray;
+ }
+
+ td:first-child{
+    max-width: 42px;
+ }
+
+ .playerName{
+    margin: 0;
+    margin-left: 12px;
+    font-family: ps2p;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
  }
 
  #tournamentStatus {
     font-family: 'ps2p';
     font-size: medium;
     color: var(--login-text);
-    /* color: var(--beach-bunny-lavendar-dark); */
  }
+
+ td{
+    vertical-align: middle;
+ }
+
