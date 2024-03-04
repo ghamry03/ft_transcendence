@@ -106,20 +106,40 @@ services:
         networks:
             - user_app_network
 
-# volumes:
-#     main_app_data:
-#         driver: local
-#         driver_opts:
-#             o: bind
-#             type: none
-#             device: ../srcs/main_app/
+    friendsapp:
+        build: ./friends_app
+        image: friendsapp
+        container_name: friendsapp
+        restart: always
+        ports:
+            - "8002:8000"
+        volumes:
+            - ../srcs/friends_app/:/home/friends_app
+            - ../srcs/user_app/:/home/user_app
+        depends_on:
+            postgres:
+                condition: service_healthy
+            userapp:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
 
+# volumes:
 #     user_app_data:
 #         driver: local
 #         driver_opts:
 #             o: bind
 #             type: none
 #             device: ../srcs/user_app/
+
+    # friends_app_data:
+    #     driver: local
+    #     driver_opts:
+    #         o: bind
+    #         type: none
+    #         device: ../srcs/friends_app/
 
     # postgres_data:
     #     driver: local
