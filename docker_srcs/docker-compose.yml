@@ -108,6 +108,8 @@ services:
 
     friendsapp:
         build: ./friends_app
+        image: friendsapp
+        container_name: friendsapp
         restart: always
         ports:
             - "8002:8000"

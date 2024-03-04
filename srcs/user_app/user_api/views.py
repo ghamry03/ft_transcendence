@@ -90,11 +90,5 @@ class UserDetailApiView(APIView):
         user_query.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class Testing(APIView):
-    authentication_classes = ()
-    def get(self, request, user_id):
-        user = User.objects.get(uid=user_id)
-        return HttpResponse(user.first_name)
-
 def health_check(request):
     return JsonResponse({'status': 'ok'})

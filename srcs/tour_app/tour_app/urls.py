@@ -20,5 +20,6 @@ from tour_game import urls as tour_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+	path('api/', include('tour_api.urls')),
     path('tour/', include(tour_urls)),
 ]
