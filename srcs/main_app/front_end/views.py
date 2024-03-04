@@ -43,3 +43,9 @@ def getOpponentInfo(request):
     }
     opponentInfo = requests.get('http://userapp:3000/users/api/' + targetUid, headers=headers)
     return JsonResponse(opponentInfo.json())
+
+def profile(request):
+    context = {
+        'name': 'blaah'
+    }
+    return render(request, 'profile.html', context)

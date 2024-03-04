@@ -1,11 +1,11 @@
-<div>
-  {% include "loginButton.html" with title="Logout" onClick="engine('/logout')" %}
-  <!-- <a onclick="engine('/login','false',0)" >logout</a> -->
+{% load static %}
+{% include "loginButton.html" with title="Logout" onClick="engine('/logout')" %}
+<div id="profileImg" data-bs-toggle="collapse show" data-bs-target="#profilePop">
+  <h1 id="userName" class="align-self-center align-middle">
+    {{ userData.username }}
+  </h1>
+  <img
+    src="http://localhost:3000/{{userData.image}}"
+    class="profilePic align-middle"
+  />
 </div>
-<h1 id="userName" class="align-self-center align-middle">
-  {{ userData.username }}
-</h1>
-<img
-  src="http://localhost:3000/{{userData.image}}"
-  class="profilePic align-middle"
-/>

@@ -8,4 +8,5 @@ urlpatterns = [
     path('cards/', views.homeCards, name='home_cards'),
     path('topbar/', views.topBar, name='topBar'),
     path('playerInfo/', views.getOpponentInfo, name='getOpponentInfo'),
+    path('profile/', views.profile, name='profile'),
 ]

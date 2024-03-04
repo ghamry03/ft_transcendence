@@ -47,6 +47,11 @@ const injections = {
       .then(() => fetchMainContent('/cards', 'homeContentArea'))
       .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
       .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'));
+      // .then(() =>
+      //   document.getElementById("profileImg").addEventListener("click", function() {
+      //     fetchMainContent('/profile', 'profileCollapse')
+      //   }));
+
   },
   '/cards': () => {
     removeScript('online');

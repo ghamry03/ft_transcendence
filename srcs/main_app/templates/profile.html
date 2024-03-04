@@ -1,2 +1,66 @@
 {% extends "baseForm.html" %}
 {% load static %}
+
+{% block formId %}profilePop{% endblock %}
+
+{% block form %}
+<div class="formBase pixelCard d-flex flex-column" style="width: 80vw; height: 80vh;">
+    <h3 class="formTitle">
+        Profile
+    </h3>
+    <div class="container-fluid d-flex flex-grow-1">
+        <div class="row flex-grow-1">
+
+            <!-- Profile pic, name, login -->
+            <div class="col-12 col-lg-4 border" style="padding: 8px;">
+                <div class="row">
+                    <div class="col-4">
+                        <img class="img-fluid" src="http://localhost:3000/{{userData.image}}" style="border-radius: 25px;">
+                    </div>
+                    <div class="col-4">
+                        <h3>{{userData.username}}</h3>
+                    </div>
+                    <div class="col-4">
+                        <button>Button</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- match history -->
+            <div class="col-12 col-lg-4 d-flex border" style="padding: 20px;">
+                <div id="matchHistoryDash" class="d-flex flex-grow-1" style="">
+                    <div class="content flex-grow-1">
+                        <div class="titleSection">
+                            <h3 class="title">Match History</h3>
+                        </div>
+
+                        <!-- content -->
+                        <div data-bs-spy="scroll">
+                            <h3>Your Matches</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- tour history -->
+            <div class="col-12 col-lg-4 d-flex border" style="padding: 20px;">
+                <div id="tournamentHistoryDash" class="d-flex flex-grow-1" style="">
+                    <div class="content flex-grow-1">
+                        <div class="titleSection">
+                            <h3 class="title">Your Tournaments</h3>
+                        </div>
+
+                        <!-- content -->
+                        <div>
+                            <h3>Your Tournaments</h3>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="overlay"  data-bs-toggle="collapse" data-bs-target="#profilePop"  aria-expanded="false" aria-controls="profilePop"></div>
+    {% endblock %}
