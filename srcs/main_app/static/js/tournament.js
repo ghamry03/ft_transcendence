@@ -132,6 +132,7 @@ tournament = () => {
 
 	async function getImage(targetUid) {
 		try {
+			console.log("Getting image from intra");
 			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
 			const jsonResponse = await response.json();
 			return jsonResponse.image;
@@ -154,6 +155,7 @@ tournament = () => {
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
 	async function addImage(playerId, imgId) {
+		
 		const imgUrl = await getImage(playerId);
 		console.log("new player image url = ", imgUrl);
 		var playerImg = document.getElementById(imgId);
@@ -335,14 +337,16 @@ tournament = () => {
 				rightPlayerScore = messageData.rightScore;
 				newspeed = ballSpeed * messageData.ballDir;
 				reset(ballSpeed * messageData.ballDir);
-				console.log("score update reset ", newspeed);
+				// console.log("score update reset ", newspeed);
 				gameRunning = true;
-				scoreChanged = true;
+				// scoreChanged = true;
 				break;
 			case "matchEnded":
 				leftPlayerScore = messageData.leftScore;
 				rightPlayerScore = messageData.rightScore;
 				reset(ballSpeed);
+				gameRunning = true;
+				// scoreChanged = true;
 				draw();
 				requestAnimationFrame(endMatch);
 				break;
@@ -521,13 +525,14 @@ tournament = () => {
 
 	function update()
 	{
-		if (pendingScoreUpdate) {
-			console.log("scoreChanged = ", scoreChanged);
-			return ;
-		}
-		// if (gameRunning == false) {
+		// if (pendingScoreUpdate) {
+		// 	console.log("scoreChanged = ", scoreChanged);
 		// 	return ;
 		// }
+		if (gameRunning == false) {
+			console.log("stuck here");
+			return ;
+		}
 		// Left paddle movement
 		if (leftWPressed && leftPaddleYaxis > 0)
 			leftPaddleYaxis -= paddleSpeed;
@@ -567,21 +572,25 @@ tournament = () => {
 		if (ballXaxis - ballRadius <= 0) {
 			// gameRunning = false;
 			// reset(ballSpeed);
-			pendingScoreUpdate = true;
+			// pendingScoreUpdate = true;
 			ballXaxis = canvasW / 2;
 			ballYaxis = canvasH / 2;
-			if (playerId == rightPlayerId)
+			if (playerId == rightPlayerId) {
+				gameRunning = false;
 				sendScoredEvent();
+			}
 		}
 		else if (ballXaxis + ballRadius >= canvasW) {
 			// gameRunning = false;
 			// reset(ballSpeed);
-			pendingScoreUpdate = true;
+			// pendingScoreUpdate = true;
 			ballXaxis = canvasW / 2;
 			ballYaxis = canvasH / 2;
 
-			if (playerId == leftPlayerId)
+			if (playerId == leftPlayerId) {
+				gameRunning = false;
 				sendScoredEvent();
+			}
 		}
 	}
 
@@ -635,10 +644,10 @@ tournament = () => {
 			leftScore.style.color = "#C5FFC0";
 			rightScore.style.color = "#C5FFC0";
 		}
-		if (pendingScoreUpdate && scoreChanged) {
-			pendingScoreUpdate = false;
-			scoreChanged = false;
-		}
+		// if (pendingScoreUpdate && scoreChanged) {
+		// 	pendingScoreUpdate = false;
+		// 	scoreChanged = false;
+		// }
 	}
 	
 	const joinQueue = () => {

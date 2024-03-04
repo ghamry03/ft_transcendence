@@ -17,7 +17,7 @@ def getMaxPos(playerMax):
 
 class TournamentConsumer(AsyncWebsocketConsumer):
 
-    PLAYER_MAX = 8
+    PLAYER_MAX = 4
     WIN_SCORE = 6
     update_lock = asyncio.Lock()
     logger = logging.getLogger(__name__)
@@ -151,6 +151,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 del self.waitingPlayers[self.playerId]
 
     async def endRound(self, winner, loser):
+        self.logger.info("ending round")
         # Save game results to db
         requests.get('http://gameapp:2000/game/endGame/' 
                     + str(winner['gid']) + '/' 
@@ -159,10 +160,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     + str(winner["score"]) + '/'
                     + str(loser["score"]) + '/')
         tour = self.activeTournaments[winner["tourName"]]
-        # requests.get('http://tourapp:4000/updateRank/'
+        # requests.get('http://localhost:4000/api/updaterank/'
         #                      + str(loser['tid']) + '/'
         #                      + str(loser['id']) + '/'
         #                      + str(tour["curRank"]) + '/')
+        await tour_db.updateRank(loser['tid'], loser['id'], tour['curRank'])
         tour["curRank"] -= 1
 
         # End the tournament here and cleanup if this is the last round
@@ -175,10 +177,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     "winnerId": winner["id"]
                 }
             )
-            # requests.get('http://tourapp:4000/updateRank/'
+            # requests.get('http://localhost:4000/api/updaterank/'
             #                      + str(winner['tid']) + '/'
             #                      + str(winner['id']) + '/'
             #                      + str(tour["curRank"]) + '/')
+            await tour_db.updateRank(winner['tid'], winner['id'], tour['curRank'])
             tour["curRank"] -= 1
             await tour_db.endTournament(winner["tid"])
             del self.activeTournaments[winner["tourName"]]
