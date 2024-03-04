@@ -44,6 +44,7 @@ main-sh		:
 
 user-sh		:
 					$(DOCKER_CMD) exec -it userapp /bin/bash
+					
 friends-sh		:
 					$(DOCKER_CMD) exec -it friendsapp /bin/bash
 

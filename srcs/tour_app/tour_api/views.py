@@ -38,22 +38,22 @@ def calculate_time_passed(self, game_endtime):
 				return "1 second"
 			return f"{time_difference.seconds} seconds"
 
-class UpdateRank(APIView):
-	# allowed_methods = ['POST', 'OPTIONS'] 
-	def get(self, request, tid, uid, rank):
-		logger.info("Updating rank")
-		try:
-			tour = Tournament.objects.get(id=tid)
-			tourRank = TournamentRank.objects.create(
-				playerID=uid,
-				rank=rank,
-				tournament=tour
-			)
-			tourRank.save()
-			return JsonResponse({'message': 'User added to ranks successfully.'})
+# class UpdateRank(APIView):
+# 	# allowed_methods = ['POST', 'OPTIONS'] 
+# 	def get(self, request, tid, uid, rank):
+# 		logger.info("Updating rank")
+# 		try:
+# 			tour = Tournament.objects.get(id=tid)
+# 			tourRank = TournamentRank.objects.create(
+# 				playerID=uid,
+# 				rank=rank,
+# 				tournament=tour
+# 			)
+# 			tourRank.save()
+# 			return JsonResponse({'message': 'User added to ranks successfully.'})
 		
-		except Tournament.DoesNotExist:
-			return HttpResponseBadRequest('Tournament not found.')
+# 		except Tournament.DoesNotExist:
+# 			return HttpResponseBadRequest('Tournament not found.')
 
 def get_rank(user_id, tournament_id):
     try:

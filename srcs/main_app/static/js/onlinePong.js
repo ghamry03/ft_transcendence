@@ -71,7 +71,7 @@ onlineGame = () => {
 	
 	async function getImage(ownerUid, targetUid, token) {
 		try {
-			const response = await fetch('playerInfo/?ownerUid=' + ownerUid + "&targetUid=" + targetUid + "&token=" + token);
+			const response = await fetch('playerInfo/?ownerUid=' + ownerUid + "&targetUid=" + targetUid);
 			const jsonResponse = await response.json();
 			return jsonResponse.image;
 		} catch (error) {
