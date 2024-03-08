@@ -4,6 +4,9 @@ import requests
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from . import AUTH_URL, USER_API_URL
+import logging 
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 def loginPage(request):
@@ -47,6 +50,7 @@ def authenticate(request):
                 'X-UID': UID,
                 'X-TOKEN': access_token
             }
+
             user_api_response = requests.get(USER_API_URL + '/users/api/' + UID, headers=headers)
             request.session['userData'] = user_api_response.json()
             request.session['logged_in'] = True

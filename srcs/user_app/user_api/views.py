@@ -53,6 +53,7 @@ class UserDetailApiView(APIView):
         """
         try:
             user_query = self.getObjectById(user_id)
+
         except:
             req_uid = request.META.get('HTTP_X_UID')
             req_token = request.META.get('HTTP_X_TOKEN')
