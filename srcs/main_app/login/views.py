@@ -26,7 +26,7 @@ def authenticate(request):
         'client_id': (None, os.environ['INTRA_UID']),
         'client_secret': (None, os.environ['INTRA_SECRET']),
         'code': (None, request.GET.get('code')),
-        'redirect_uri': (None, 'http://127.0.0.1:8000/authenticate'),
+        'redirect_uri': (None, 'http://localhost/authenticate'),
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
     if response.status_code == 200:

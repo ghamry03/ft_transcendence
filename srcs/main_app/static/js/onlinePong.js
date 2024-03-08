@@ -9,7 +9,6 @@ onlineGame = () => {
 	const paddleHScale = 0.2
 	const paddleWScale = 0.015
 	const remoteCanvasH = 510;
-	const padding = 20;
 	
 	var animationId;
 
@@ -18,7 +17,6 @@ onlineGame = () => {
 
 	canvas.width = canvasW;
 	canvas.height = canvasH;
-	var scaleFactor = canvasH / remoteCanvasH;
 	
 	// Paddles
 	var paddleHeight = Math.floor(canvasH * paddleHScale);
@@ -37,7 +35,7 @@ onlineGame = () => {
 	// Score
 	var leftPlayerScore = 0;
 	var rightPlayerScore = 0;
-	var maxScore = 10;
+	const WIN_SCORE = 6;
 
 	var wPressed = false;
 	var sPressed = false;
@@ -52,6 +50,7 @@ onlineGame = () => {
 	var leftSPressed = false;
 	var rightWPressed = false;
 	var rightSPressed = false;
+	var gameRunning = false;
 
 	function getCookie(cname) {
 		let name = cname + "=";
@@ -110,18 +109,6 @@ onlineGame = () => {
 		// Initiate an interval, but store it in a variable so we can remove it later.
 		var interval = setInterval( count, 1000 );  
 	}
-	
-	function startGame() {
-		countdown( document.getElementById("readyGo"), animateGame);
-		// {
-			// document.getElementById("readyGo").innerHTML = '<p class="nums">GO</p>';
-			// console.log("game started");
-			// if (!gameRunning) {
-			// 	gameRunning = true;
-			// 	animateGame();
-			// }
-		// });	
-	}
 
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
 	
@@ -145,6 +132,16 @@ onlineGame = () => {
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
 			reset(ballSpeed * messageData.ballDir);
+			gameRunning = true;
+		}
+		else if (messageData.type === "matchEnded") {
+			leftPlayerScore = messageData.leftScore;
+			rightPlayerScore = messageData.rightScore;
+			reset(ballSpeed);
+			// gameRunning = true;
+			// scoreChanged = true;
+			draw();
+			requestAnimationFrame(endMatch);
 		}
 		else if (messageData.type === "inGame") {
 			// console.log("you're queued or have another ongoing match on another tab or computer", playerId);
@@ -156,16 +153,18 @@ onlineGame = () => {
 			leftPlayerId = messageData.left;
 			rightPlayerId = messageData.right;
 			console.log("Match found, left = ", leftPlayerId, " right = ", rightPlayerId);
-			
+			gameRunning = true;
 			countdown(document.getElementById("readyGo"), animateGame);
 			var leftImage = document.getElementById("leftImage");
 			var rightImage = document.getElementById("rightImage");
 			getImage(playerId, leftPlayerId, token)
 				.then(imgUrl => {
+					console.log("left image found: ", imgUrl);
 					leftImage.src = "http://localhost:3000" + imgUrl;
 				});
 			getImage(playerId, rightPlayerId, token)
 				.then(imgUrl => {
+					console.log("right image found: ", imgUrl);
 					rightImage.src = "http://localhost:3000" + imgUrl;
 				});
 		}
@@ -176,6 +175,24 @@ onlineGame = () => {
 			// show error pop up and redirect them back to home page 
 		}
 	};
+
+	function endMatch()
+	{
+		if (leftPlayerScore == WIN_SCORE && leftPlayerId == playerId 
+			|| rightPlayerScore == WIN_SCORE && rightPlayerId == playerId) {
+			setTimeout(function() {
+				alert("You win!");
+				cancelAnimationFrame(animationId);
+			  }, 0)
+		}
+		else {
+			setTimeout(function() {
+				alert("You lose.");
+				cancelAnimationFrame(animationId);
+			  }, 0)
+		}
+		gameRunning = false;
+	}
 
 	function sendKeyUpdate(key, keyDown)
 	{
@@ -234,6 +251,10 @@ onlineGame = () => {
 
 	function update()
 	{
+		if (gameRunning == false) {
+			console.log("stuck here");
+			return ;
+		}
 		// Left paddle movement
 		if (leftWPressed && leftPaddleYaxis > 0)
 			leftPaddleYaxis -= paddleSpeed;
@@ -270,13 +291,30 @@ onlineGame = () => {
 				ballSpeedXaxis = -ballSpeedXaxis;
 
 		// Check if ball goes out of bounds on left or right side of canvas
+		// if (ballXaxis - ballRadius <= 0) {
+		// 	if (playerId == rightPlayerId)
+		// 		sendScoredEvent();
+		// }
+		// else if (ballXaxis + ballRadius >= canvasW) {
+		// 	if (playerId == leftPlayerId)
+		// 		sendScoredEvent();
+		// }
 		if (ballXaxis - ballRadius <= 0) {
-			if (playerId == rightPlayerId)
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+			if (playerId == rightPlayerId) {
+				gameRunning = false;
 				sendScoredEvent();
+			}
 		}
 		else if (ballXaxis + ballRadius >= canvasW) {
-			if (playerId == leftPlayerId)
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+
+			if (playerId == leftPlayerId) {
+				gameRunning = false;
 				sendScoredEvent();
+			}
 		}
 	}
 
@@ -346,6 +384,7 @@ onlineGame = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId, " token = ", token);
 		ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
+		console.log("Socket established, ws = ", ws);
 		ws.onmessage = handleWebSocketMessage;
 		// Keyboard events
 		document.addEventListener("keydown", keyDownHandler);

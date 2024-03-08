@@ -12,6 +12,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
     players = {}
     update_lock = asyncio.Lock()
     logger = logging.getLogger(__name__)
+    WIN_SCORE = 6
 
     @sync_to_async
     def createGame(self, pid1, pid2):
@@ -111,23 +112,29 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
             if self.player_id in self.queue:
                 self.queue.pop(self.queue.index(self.player_id))
             elif self.player_id in self.players:
-                # if this player is in a match with another player, we want to let the them know that this player disconnected
                 groupOwner = self.players[self.player_id]["groupOwner"]
                 opponentId = self.players[self.player_id]["opponentId"]
-                score1 = self.players[self.player_id]["score"]
-                score2 = self.players[opponentId]["score"]
-                gid = self.players[self.player_id]['gid']
+                if opponentId == None:
+                    await self.channel_layer.group_discard(
+                        groupOwner, self.channel_name
+                    )
+                    del self.players[self.player_id]
+                else:
+                    # if this player is in a match with another player, we want to let the them know that this player disconnected
+                    score1 = self.players[self.player_id]["score"]
+                    score2 = self.players[opponentId]["score"]
+                    gid = self.players[self.player_id]['gid']
 
-                del self.players[self.player_id]
-                await self.channel_layer.group_discard(
-                    self.player_id, self.channel_name
-                )
-                await self.channel_layer.group_send(
-                    groupOwner,
-                    {"type": "disconnected"}
-                )
-                del self.players[opponentId]
-                await self.endGame(gid, self.player_id, opponentId, score1, score2)
+                    del self.players[self.player_id]
+                    await self.channel_layer.group_discard(
+                        groupOwner, self.channel_name
+                    )
+                    await self.channel_layer.group_send(
+                        groupOwner,
+                        {"type": "disconnected"}
+                    )
+                    del self.players[opponentId]
+                    await self.endGame(gid, self.player_id, opponentId, score1, score2)
 
 
     async def receive(self, text_data):
@@ -167,16 +174,42 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
             else:
                 leftScore = opponent["score"]
                 rightScore = player["score"]
-            await self.channel_layer.group_send(
-                player["groupOwner"], 
-                {
-                    "type": "scoreUpdate",
-                    "leftScore": leftScore,
-                    "rightScore": rightScore,
-                    "ballDir": ballDir
-                }
-            )
-            self.logger.info("Sent score update back %d %d", player["score"], opponent["score"])
+
+            if leftScore == self.WIN_SCORE or rightScore == self.WIN_SCORE:
+                # Broadcast match end message with final scores
+                await self.channel_layer.group_send(
+                    player["groupOwner"], 
+                    {
+                        "type": "matchEnded",
+                        "leftScore": leftScore,
+                        "rightScore": rightScore
+                    }
+                )
+
+                # Clear both players channels from their group
+                await self.channel_layer.group_discard(
+                    player["groupOwner"], self.channel_name
+                )
+                await self.endGame(player["gid"], self.player_id, opponent["id"], player["score"], opponent["score"])
+                opponentId = self.players[self.player_id]["opponentId"]
+                self.players[opponentId]["opponentId"] = None
+                del self.players[self.player_id]
+                
+                # await self.channel_layer.group_discard(
+                #     player["groupOwner"], opponent["channel"]
+                # )
+                self.logger.info("Match ended %d %d", player["score"], opponent["score"])
+            else:
+                await self.channel_layer.group_send(
+                    player["groupOwner"], 
+                    {
+                        "type": "scoreUpdate",
+                        "leftScore": leftScore,
+                        "rightScore": rightScore,
+                        "ballDir": ballDir
+                    }
+                )
+                self.logger.info("Sent score update back %d %d", player["score"], opponent["score"])
     
     async def matchFound(self, event):
         await self.send(
@@ -218,6 +251,17 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     "key": event["key"],
                     "keyDown": event["keyDown"],
                     "isLeft": event["isLeft"],
+                }
+            )
+        )
+
+    async def matchEnded(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "matchEnded",
+                    "leftScore": event["leftScore"],
+                    "rightScore": event["rightScore"]
                 }
             )
         )

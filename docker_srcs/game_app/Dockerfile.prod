@@ -3,6 +3,8 @@ FROM python:3.12.0-bullseye
 RUN addgroup --system app && adduser --system --group app
 
 ENV HOME=/home/game_app
+# ENV DJANGO_SETTINGS_MODULE=game_app.settings
+
 RUN mkdir -p $HOME
 WORKDIR $HOME
 COPY docker_srcs/game_app/requirements.txt ./

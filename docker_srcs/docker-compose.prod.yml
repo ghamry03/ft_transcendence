@@ -9,9 +9,16 @@ services:
             - ./server/conf.d:/etc/nginx/conf.d
         ports:
             - "80:80"
+            - "3000:3000"
+            - "4000:4000"
+            - "8002:8002"
+            - "2000:2000"
         depends_on:
             - mainapp
             - userapp
+            - tourapp
+            - gameapp
+            - friendsapp
         networks:
             - user_app_network
 
@@ -25,9 +32,17 @@ services:
         expose:
           - 8000
         command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
+        volumes:
+            - ../srcs/main_app/:/home/main_app
         depends_on:
             postgres:
                 condition: service_healthy
+            userapp:
+                condition: service_started
+            gameapp:
+                condition: service_started
+            tourapp:
+                condition: service_started
         env_file:
             - ./.env
         networks:
@@ -42,14 +57,40 @@ services:
         restart: on-failure
         expose:
           - 2000
-        # command: gunicorn game_app.wsgi:application --bind 0.0.0.0:2000
+        # command: daphne gameapp.asgi:application --bind 0.0.0.0:2000
         depends_on:
             userapp:
+                condition: service_healthy
+            tourapp:
+                condition: service_healthy
+                # condition: service_started
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+
+    tourapp:
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/tour_app/Dockerfile.prod
+        image: tourapp
+        container_name: tourapp
+        restart: on-failure
+        expose:
+          - 4000
+        command: daphne tourapp.asgi:application --bind 0.0.0.0:4000
+        depends_on:
+            postgres:
                 condition: service_healthy
         env_file:
             - ./.env
         networks:
             - user_app_network
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:4000/tour/health"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
 
     userapp:
         build:
@@ -68,6 +109,11 @@ services:
             - ./.env
         networks:
             - user_app_network
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:3000/users/health"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
 
     postgres:
         build: ./postgres
@@ -87,13 +133,24 @@ services:
         networks:
             - user_app_network
 
-# volumes:
-#     postgres_data:
-#         driver: local
-#         driver_opts:
-#             o: bind
-#             type: none
-#             device: ../srcs/postgres/data
+    friendsapp:
+        build:
+          context: ../
+          dockerfile: ./docker_srcs/friends_app/Dockerfile.prod
+        image: friendsapp
+        container_name: friendsapp
+        restart: always
+        expose:
+          - 8002
+        depends_on:
+            postgres:
+                condition: service_healthy
+            userapp:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
 
 networks:
     user_app_network:
