@@ -1,7 +1,6 @@
 from django.urls import path
 
 from .views import (
-	UserMatchListApiView,
 	TournamentGameListApiView,
 	MatchPlayerListApiView,
 	MatchHistoryApiView,
