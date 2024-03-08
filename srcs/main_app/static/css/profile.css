@@ -1,5 +1,4 @@
 .profile {
-	/* background-color: #D4BBFE; */
 	width: 80vw;
 	height: 60vh;
 	overflow: scroll;
@@ -58,15 +57,7 @@
 	transform: translate(0, 50%);
 }
 
-.profile .d-flex img {
-	/* width: 1.5em; */
-	/* height: 1.5em; */
-	/* height: 100%; */
-	/* width: auto; */
-	/* max-width: 100%; */
-}
-
-.profile .d-flex #test {
+.profile .d-flex a {
 	color: var(--Beach-bunny-Text, #59322B);
 	font-family: 'bpdots';
 	font-size: 1.5em;
@@ -75,6 +66,5 @@
 	line-height: normal;
 	position: relative;
 	float: left;
-	/* transform: translate(0, 50%); */
 	text-decoration-line: underline;
 }

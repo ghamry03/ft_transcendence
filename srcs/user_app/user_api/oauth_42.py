@@ -28,6 +28,15 @@ class oauth_42:
     def get_first_name(self):
         return self.json['first_name']
 
+    def get_last_name(self):
+        return self.json['last_name']
+
+    def get_campus(self):
+        return self.json['campus'][0]['name']
+
+    def get_intra_link(self):
+        return f'https://profile.intra.42.fr/users/{self.json['login']}'
+
     def get_image_url(self):
         return self.json['image']['link']
 
@@ -52,6 +61,9 @@ class oauth_42:
         new_user.uid = int(self.get_uid())
         new_user.username = self.get_username()
         new_user.first_name = self.get_first_name()
+        new_user.last_name = self.get_last_name()
+        new_user.campus_name = self.get_campus()
+        new_user.intra_url = self.get_intra_link()
 
         new_user.validate_unique()
 

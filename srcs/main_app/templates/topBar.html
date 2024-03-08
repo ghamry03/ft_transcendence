@@ -1,10 +1,15 @@
 {% load static %}
-<div id="profileImg" class="d-flex" data-bs-toggle="collapse show" data-bs-target="#profilePop">
-  <h1 id="userName" class="align-self-center align-middle">
-    {{ userData.username }}
-  </h1>
-  <img
-    src="http://localhost:3000/{{userData.image}}"
-    class="profilePic align-middle"
-  />
+<div
+    id="profileImg" class="d-flex"
+    data-bs-toggle="collapse"
+    data-bs-target="#profilePop"
+    onclick="engine('/profile', '{{userData.uid}}' );"
+>
+    <h1 id="userName" class="align-self-center align-middle">
+        {{ userData.username }}
+    </h1>
+    <img
+        src="http://localhost:3000/{{userData.image}}"
+        class="profilePic align-middle"
+    />
 </div>

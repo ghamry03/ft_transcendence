@@ -47,11 +47,6 @@ const injections = {
       .then(() => fetchMainContent('/cards', 'homeContentArea'))
       .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
       .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'));
-      // .then(() =>
-      //   document.getElementById("profileImg").addEventListener("click", function() {
-      //     fetchMainContent('/profile', 'profileCollapse')
-      //   }));
-
   },
   '/cards': () => {
     removeScript('online');
@@ -74,11 +69,14 @@ const injections = {
     removeScript('token');
     removeScript('offline')
     removeScript('online')
+  },
+  '/profile': (uid) => {
+    fetchMainContent("/profile/" + uid.toString() + "/" , 'profileContent');
   }
 }
 
-function engine(pageUrl, addToHistory=true) {
-  injections[pageUrl]();
+function engine(pageUrl, param=null, addToHistory=true) {
+  injections[pageUrl](param);
   if (addToHistory) {
     if (pageUrl == '/home') {
       pageUrl = '/cards';
@@ -95,3 +93,6 @@ window.addEventListener('popstate', (event) => {
     engine(state.pageUrl, false);
   }
 });
+
+function profileInjection(uid) {
+}

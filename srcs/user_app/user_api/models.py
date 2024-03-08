@@ -17,6 +17,15 @@ class User(models.Model):
     first_name = models.CharField(
             max_length=64
     )
+    last_name = models.CharField(
+            max_length=64
+    )
+    campus_name = models.CharField(
+            max_length=64
+    )
+    intra_url = models.CharField(
+            max_length=64
+    )
     image = models.ImageField()
     STATUS_CHOICE = [
         (0, 'Offline'),

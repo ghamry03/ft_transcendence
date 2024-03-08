@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import requests
+from . import USER_API_URL
 
 # Create your views here.
 def index(request):
@@ -44,8 +45,18 @@ def getOpponentInfo(request):
     opponentInfo = requests.get('http://userapp:3000/users/api/' + targetUid, headers=headers)
     return JsonResponse(opponentInfo.json())
 
-def profile(request):
-    context = {
-        'name': 'blaah'
+def profile(request, uid):
+    headers = {
+        'X-UID': str(request.session['userData']['uid']),
+        'X-TOKEN': request.session['access_token']
     }
-    return render(request, 'profile.html', context)
+    response = requests.get(USER_API_URL + '/users/api/' + str(uid), headers=headers)
+    json = response.json()
+    context = {
+        'image': json['image'],
+        'username': json['username'],
+        'full_name': f"{json['first_name']} {json['last_name']}",
+        'campus': json['campus_name'],
+        'intra_url': json['intra_url']
+    }
+    return render(request, 'profileContent.html', context)
