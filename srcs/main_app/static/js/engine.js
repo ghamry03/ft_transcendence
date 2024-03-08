@@ -6,7 +6,7 @@ function fetchMainContent(pageUrl, container) {
         var parser = new DOMParser();
         var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
         document.getElementById(container).innerHTML = doc;
-        resolve();
+        resolve();  
       });
   });
 }
@@ -30,6 +30,10 @@ const cleanScript = {
     onlineGame.destroy();
     delete(onlineGame);
   },
+  'tournament': () => {
+    tournament.destroy();
+    delete(tournament);
+  },
 }
 
 function removeScript(id) {
@@ -50,6 +54,7 @@ const injections = {
   '/cards': () => {
     removeScript('online');
     removeScript('offline');
+    removeScript('tournament');
     fetchMainContent('/cards', 'homeContentArea');
   },
   '/offline': () => {
@@ -58,7 +63,14 @@ const injections = {
   },
   '/online': () => {
     fetchMainContent('/online', 'homeContentArea')
-      .then(() => injectScript('/static/js/canvas.js', 'homeContentArea', 'online'));
+      .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'));
+  },
+  '/tournament': () => {
+    fetchMainContent('/tournament', 'homeContentArea')
+      .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'));
+  },
+  '/tourGame': () => {
+    return fetchMainContent('/online', 'gameBox');
   },
   '/login': () => {
     fetchMainContent("/login", 'mainContainer');
@@ -68,11 +80,12 @@ const injections = {
     removeScript('token');
     removeScript('offline')
     removeScript('online')
+    removeScript('tournament');
   }
 }
 
 function engine(pageUrl, addToHistory=true) {
-  injections[pageUrl]();
+  let promise = injections[pageUrl]();
   if (addToHistory) {
     if (pageUrl == '/home') {
       pageUrl = '/cards';
@@ -81,6 +94,7 @@ function engine(pageUrl, addToHistory=true) {
     }
     history.pushState({ pageUrl: pageUrl }, '');
   }
+  return promise;
 }
 
 window.addEventListener('popstate', (event) => {

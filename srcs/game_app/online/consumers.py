@@ -2,26 +2,16 @@ import json
 import asyncio
 import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import UserApiUser, Tournament, Game, PlayerMatch
+from .models import UserApiUser, Game, PlayerMatch
 from django.utils import timezone
 from asgiref.sync import sync_to_async
 
 class RemotePlayerConsumer(AsyncWebsocketConsumer):
 
-    PADDING = 20
-    SPEED = 10
-    paddleHScale = 0.2
-    paddleWScale = 0.015
     queue = []
     players = {}
     update_lock = asyncio.Lock()
     logger = logging.getLogger(__name__)
-    canvasHeight = 510
-    canvasWidth = 960
-    paddleHeight = canvasHeight * paddleHScale
-    paddleWidth = canvasWidth * paddleWScale
-    ballRadius = paddleWidth
-    paddleSpeed = SPEED
 
     @sync_to_async
     def createGame(self, pid1, pid2):
@@ -40,7 +30,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
             player=player2,
             score=0
         )
-        self.logger.info("added new game info to db")
+        self.logger.info("Created new game record in database")
         return game.id
     
     @sync_to_async
@@ -63,18 +53,18 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         await self.accept()
         self.player_id = self.scope['query_string'].decode('utf-8').split('=')[1]
         if self.player_id in self.queue or self.player_id in self.players:
-            self.logger.info("same user already in game or queue")
+            self.logger.info("Same user already in game or queue")
             await self.send(
                 text_data=json.dumps({"type": "inGame"})
             )
         else:
-            self.logger.info("player %s joined", self.player_id)
+            self.logger.info("Player %s joined", self.player_id)
             queuedPlayerId = None
             async with self.update_lock:
                 # search for a match in the queue
                 if len(self.queue) > 0:
                     queuedPlayerId = self.queue[0]
-                    self.logger.info("found a player %s with no opponent", queuedPlayerId)
+                    self.logger.info("Found a player %s with no opponent", queuedPlayerId)
                     gid = await self.createGame(queuedPlayerId, self.player_id)
 
                     # moving queued player from queue to player pool
@@ -82,10 +72,6 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     self.players[queuedPlayerId] = {
                         "id": queuedPlayerId,
                         "opponentId": self.player_id,
-                        "paddlePosition":  self.canvasHeight / 2 - self.paddleHeight / 2,
-                        "upPressed": False,
-                        "downPressed": False,
-                        "ready": False,
                         "score": 0,
                         "groupOwner": queuedPlayerId,
                         "gid": gid
@@ -100,10 +86,6 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     self.players[self.player_id] = { # add new player to player pool
                         "id": self.player_id,
                         "opponentId": queuedPlayerId,
-                        "paddlePosition": self.canvasHeight / 2 - self.paddleHeight / 2,
-                        "upPressed": False,
-                        "downPressed": False,
-                        "ready": False,
                         "score": 0,
                         "groupOwner": queuedPlayerId,
                         "gid": gid
@@ -119,7 +101,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                         self.player_id, self.channel_name
                     )
 
-            self.logger.info("queue len = %d", len(self.queue))
+            self.logger.info("Queue len = %d", len(self.queue))
 
     async def disconnect(self, close_code=None):
         # this is a check for duplicate tab we so dont disconnect the other tab
@@ -157,43 +139,46 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         if not player:
             self.logger.info("not a player")
             return
-        
+        opponent = self.players[player["opponentId"]]
         if msg_type == "keypress":
             key = clientData.get("key")
             keyDown = clientData.get("keyDown")
-            if key == "w":
-                player["upPressed"] = keyDown
-            elif key == "s":
-                player["downPressed"] = keyDown
+            await self.channel_layer.group_send(
+                player["groupOwner"],
+                { 
+                    "type": "keyUpdate",
+                    "key": key,
+                    "keyDown": keyDown,
+                    "isLeft": playerId == player["groupOwner"],
+                },
+            )
 
-        elif msg_type == "ready":
-            player["ready"] = True
-            opponent = self.players[player["opponentId"]]
-            if opponent["ready"] == True:                
-                await asyncio.sleep(6)
-                if playerId == player["groupOwner"]:
-                    asyncio.create_task(self.game_loop(playerId, player["opponentId"]))
-                else:
-                    asyncio.create_task(self.game_loop(player["groupOwner"], playerId))
-
-    async def state_update(self, event):
-        # self.logger.info("sending a status update!!")
-        await self.send(
-            text_data=json.dumps(
+        elif msg_type == "playerScored":
+            player["score"] += 1
+            leftScore = 0
+            rightScore = 0
+            ballDir = 1
+            # left scored
+            if playerId == player["groupOwner"]: # this player is the left
+                leftScore = player["score"]
+                rightScore = opponent["score"]
+                ballDir = -1
+            # right scored
+            else:
+                leftScore = opponent["score"]
+                rightScore = player["score"]
+            await self.channel_layer.group_send(
+                player["groupOwner"], 
                 {
-                    "type": "stateUpdate",
-                    "leftPaddle": event["leftPaddle"],
-                    "rightPaddle": event["rightPaddle"],
-                    "leftScore": event["leftScore"],
-                    "rightScore": event["rightScore"], 
-                    "ballX": event["ballX"],
-                    "ballY": event["ballY"],
+                    "type": "scoreUpdate",
+                    "leftScore": leftScore,
+                    "rightScore": rightScore,
+                    "ballDir": ballDir
                 }
             )
-        )
+            self.logger.info("Sent score update back %d %d", player["score"], opponent["score"])
     
     async def matchFound(self, event):
-        # self.logger.info("sending a status update!!")
         await self.send(
             text_data=json.dumps(
                 {
@@ -205,7 +190,6 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         )
     
     async def disconnected(self, event):
-        # self.logger.info("sending a status update!!")
         await self.send(
             text_data=json.dumps(
                 {
@@ -213,79 +197,27 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 }
             )
         )
-
-    async def game_loop(self, playerId1, playerId2):
-        ballXaxis = self.canvasWidth / 2
-        ballYaxis = self.canvasHeight / 2
-        ballSpeedXaxis = self.SPEED
-        ballSpeedYaxis = self.SPEED
-        while playerId1 in self.players and playerId2 in self.players:
-            async with self.update_lock:
-                player1 = self.players[playerId1]
-                player2 = self.players[playerId2]
-
-                if player1["upPressed"] and player1["paddlePosition"] > self.PADDING:
-                    player1["paddlePosition"] -= self.paddleSpeed
-                elif player1["downPressed"] and player1["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
-                    player1["paddlePosition"] += self.paddleSpeed    
-                if player2["upPressed"] and player2["paddlePosition"] > self.PADDING:
-                    player2["paddlePosition"] -= self.paddleSpeed
-                elif player2["downPressed"] and player2["paddlePosition"] + self.paddleHeight < self.canvasHeight - self.PADDING:
-                    player2["paddlePosition"] += self.paddleSpeed    
-
-                # ball pos calc - move to a sync function later
-                ballXaxis += ballSpeedXaxis
-                ballYaxis += ballSpeedYaxis
-
-                # Top & bottom collision
-                if ballYaxis - self.ballRadius < self.PADDING or ballYaxis + self.ballRadius > self.canvasHeight - self.PADDING:
-                    ballSpeedYaxis = -ballSpeedYaxis
-
-                # Left paddle collision
-                if (
-                    ballXaxis - self.ballRadius < self.paddleWidth
-                    and player1["paddlePosition"] < ballYaxis < player1["paddlePosition"] + self.paddleHeight
-                ):
-                    ballSpeedXaxis = -ballSpeedXaxis
-
-                # Right paddle collision
-                if (
-                    ballXaxis + self.ballRadius > self.canvasWidth - self.paddleWidth - self.PADDING
-                    and player2["paddlePosition"] < ballYaxis < player2["paddlePosition"] + self.paddleHeight
-                ):
-                    ballSpeedXaxis = -ballSpeedXaxis
-
-                # Check if ball goes out of bounds on left or right side of canvas
-                if ballXaxis < 0:
-                    player2["score"] += 1
-                    ballXaxis = self.canvasWidth / 2;
-                    ballYaxis = self.canvasHeight / 2;
-                    ballSpeedXaxis = -ballSpeedXaxis
-                    ballSpeedYaxis = -ballSpeedYaxis
-
-                elif ballXaxis > self.canvasWidth - self.PADDING:
-                    player1["score"] += 1
-                    ballXaxis = self.canvasWidth / 2;
-                    ballYaxis = self.canvasHeight / 2;
-                    ballSpeedXaxis = -ballSpeedXaxis
-                    ballSpeedYaxis = -ballSpeedYaxis
-
-                await self.channel_layer.group_send(
-                    playerId1,
-                    { 
-                        "type": "state_update", 
-                        "leftPaddle": player1["paddlePosition"], 
-                        "rightPaddle": player2["paddlePosition"],
-                        "leftScore": player1["score"],
-                        "rightScore": player2["score"], 
-                        "ballX": ballXaxis, 
-                        "ballY": ballYaxis 
-                    },
-                )
-                if player1["score"] == 11 or player2["score"] == 11:
-                    gid = player1["gid"]
-                    score1 = player1["score"]
-                    score2 = player2["score"]
-                    await self.endGame(gid, playerId1, playerId2, score1, score2)
-                    break
-            await asyncio.sleep(0.05)
+    
+    async def scoreUpdate(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "scoreUpdate",
+                    "leftScore": event["leftScore"],
+                    "rightScore": event["rightScore"],
+                    "ballDir": event["ballDir"]
+                }
+            )
+        )
+    
+    async def keyUpdate(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "keyUpdate",
+                    "key": event["key"],
+                    "keyDown": event["keyDown"],
+                    "isLeft": event["isLeft"],
+                }
+            )
+        )

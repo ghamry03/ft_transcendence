@@ -44,11 +44,18 @@ main-sh		:
 
 user-sh		:
 					$(DOCKER_CMD) exec -it userapp /bin/bash
+					
 friends-sh		:
 					$(DOCKER_CMD) exec -it friendsapp /bin/bash
 
+tour-sh		:
+					$(DOCKER_CMD) exec -it tourapp /bin/bash
+
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
+
+tour-logs		:
+					docker logs -f tourapp
 
 psql		:
 					$(DOCKER_CMD) exec postgres psql --username=postgres --dbname=usermanagement
@@ -59,7 +66,8 @@ ps				:
 logs			:
 					$(DOCKER_CMD) logs -f
 
-clean			:	down
+clean			:	
+					$(DOCKER_CMD) down -v --rmi all
 
 fclean			:
 					$(DOCKER_CMD) down -v --rmi all
@@ -70,6 +78,8 @@ fclean			:
 					rm -rf srcs/user_app/user_api/__pycache__/
 
 re				: fclean all
+
+restart			:	clean all
 
 .PHONY			:	$(NAME) all build up down clean fclean re	\
 					server mainapp userapp postgres			\
