@@ -16,6 +16,7 @@ all				:	$(NAME)
 
 build			:
 					mkdir -p ./srcs/postgres/data
+					mkdir -p ./srcs/user_app/media
 					$(DOCKER_CMD) build
 
 up				:
@@ -96,10 +97,10 @@ clean			:
 fclean			:
 					$(DOCKER_CMD) down -v --rmi all
 					rm -rf srcs/postgres/data
-					rm -rf srcs/friends_app/friends_api/migrations/
-					rm -rf srcs/friends_app/friends_api/__pycache__/
-					rm -rf srcs/user_app/user_api/migrations/
-					rm -rf srcs/user_app/user_api/__pycache__/
+#					rm -rf srcs/friends_app/friends_api/migrations/
+#					rm -rf srcs/friends_app/friends_api/__pycache__/
+#					rm -rf srcs/user_app/user_api/migrations/
+#					rm -rf srcs/user_app/user_api/__pycache__/
 
 re				: fclean all
 

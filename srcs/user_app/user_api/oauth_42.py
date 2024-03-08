@@ -4,6 +4,10 @@ from rest_framework import exceptions
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class oauth_42:
     url = 'https://api.intra.42.fr/v2/me'
 

@@ -12,12 +12,13 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY docker_srcs/user_app/entrypoint.sh /
-RUN chmod a+x /entrypoint.sh
+COPY docker_srcs/user_app/entrypoint.prod.sh /
+RUN chmod a+x /entrypoint.prod.sh
 
 COPY ./srcs/user_app .
+RUN chmod +w /home/user_app/media
 RUN chown -R app:app $HOME
 USER app
 EXPOSE 3000
 
-ENTRYPOINT [ "/entrypoint.sh"]
+ENTRYPOINT [ "/entrypoint.prod.sh"]

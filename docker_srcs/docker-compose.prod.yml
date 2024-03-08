@@ -7,6 +7,8 @@ services:
         restart: on-failure
         volumes:
             - ./server/conf.d:/etc/nginx/conf.d
+            - ../srcs/main_app/static/:/vol/static
+            - ../srcs/user_app/media/:/vol/media
         ports:
             - "80:80"
             - "3000:3000"
@@ -31,9 +33,7 @@ services:
         restart: on-failure
         expose:
           - 8000
-        command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
-        volumes:
-            - ../srcs/main_app/:/home/main_app
+        # command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
         depends_on:
             postgres:
                 condition: service_healthy
@@ -78,7 +78,7 @@ services:
         restart: on-failure
         expose:
           - 4000
-        command: daphne tourapp.asgi:application --bind 0.0.0.0:4000
+        # command: daphne tourapp.asgi:application --bind 0.0.0.0:4000
         depends_on:
             postgres:
                 condition: service_healthy
@@ -101,12 +101,14 @@ services:
         restart: on-failure
         expose:
           - 3000
-        command: gunicorn userapp.wsgi:application --bind 0.0.0.0:3000
+        # command: gunicorn userapp.wsgi:application --bind 0.0.0.0:3000
         depends_on:
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
+        volumes:
+            - ../srcs/user_app/media:/home/user_app/media
         networks:
             - user_app_network
         healthcheck:

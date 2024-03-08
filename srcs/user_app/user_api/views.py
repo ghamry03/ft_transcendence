@@ -7,6 +7,9 @@ from .models import User
 from .serializers import UserSerializer
 from user_app.permissions import IsRequestedUser
 from django.core.exceptions import ValidationError
+import logging
+
+logger = logging.getLogger(__name__)
 
 # List view of all Users
 class UsersListApiView(APIView):
