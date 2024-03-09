@@ -60,6 +60,11 @@ body {
   min-height: 100vh;
 }
 
+#homeContentArea{
+  height: 80vh;
+  max-height: 80vh;
+}
+
 .navigationBar {
   position: relative;
   z-index: 99;

@@ -60,6 +60,22 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
+MEDIA_URL = 'http://localhost:3000/media/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',  # Adjust the log level as needed
+    },
+}
+
 ROOT_URLCONF = 'friends_app.urls'
 
 TEMPLATES = [
