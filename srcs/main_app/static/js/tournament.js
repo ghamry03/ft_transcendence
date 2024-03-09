@@ -159,7 +159,7 @@ tournament = () => {
 		const imgUrl = await getImage(playerId);
 		console.log("new player image url = ", imgUrl);
 		var playerImg = document.getElementById(imgId);
-		playerImg.src = 'http://localhost:3000' + imgUrl;
+		playerImg.src = 'https://localhost:3000' + imgUrl;
 		playerImg.setAttribute("data-uid", playerId);
 	}
 
@@ -173,7 +173,7 @@ tournament = () => {
 				if (playerId == 0)
 					break
 				const imgUrl = await getImage(playerId);
-				playerImages[i].firstElementChild.setAttribute("src", 'http://localhost:3000' + imgUrl);
+				playerImages[i].firstElementChild.setAttribute("src", 'https://localhost:3000' + imgUrl);
 				playerImages[i].firstElementChild.setAttribute("data-uid", playerId);
 				i++;
 			}
@@ -209,7 +209,7 @@ tournament = () => {
 		divElement.className = "img-cir round";
 
 		var imgElement = document.createElement("img");
-		imgElement.src = 'http://localhost:3000' + imgUrl;
+		imgElement.src = 'https://localhost:3000' + imgUrl;
 		imgElement.alt = "Winner";
 		imgElement.id = "winnerImg";
 
@@ -255,12 +255,12 @@ tournament = () => {
 		getImage(leftPlayerId)
 			.then(imgUrl => {
 				console.log("Image URL:", imgUrl);
-				leftImage.src = "http://localhost:3000" + imgUrl;
+				leftImage.src = "https://localhost:3000" + imgUrl;
 			});
 		getImage(rightPlayerId)
 			.then(imgUrl => {
 				console.log("Image URL:", imgUrl);
-				rightImage.src = "http://localhost:3000" + imgUrl;
+				rightImage.src = "https://localhost:3000" + imgUrl;
 			});
 		canvas = document.getElementById("gameCanvas");
 		leftScore = document.getElementById("leftScore");
@@ -653,7 +653,7 @@ tournament = () => {
 	const joinQueue = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId);
-		ws = new WebSocket("ws://localhost:4000/ws/tour/?uid=" + playerId);
+		ws = new WebSocket("wss://localhost:4000/ws/tour/?uid=" + playerId);
 		ws.onmessage = handleWebSocketMessage;
 	};
 	joinQueue();

@@ -160,12 +160,12 @@ onlineGame = () => {
 			getImage(playerId, leftPlayerId, token)
 				.then(imgUrl => {
 					console.log("left image found: ", imgUrl);
-					leftImage.src = "http://localhost:3000" + imgUrl;
+					leftImage.src = "https://localhost:3000" + imgUrl;
 				});
 			getImage(playerId, rightPlayerId, token)
 				.then(imgUrl => {
 					console.log("right image found: ", imgUrl);
-					rightImage.src = "http://localhost:3000" + imgUrl;
+					rightImage.src = "https://localhost:3000" + imgUrl;
 				});
 		}
 		else if (messageData.type === "disconnected") {
@@ -383,7 +383,7 @@ onlineGame = () => {
 	const joinQueue = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId, " token = ", token);
-		ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
+		ws = new WebSocket("wss://localhost:2000/ws/game/?uid=" + playerId);
 		console.log("Socket established, ws = ", ws);
 		ws.onmessage = handleWebSocketMessage;
 		// Keyboard events

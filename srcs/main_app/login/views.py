@@ -3,7 +3,7 @@ import os
 import requests
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from . import AUTH_URL, USER_API_URL
+from . import AUTH_URL, USER_API_URL, REDIRECT_URI
 import logging 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def authenticate(request):
         'client_id': (None, os.environ['INTRA_UID']),
         'client_secret': (None, os.environ['INTRA_SECRET']),
         'code': (None, request.GET.get('code')),
-        'redirect_uri': (None, 'http://localhost/authenticate'),
+        'redirect_uri': (None, REDIRECT_URI),
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
     if response.status_code == 200:
