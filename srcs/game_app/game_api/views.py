@@ -41,9 +41,6 @@ class MatchPlayerListApiView(APIView):
 		serializer = MatchSerializer(players, many=True)
 		return Response(serializer.data, status=status.HTTP_200_OK)
 
-def get_players(gid):
-		return PlayerMatch.objects.filter(game=gid)
-
 def calculate_time_passed(self, game_endtime):
 		current_time = now()
 		time_difference = current_time - game_endtime

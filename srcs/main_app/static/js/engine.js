@@ -6,7 +6,7 @@ function fetchMainContent(pageUrl, container) {
         var parser = new DOMParser();
         var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
         document.getElementById(container).innerHTML = doc;
-        resolve();
+        resolve();  
       });
   });
 }
