@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-12">
         <p id="welcome">
-            Welcome back {{ userData.first_name }}, it's PONGPING time! {{userData.image}}
+            Welcome back {{ userData.first_name }}, it's PONGPING time!
         </p>
     </div>
     <!-- <div class="col-2">
@@ -36,7 +36,7 @@
                 <h3 class="title">Your Tournaments</h3>
             </div>
             <div id="tournamentHistoryInjection">
-                {% include 'tournamentHistoryEntry.html' with img="http://127.0.0.1:3000/media/kamin.jpg" rank=1 date="12/1/2023"%}
+                {% include 'tournamentHistoryEntry.html' with img="http://127.0.0.1:3000/media/{{userData.username}}.jpg" rank=1 date="12/1/2023"%}
             </div>
         </div>
     </div>

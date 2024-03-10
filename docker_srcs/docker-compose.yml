@@ -11,6 +11,7 @@ services:
             - user_app_network
         volumes:
             - ../srcs/main_app/:/home/main_app
+            - ../srcs/user_app/user_api/models.py:/home/user_app/models.py
             # - main_app_data:/home/main_app
         depends_on:
             userapp:

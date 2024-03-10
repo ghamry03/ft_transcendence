@@ -36,9 +36,9 @@ def homePage(request):
         friendsList,
     )
 
-    tournamentHistory = requests.get(
-        TOURNAMENT_HISOTRY_URL + "api/tourhistory/" + f'{uid}'
-    ).json()
+    # tournamentHistory = requests.get(
+    #     TOURNAMENT_HISOTRY_URL + "api/tourhistory/" + f'{uid}'
+    # ).json()
 
     context = {"userData": request.session["userData"], "friendsList": list(friendsList)}
 
