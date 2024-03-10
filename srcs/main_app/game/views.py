@@ -11,3 +11,7 @@ def offlineGame(request):
     }
     return render(request, 'offline.html', context)
 
+def tournament(request):
+    context = {
+    }
+    return render(request, 'tournament.html', context)

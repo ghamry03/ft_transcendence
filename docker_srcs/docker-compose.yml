@@ -35,10 +35,36 @@ services:
         depends_on:
             userapp:
                 condition: service_healthy
+            tourapp:
+                # condition: service_healthy
+                condition: service_started
         env_file:
             - ./.env
         networks:
             - user_app_network
+    
+    tourapp:
+        build: ./tour_app
+        image: tourapp
+        container_name: tourapp
+        restart: on-failure
+        ports:
+            - "4000:4000"
+        volumes:
+            - ../srcs/tour_app/:/home/tour_app
+            # - tour_app_data:/home/tour_app
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+        # healthcheck:
+        #     test: ["CMD", "curl", "--fail", "http://localhost:4000/tour/health"]
+        #     interval: 5s
+        #     timeout: 5s
+        #     retries: 5
             
     userapp:
         build: ./user_app
@@ -82,6 +108,8 @@ services:
 
     friendsapp:
         build: ./friends_app
+        image: friendsapp
+        container_name: friendsapp
         restart: always
         ports:
             - "8002:8000"

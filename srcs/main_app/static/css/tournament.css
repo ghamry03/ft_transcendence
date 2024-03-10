@@ -1,0 +1,61 @@
+@font-face {
+    font-family: 'ps2p';
+    src: local('Ps2p'),
+         url('../fonts/ps2p.ttf') format("truetype");
+}
+
+.outer-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 25%;
+}
+
+.status-container {
+    display: block;
+	justify-content: center;
+	align-items: center;
+	height: 25%;
+}
+
+.image-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+}
+
+/* .image-container img {
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+	margin: 0 10px;
+} */
+
+.img-cir {
+    border-radius: 50%;
+    position: relative;
+    height: 70px;
+    width: 70px;
+    overflow: hidden;
+    /* rename this */
+	/* margin-left: auto;
+	margin-right: auto; */
+    float: left;
+    margin-right: 10px;
+}
+
+.img-cir.round img {
+    position: absolute;
+    left: 50%;
+    width: auto;
+    height: 70px;
+    transform: translateX(-50%);
+ }
+
+ #tournamentStatus {
+    font-family: 'ps2p';
+    font-size: medium;
+    color: var(--login-text);
+    /* color: var(--beach-bunny-lavendar-dark); */
+ }

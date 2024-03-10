@@ -1,4 +1,4 @@
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponse
 from rest_framework.views import APIView
 from rest_framework import exceptions
 from rest_framework.response import Response

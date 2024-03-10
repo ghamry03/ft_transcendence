@@ -22,11 +22,7 @@ def homePage(request):
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
     httpResponse.set_cookie('uid' , request.session['userData']['uid'])
-    httpResponse.set_cookie('token' , request.session['access_token'])
     return httpResponse
-    # return render(request, 'home.html', {
-    #     'userData': request.session['userData'],
-    # })
 
 def homeCards(request):
     context = {
@@ -37,7 +33,8 @@ def homeCards(request):
 def getOpponentInfo(request):
     ownerUid = request.GET.get('ownerUid')
     targetUid = request.GET.get('targetUid')
-    token = request.GET.get('token')
+    token = request.session['access_token']
+    # token = request.GET.get('token')
     headers = {
         'X-UID': ownerUid,
         'X-TOKEN': token
