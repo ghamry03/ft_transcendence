@@ -88,8 +88,8 @@ const injections = {
   }
 }
 
-function engine(pageUrl, addToHistory=true) {
-  let promise = injections[pageUrl]();
+function engine(pageUrl, param=null, addToHistory=true) {
+  let promise = injections[pageUrl](param);
   if (addToHistory) {
     if (pageUrl == '/home') {
       pageUrl = '/cards';
