@@ -27,6 +27,8 @@ tournament = () => {
 		}
 	}
 
+	const WIN_SCORE = 8;
+
 	const playerId = getCookie("uid");
 	const lock = new AsyncLock();
 	const bracket = document.getElementById("queue");
@@ -67,7 +69,6 @@ tournament = () => {
 	var rightSPressed = false;
 
 	var gameRunning = false;
-	const WIN_SCORE = 6;
 	var roundNo = 0;
 	var paddleSpeed;
 	var ballXaxis;
