@@ -160,10 +160,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     + str(winner["score"]) + '/'
                     + str(loser["score"]) + '/')
         tour = self.activeTournaments[winner["tourName"]]
-        # requests.get('http://localhost:4000/api/updaterank/'
-        #                      + str(loser['tid']) + '/'
-        #                      + str(loser['id']) + '/'
-        #                      + str(tour["curRank"]) + '/')
         await tour_db.updateRank(loser['tid'], loser['id'], tour['curRank'])
         tour["curRank"] -= 1
 
@@ -177,10 +173,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     "winnerId": winner["id"]
                 }
             )
-            # requests.get('http://localhost:4000/api/updaterank/'
-            #                      + str(winner['tid']) + '/'
-            #                      + str(winner['id']) + '/'
-            #                      + str(tour["curRank"]) + '/')
             await tour_db.updateRank(winner['tid'], winner['id'], tour['curRank'])
             tour["curRank"] -= 1
             await tour_db.endTournament(winner["tid"])

@@ -133,7 +133,6 @@ tournament = () => {
 
 	async function getImage(targetUid) {
 		try {
-			console.log("Getting image from intra");
 			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
 			const jsonResponse = await response.json();
 			return jsonResponse.image;
@@ -160,7 +159,7 @@ tournament = () => {
 		const imgUrl = await getImage(playerId);
 		console.log("new player image url = ", imgUrl);
 		var playerImg = document.getElementById(imgId);
-		playerImg.src = 'https://localhost:3000' + imgUrl;
+		playerImg.src = imgUrl;
 		playerImg.setAttribute("data-uid", playerId);
 	}
 
@@ -174,7 +173,7 @@ tournament = () => {
 				if (playerId == 0)
 					break
 				const imgUrl = await getImage(playerId);
-				playerImages[i].firstElementChild.setAttribute("src", 'https://localhost:3000' + imgUrl);
+				playerImages[i].firstElementChild.setAttribute("src", imgUrl);
 				playerImages[i].firstElementChild.setAttribute("data-uid", playerId);
 				i++;
 			}
@@ -210,7 +209,7 @@ tournament = () => {
 		divElement.className = "img-cir round";
 
 		var imgElement = document.createElement("img");
-		imgElement.src = 'https://localhost:3000' + imgUrl;
+		imgElement.src = imgUrl;
 		imgElement.alt = "Winner";
 		imgElement.id = "winnerImg";
 
@@ -256,12 +255,12 @@ tournament = () => {
 		getImage(leftPlayerId)
 			.then(imgUrl => {
 				console.log("Image URL:", imgUrl);
-				leftImage.src = "https://localhost:3000" + imgUrl;
+				leftImage.src = imgUrl;
 			});
 		getImage(rightPlayerId)
 			.then(imgUrl => {
 				console.log("Image URL:", imgUrl);
-				rightImage.src = "https://localhost:3000" + imgUrl;
+				rightImage.src = imgUrl;
 			});
 		canvas = document.getElementById("gameCanvas");
 		leftScore = document.getElementById("leftScore");

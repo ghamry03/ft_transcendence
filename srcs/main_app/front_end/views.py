@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import requests
+from . import USER_SERVICE_URL
+
 
 # Create your views here.
 def index(request):
@@ -11,7 +13,8 @@ def topBar(request):
         return render(request, 'topBar.html')
 
     return render(request, 'topBar.html', {
-        'userData': request.session['userData']
+        'userData': request.session['userData'],
+        'userServiceUrl': USER_SERVICE_URL,
     })
 
 def homePage(request):
@@ -38,5 +41,7 @@ def getOpponentInfo(request):
         'X-UID': ownerUid,
         'X-TOKEN': token
     }
-    opponentInfo = requests.get('http://userapp:3000/users/api/' + targetUid, headers=headers)
-    return JsonResponse(opponentInfo.json())
+    response = requests.get('http://userapp:3000/users/api/' + targetUid, headers=headers)
+    opponentInfo = response.json()
+    opponentInfo['image'] = USER_SERVICE_URL + opponentInfo['image']
+    return JsonResponse(opponentInfo)

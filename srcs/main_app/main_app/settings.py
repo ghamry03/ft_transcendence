@@ -155,7 +155,7 @@ USE_TZ = True
 # STATICFILES_DIRS = [BASE_DIR / 'static']
 # ------------------------------------------
 
-STATIC_URL = "static/"   # e.g. localhost:80/static/styles.css
+STATIC_URL = "static/"
 
 # directory where all static files of the app are going to be put
 # STATIC_ROOT = "/vol/static"

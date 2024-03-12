@@ -160,12 +160,12 @@ onlineGame = () => {
 			getImage(playerId, leftPlayerId, token)
 				.then(imgUrl => {
 					console.log("left image found: ", imgUrl);
-					leftImage.src = "https://localhost:3000" + imgUrl;
+					leftImage.src = imgUrl;
 				});
 			getImage(playerId, rightPlayerId, token)
 				.then(imgUrl => {
 					console.log("right image found: ", imgUrl);
-					rightImage.src = "https://localhost:3000" + imgUrl;
+					rightImage.src = imgUrl;
 				});
 		}
 		else if (messageData.type === "disconnected") {

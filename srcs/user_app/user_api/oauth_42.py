@@ -44,8 +44,6 @@ class oauth_42:
         response = requests.get(self.image_url)
         content = ""
         if response.status_code != 200:
-
-            # response = requests.get('http://localhost:3000/media/johndoe.png')
             imgFile = open(settings.MEDIA_ROOT + 'johndoe.png', 'rb')
             content = imgFile.read()
             imgFile.close()
