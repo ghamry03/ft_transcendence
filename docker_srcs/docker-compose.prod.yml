@@ -33,7 +33,6 @@ services:
         restart: on-failure
         expose:
           - 8000
-        # command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
         depends_on:
             postgres:
                 condition: service_healthy
@@ -57,7 +56,6 @@ services:
         restart: on-failure
         expose:
           - 2000
-        # command: daphne gameapp.asgi:application --bind 0.0.0.0:2000
         depends_on:
             userapp:
                 condition: service_healthy
@@ -78,7 +76,6 @@ services:
         restart: on-failure
         expose:
           - 4000
-        # command: daphne tourapp.asgi:application --bind 0.0.0.0:4000
         depends_on:
             postgres:
                 condition: service_healthy
@@ -101,7 +98,6 @@ services:
         restart: on-failure
         expose:
           - 3000
-        # command: gunicorn userapp.wsgi:application --bind 0.0.0.0:3000
         depends_on:
             postgres:
                 condition: service_healthy
@@ -124,7 +120,6 @@ services:
         restart: on-failure
         volumes:
             - ../srcs/postgres/data:/var/lib/postgresql/data
-            # - postgres_data:/var/lib/postgresql/data
         healthcheck:
             test: pg_isready -U postgres
             interval: 5s
