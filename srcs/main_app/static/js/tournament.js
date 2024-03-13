@@ -653,7 +653,11 @@ tournament = () => {
 	const joinQueue = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId);
+		// prod version
 		ws = new WebSocket("wss://localhost:4000/ws/tour/?uid=" + playerId);
+		
+		// dev version
+		// ws = new WebSocket("ws://localhost:4000/ws/tour/?uid=" + playerId);
 		ws.onmessage = handleWebSocketMessage;
 	};
 	joinQueue();

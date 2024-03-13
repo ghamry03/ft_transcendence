@@ -383,7 +383,12 @@ onlineGame = () => {
 	const joinQueue = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId, " token = ", token);
+		// prod version
 		ws = new WebSocket("wss://localhost:2000/ws/game/?uid=" + playerId);
+		
+		// dev version
+		// ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
+		
 		console.log("Socket established, ws = ", ws);
 		ws.onmessage = handleWebSocketMessage;
 		// Keyboard events
