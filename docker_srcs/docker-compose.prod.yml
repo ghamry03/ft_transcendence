@@ -6,7 +6,6 @@ services:
         container_name: nginx
         restart: on-failure
         volumes:
-            - ./server/conf.d:/etc/nginx/conf.d
             - ../srcs/main_app/static/:/vol/static
             - ../srcs/user_app/media/:/vol/media
         ports:
