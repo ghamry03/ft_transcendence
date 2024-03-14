@@ -4,7 +4,7 @@ import requests, logging
 
 logger = logging.getLogger(__name__)
 
-from . import FRIEND_API_URL, TOURNAMENT_HISOTRY_URL
+from . import FRIEND_API_URL, TOURNAMENT_HISOTRY_URL, USER_API_URL
 
 # Create your views here.
 def index(request):
@@ -64,3 +64,26 @@ def getOpponentInfo(request):
     }
     opponentInfo = requests.get('http://userapp:3000/users/api/' + targetUid, headers=headers)
     return JsonResponse(opponentInfo.json())
+
+def getUsers(request, username):
+    headers = {
+        'X-UID': f'{request.session['userData']['uid']}',
+        'X-TOKEN': request.session['access_token']
+    }
+
+    base_url = USER_API_URL + 'users/api/'
+    
+    response = requests.get(base_url, headers=headers)
+    
+    if response.status_code == 200:
+        data = {
+            'status': response.status_code,
+            'data': response.json(),
+            'uid': request.session['userData']['uid']
+            }
+        logger.debug(data)
+        return render(request, 'searchedUser.html', data)
+    else:
+        logger.debug(f"Error: {response.status_code}")
+        return HttpResponse()
+

@@ -2,7 +2,8 @@ import json
 import asyncio
 import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import UserApiUser, Game, PlayerMatch
+from .models import Game, PlayerMatch
+from user_api.models import User
 from django.utils import timezone
 from asgiref.sync import sync_to_async
 
@@ -18,13 +19,13 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
         game = Game.objects.create(
             starttime=timezone.now()
         )
-        player1 = UserApiUser.objects.get(uid=int(pid1))
+        player1 = User.objects.get(uid=int(pid1))
         PlayerMatch.objects.create(
             game=game,
             player=player1,
             score=0
         )
-        player2 = UserApiUser.objects.get(uid=int(pid2))
+        player2 = User.objects.get(uid=int(pid2))
         PlayerMatch.objects.create(
             game=game,
             player=player2,

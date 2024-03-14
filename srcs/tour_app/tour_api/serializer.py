@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch, UserApiUser
+# from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch, UserApiUser
+from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch
 
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,7 +17,7 @@ class MatchSerializer(serializers.ModelSerializer):
         model = OnlinePlayermatch
         fields = ['score', 'game', 'player']
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserApiUser
-        fields = ['uid', 'username', 'first_name', 'image', 'status']
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = UserApiUser
+#         fields = ['uid', 'username', 'first_name', 'image', 'status']

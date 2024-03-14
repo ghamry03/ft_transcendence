@@ -32,7 +32,7 @@ services:
             - "2000:2000"
         volumes:
             - ../srcs/game_app/:/home/game_app
-            # - game_app_data:/home/game_app
+            - ../srcs/user_app/:/home/user_app
         depends_on:
             userapp:
                 condition: service_healthy
@@ -53,7 +53,7 @@ services:
             - "4000:4000"
         volumes:
             - ../srcs/tour_app/:/home/tour_app
-            # - tour_app_data:/home/tour_app
+            - ../srcs/user_app/:/home/user_app
         depends_on:
             postgres:
                 condition: service_healthy

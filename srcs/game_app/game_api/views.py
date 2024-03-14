@@ -1,6 +1,7 @@
 from django.http import Http404, JsonResponse, HttpResponse
 from django.utils.timezone import now
 from django.utils import timezone
+from django.db import models
 
 import requests
 
@@ -9,7 +10,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 import logging
 
-from online.models import PlayerMatch, Game, TourGameTournament, UserApiUser
+from online.models import PlayerMatch, Game, TourGameTournament
+from user_api.models import User
 from game_api.serializer import MatchSerializer, GameSerializer
 
 logger = logging.getLogger(__name__)
@@ -125,13 +127,13 @@ class CreateGameApiView(APIView):
 			starttime=timezone.now(),
 			tournament=tour
 		)
-		player1 = UserApiUser.objects.get(uid=pid1)
+		player1 = User.objects.get(uid=pid1, on_delete=models.CASCADE)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player1,
 			score=0
 		)
-		player2 = UserApiUser.objects.get(uid=pid2)
+		player2 = User.objects.get(uid=pid2, on_delete=models.CASCADE)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player2,

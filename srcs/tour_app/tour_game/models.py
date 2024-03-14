@@ -2,16 +2,17 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.utils import timezone
+from user_api.models import User
 
-class UserApiUser(models.Model):
-    uid = models.BigIntegerField(primary_key=True)
-    username = models.CharField(unique=True, max_length=64)
-    first_name = models.CharField(max_length=64)
-    image = models.CharField(max_length=100)
-    status = models.SmallIntegerField()
-    class Meta:
-        managed = False
-        db_table = 'user_api_user'
+# class UserApiUser(models.Model):
+#     uid = models.BigIntegerField(primary_key=True)
+#     username = models.CharField(unique=True, max_length=64)
+#     first_name = models.CharField(max_length=64)
+#     image = models.CharField(max_length=100)
+#     status = models.SmallIntegerField()
+#     class Meta:
+#         managed = False
+#         db_table = 'user_api_user'
 
 class Tournament(models.Model):
     id = models.AutoField(primary_key=True)
@@ -20,7 +21,7 @@ class Tournament(models.Model):
 
 class TournamentRank(models.Model):
     id = models.AutoField(primary_key=True)
-    player = models.ForeignKey(UserApiUser, models.CASCADE, blank=True, null=True)
+    player = models.ForeignKey(User, models.CASCADE, blank=True, null=True)
     rank = models.IntegerField()
     tournament = models.ForeignKey(Tournament, models.CASCADE, blank=True, null=True)
 
@@ -36,7 +37,7 @@ class OnlineGame(models.Model):
 class OnlinePlayermatch(models.Model):
     score = models.IntegerField(blank=True, null=True)
     game = models.ForeignKey(OnlineGame, models.CASCADE, blank=True, null=True)
-    player = models.ForeignKey(UserApiUser, models.CASCADE, blank=True, null=True)
+    player = models.ForeignKey(User, models.CASCADE, blank=True, null=True)
 
     class Meta:
         managed = False

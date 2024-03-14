@@ -1,6 +1,8 @@
 from asgiref.sync import sync_to_async
 from django.utils import timezone
-from .models import UserApiUser, OnlineGame, OnlinePlayermatch, Tournament, TournamentRank
+from .models import OnlineGame, OnlinePlayermatch, Tournament, TournamentRank
+# from .models import UserApiUser, OnlineGame, OnlinePlayermatch, Tournament, TournamentRank
+from user_api.models import User
 
 @sync_to_async
 def createTournament():
@@ -23,7 +25,7 @@ def endTournament(tid):
 @sync_to_async
 def updateRank(tid, uid, rank):
 	tour = Tournament.objects.get(id=tid)
-	player = UserApiUser.objects.get(uid=uid)
+	player = User.objects.get(uid=uid)
 	tourRank = TournamentRank.objects.create(
 		player=player,
 		rank=rank,
