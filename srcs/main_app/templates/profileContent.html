@@ -15,12 +15,30 @@
             <!-- username -->
             <div class="d-flex">
                 <h1 class="text-truncate text-nowrap">{{username}}</h1>
-                <img src="{% static 'imgs/offline_status.svg' %}" class="img-fluid" style="height: 100%; width: auto;">
+                {% if status == 1 %}
+                    <img src="{% static 'imgs/online_status.svg' %}" alt="online" class="img-fluid" style="height: 100%; width: auto;">
+                {% elif status == 2 %}
+                    <img src="{% static 'imgs/in-game_status.svg' %}" alt="in-game" class="img-fluid" style="height: 100%; width: auto;">
+                {% else %}
+                    <img src="{% static 'imgs/offline_status.svg' %}" alt="offline" class="img-fluid" style="height: 100%; width: auto;">
+                {% endif %}
             </div>
 
             <!-- button -->
             <div class="d-flex" id="button">
-                <button class="btn">edit profile</button>
+                {% if type == 0 %}
+                    <button class="btn"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#edit_profile"
+                    onclick="engine('/edit_profile');"
+                >
+                    Edit Profile
+                </button>
+                {% elif type == 1 %}
+                    <button class="btn" onclick="">Remove Friend</button>
+                {% else %}
+                    <button class="btn" onclick="">Add Friend</button>
+                {% endif %}
             </div>
 
             <!-- first_name -->

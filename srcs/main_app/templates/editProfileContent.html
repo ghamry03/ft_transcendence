@@ -1,0 +1,58 @@
+<form action="{% url 'edit_profile' %}" method="POST" enctype="multipart/form-data" class="h-100" style="margin: 20px">
+<!-- <form action="javascript: engine('/edit_profile')" method="POST" class="h-100" style="margin: 20px"> -->
+  {% csrf_token %}
+  <div class="container-fluid h-100 d-flex flex-column mh-100">
+    <div class="row">
+      <!-- profile picture -->
+      <div class="col-12 col-xl-6">
+        <image id="profileImage" class="img-fluid rounded" src="http://localhost:3000/{{userData.image}}">
+        <input id="imageInput" name="image" class="form-control" type="file" accept="image/*" onchange="previewImage()">
+      </div>
+
+      <!-- username input -->
+      <!-- </div> -->
+      <div class="col-12 col-xl-6">
+        <div class="row">
+          <div class="col-12">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" name="username" placeholder='{{userData.username}}'>
+          </div>
+        </div>
+        <!-- first name && last name -->
+        <div class="row">
+          <div class="col-12 col-sm-6">
+            <label class="form-label">First name</label>
+            <input type="" class="form-control" placeholder='{{userData.first_name}}' readonly>
+          </div>
+
+          <div class="col-12 col-sm-6">
+            <label class="form-label">Last name</label>
+            <input type="" class="form-control" placeholder='{{userData.last_name}}' readonly>
+          </div>
+        </div>
+
+        <!-- campus -->
+        <div class="row">
+          <div class="col-12">
+            <label class="form-label">Campus</label>
+            <input type="" class="form-control" placeholder='{{userData.campus_name}}' readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex flex-grow-1"></div>
+
+    <!-- buttons -->
+    <div class="row flex-row-reverse">
+      <div class="col-7 col-xl-4">
+        <!-- <button id="primary-btn" class="btn w-100">Save changes</button> -->
+        <button type="submit" id="primary-btn" class="btn w-100">Save changes</button>
+        <!-- <input type="submit" value="Save changes"> -->
+      </div>
+      <div class="col-5 col-xl-2">
+        <button id="secondry-btn" class="btn w-100">Cancel</button>
+      </div>
+    </div>
+  </div>
+</form>

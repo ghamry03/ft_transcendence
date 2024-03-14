@@ -49,11 +49,82 @@ def profile(request, uid):
     }
     response = requests.get(USER_API_URL + '/users/api/' + str(uid), headers=headers)
     json = response.json()
+
+    profile_type = 0 # Current client profile
+    if uid != request.session['userData']['uid']:
+        # check if it's a friend or not
+        profile_type = 1 # a friend
+        profile_type = 2 # not a friend
+
     context = {
         'image': json['image'],
         'username': json['username'],
         'full_name': f"{json['first_name']} {json['last_name']}",
         'campus': json['campus_name'],
-        'intra_url': json['intra_url']
+        'intra_url': json['intra_url'],
+        'status': json['status'],
+        'type': profile_type
     }
     return render(request, 'profileContent.html', context)
+
+def updateStatus(request, status):
+    headers = {
+        'X-UID': str(request.session['userData']['uid']),
+        'X-TOKEN': request.session['access_token']
+    }
+    data = { 'status': status }
+    response = requests.post(
+        USER_API_URL + '/users/api/' + str(request.session['userData']['uid']) + '/',
+        headers=headers,
+        data=data
+    )
+
+def pretty_request(request):
+    headers = ''
+    for header, value in request.META.items():
+        if not header.startswith('HTTP'):
+            continue
+        header = '-'.join([h.capitalize() for h in header[5:].lower().split('_')])
+        headers += '{}: {}\n'.format(header, value)
+
+    return (
+        '{method} HTTP/1.1\n'
+        'Content-Length: {content_length}\n'
+        'Content-Type: {content_type}\n'
+        '{headers}\n\n'
+        '{body}'
+    ).format(
+        method=request.method,
+        content_length=request.META['CONTENT_LENGTH'],
+        content_type=request.META['CONTENT_TYPE'],
+        headers=headers,
+        body=request.body,
+    )
+
+def edit_profile(request):
+    print(request)
+    if request.method == 'POST':
+        # print(pretty_request(request))
+        headers = {
+            'X-UID': str(request.session['userData']['uid']),
+            'X-TOKEN': request.session['access_token']
+        }
+        data = None
+        files = None
+        print("username: " + request.POST.get('username'))
+        if request.POST.get('username'):
+            data = { 'username': request.POST.get('username') }
+        if request.FILES.get('image'):
+            print("IMAGE MAWGOOOOD")
+            files = { 'image': request.FILES.get('image') }
+        response = requests.post(
+            USER_API_URL + '/users/api/' + str(request.session['userData']['uid']) + '/',
+            headers=headers,
+            data=data,
+            files=files,
+        )
+        # pretty_request(response)
+        return render(request, 'editProfileContent.html')
+        # return JsonResponse({'message': 'Form submitted successfully!'})
+    else:
+        return render(request, 'editProfileContent.html')

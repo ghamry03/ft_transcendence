@@ -1,0 +1,12 @@
+{% extends "baseForm.html" %}
+{% load static %}
+
+{% block formId %}edit_profile{% endblock %}
+
+{% block form %}
+<div class="formBase editProfile pixelCard d-flex flex-column overflow-auto">
+    <h3 class="mb-3 mt-3">{{userData.username}}</h3>
+    <div id="edit_profile_form"></div>
+</div>
+<div class="overlay"  data-bs-toggle="collapse" data-bs-target="#edit_profile"  aria-expanded="false" aria-controls="edit_profile"></div>
+{% endblock %}
