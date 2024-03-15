@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import requests
-from . import USER_SERVICE_URL
+from . import USER_SERVICE_URL, USER_API_URL
 
 
 # Create your views here.
@@ -41,7 +41,7 @@ def getOpponentInfo(request):
         'X-UID': ownerUid,
         'X-TOKEN': token
     }
-    response = requests.get('http://userapp:3000/users/api/' + targetUid, headers=headers)
+    response = requests.get(USER_API_URL + '/users/api/' + targetUid, headers=headers)
     opponentInfo = response.json()
     opponentInfo['image'] = USER_SERVICE_URL + opponentInfo['image']
     return JsonResponse(opponentInfo)

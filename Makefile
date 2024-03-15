@@ -94,13 +94,16 @@ logs			:
 clean			:	
 					$(DOCKER_CMD) down -v --rmi all
 
-fclean			:
-					$(DOCKER_CMD) down -v --rmi all
+fclean			:	clean
 					rm -rf srcs/postgres/data
-#					rm -rf srcs/friends_app/friends_api/migrations/
-#					rm -rf srcs/friends_app/friends_api/__pycache__/
-#					rm -rf srcs/user_app/user_api/migrations/
-#					rm -rf srcs/user_app/user_api/__pycache__/
+					rm -rf srcs/friends_app/friends_api/migrations/
+					rm -rf srcs/friends_app/friends_api/__pycache__/
+					rm -rf srcs/user_app/user_api/migrations/
+					rm -rf srcs/user_app/user_api/__pycache__/
+					rm -rf srcs/game_app/online/migrations/
+					rm -rf srcs/game_app/online/__pycache__/
+					rm -rf srcs/tour_app/tour_game/migrations/
+					rm -rf srcs/tour_app/tour_game/__pycache__/
 
 re				: fclean all
 
