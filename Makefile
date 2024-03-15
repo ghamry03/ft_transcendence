@@ -58,7 +58,7 @@ tour-sh		:
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
 
-nginx-logs		:
+server-logs		:
 					docker logs -f nginx
 
 main-logs		:

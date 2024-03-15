@@ -2,7 +2,7 @@ FROM nginx:latest
 
 WORKDIR /etc/nginx/conf.d
 RUN rm /etc/nginx/conf.d/default.conf
-COPY ./conf.d/nginx.conf /etc/nginx/conf.d
+COPY ./conf.d/. /etc/nginx/conf.d/
 
 RUN apt update && apt install ca-certificates -y && apt install nano -y
 RUN apt install net-tools iputils-ping -y
