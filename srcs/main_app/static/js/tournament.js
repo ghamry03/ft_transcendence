@@ -357,7 +357,7 @@ tournament = () => {
 				startMatch(messageData.leftPlayer, messageData.rightPlayer);
 				break;
 			case "tournamentStarted":
-				console.log("Tournament starting... Player list = ");
+				console.log("Tournament starting...");
 				if (!lost)
 					startNextRound();
 				break;
@@ -405,7 +405,6 @@ tournament = () => {
 				ws.close();
 				break;
 			default:
-				// Handle default case if needed
 				break;
 		}
 	}
