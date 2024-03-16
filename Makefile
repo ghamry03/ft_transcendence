@@ -16,6 +16,7 @@ all				:	$(NAME)
 
 build			:
 					mkdir -p ./srcs/postgres/data
+					mkdir -p ./srcs/user_app/media
 					$(DOCKER_CMD) build
 
 up				:
@@ -48,17 +49,41 @@ user-sh		:
 friends-sh		:
 					$(DOCKER_CMD) exec -it friendsapp /bin/bash
 
+game-sh		:
+					$(DOCKER_CMD) exec -it gameapp /bin/bash
+
 tour-sh		:
 					$(DOCKER_CMD) exec -it tourapp /bin/bash
 
 db-sh		:
 					$(DOCKER_CMD) exec -it postgres /bin/bash
 
+server-logs		:
+					docker logs -f nginx
+
+main-logs		:
+					docker logs -f mainapp
+
+user-logs		:
+					docker logs -f userapp
+
+game-logs		:
+					docker logs -f gameapp
+
 tour-logs		:
 					docker logs -f tourapp
 
-psql		:
+db-logs		:
+					docker logs -f postgres
+
+friends-logs		:
+					docker logs -f friendsapp
+
+psql-us		:
 					$(DOCKER_CMD) exec postgres psql --username=postgres --dbname=usermanagement
+
+psql-fr		:
+					$(DOCKER_CMD) exec postgres psql --username=postgres --dbname=friends
 
 ps				:
 					$(DOCKER_CMD) ps
@@ -69,8 +94,7 @@ logs			:
 clean			:	
 					$(DOCKER_CMD) down -v --rmi all
 
-fclean			:
-					$(DOCKER_CMD) down -v --rmi all
+fclean			:	clean
 					rm -rf srcs/postgres/data
 					rm -rf srcs/game_app/online/migrations/
 					rm -rf srcs/game_app/online/__pycache__/
@@ -78,6 +102,10 @@ fclean			:
 					rm -rf srcs/friends_app/friends_api/__pycache__/
 					rm -rf srcs/user_app/user_api/migrations/
 					rm -rf srcs/user_app/user_api/__pycache__/
+					rm -rf srcs/game_app/online/migrations/
+					rm -rf srcs/game_app/online/__pycache__/
+					rm -rf srcs/tour_app/tour_game/migrations/
+					rm -rf srcs/tour_app/tour_game/__pycache__/
 
 re				: fclean all
 

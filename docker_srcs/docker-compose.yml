@@ -113,7 +113,7 @@ services:
         container_name: friendsapp
         restart: always
         ports:
-            - "8002:8000"
+            - "8002:8002"
         volumes:
             - ../srcs/friends_app/:/home/friends_app
             - ../srcs/user_app/:/home/user_app

@@ -89,11 +89,15 @@ DATABASES = {
     }
 }
 
+# import django
+# django.setup()
+
 CHANNEL_LAYERS = { 
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }   
 }
+LOGGING_CONFIG = None
 
 LOGGING = {
     'version': 1,
