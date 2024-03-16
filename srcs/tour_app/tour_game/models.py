@@ -4,11 +4,15 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 class UserApiUser(models.Model):
-    uid = models.BigIntegerField(primary_key=True)
-    username = models.CharField(unique=True, max_length=64)
+    uid = models.BigIntegerField(primary_key=True, unique=True)
+    username = models.CharField(max_length=64, unique=True)
     first_name = models.CharField(max_length=64)
-    image = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=64)
+    campus_name = models.CharField(max_length=64)
+    intra_url = models.CharField(max_length=64)
+    image = models.ImageField()
     status = models.SmallIntegerField()
+
     class Meta:
         managed = False
         db_table = 'user_api_user'
