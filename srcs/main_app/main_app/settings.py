@@ -146,20 +146,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+STATIC_URL = 'static/'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-# STATIC_URL = 'static/'
-
+# Uncomment this for dev mode 
 # STATICFILES_DIRS = [BASE_DIR / 'static']
-# ------------------------------------------
 
-STATIC_URL = "static/"   # e.g. localhost:80/static/styles.css
-
-# directory where all static files of the app are going to be put
-# STATIC_ROOT = "/vol/static"
-# STATIC_ROOT = "/vol/static"
+# Uncomment this for prod mode
 STATIC_ROOT = path.join(BASE_DIR, 'static/')
 
 # Default primary key field type

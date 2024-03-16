@@ -4,5 +4,4 @@ python manage.py flush --no-input
 python manage.py makemigrations tour_game
 python manage.py makemigrations
 python manage.py migrate --noinput
-python manage.py runserver 0.0.0.0:4000
-# daphne tour_app.asgi:application --bind 0.0.0.0:4000
+daphne -b 0.0.0.0 -p 4000 tour_app.asgi:application
