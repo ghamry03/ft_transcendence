@@ -36,7 +36,7 @@ tournament = () => {
 	}
 
 
-	const WIN_SCORE = 8;
+	const WIN_SCORE = 11;
 
 	const playerId = getCookie("uid");
 	const lock = new AsyncLock();
@@ -367,19 +367,17 @@ tournament = () => {
 				}
 				break;
 			case "scoreUpdate":
+				console.log("score reset received, ", messageData.ballDir);
 				leftPlayerScore = messageData.leftScore;
 				rightPlayerScore = messageData.rightScore;
-				newspeed = ballSpeed * messageData.ballDir;
 				reset(ballSpeed * messageData.ballDir);
 				gameRunning = true;
-				// scoreChanged = true;
 				break;
 			case "matchEnded":
 				leftPlayerScore = messageData.leftScore;
 				rightPlayerScore = messageData.rightScore;
 				reset(ballSpeed);
 				gameRunning = true;
-				// scoreChanged = true;
 				draw();
 				requestAnimationFrame(endMatch);
 				break;
@@ -614,26 +612,29 @@ tournament = () => {
 
 		// Check if ball goes out of bounds on left or right side of canvas
 		if (ballXaxis - ballRadius <= 0) {
-			// gameRunning = false;
-			// reset(ballSpeed);
-			// pendingScoreUpdate = true;
-			ballXaxis = canvasW / 2;
-			ballYaxis = canvasH / 2;
 			if (playerId == rightPlayerId) {
+				console.log("i scored on left");
+				ballXaxis = canvasW / 2;
+				ballYaxis = canvasH / 2;
 				gameRunning = false;
 				sendScoredEvent();
 			}
+			else {
+				console.log("opponent scored on left")
+				ballSpeedXaxis = -ballSpeedXaxis;
+			}
 		}
 		else if (ballXaxis + ballRadius >= canvasW) {
-			// gameRunning = false;
-			// reset(ballSpeed);
-			// pendingScoreUpdate = true;
-			ballXaxis = canvasW / 2;
-			ballYaxis = canvasH / 2;
-
 			if (playerId == leftPlayerId) {
+				console.log("i scored on right");
+				ballXaxis = canvasW / 2;
+				ballYaxis = canvasH / 2;
 				gameRunning = false;
 				sendScoredEvent();
+			}
+			else {
+				console.log("opponent scored on right")
+				ballSpeedXaxis = -ballSpeedXaxis;
 			}
 		}
 	}
@@ -690,20 +691,16 @@ tournament = () => {
 			leftScore.style.color = "#C5FFC0";
 			rightScore.style.color = "#C5FFC0";
 		}
-		// if (pendingScoreUpdate && scoreChanged) {
-		// 	pendingScoreUpdate = false;
-		// 	scoreChanged = false;
-		// }
 	}
 	
 	const joinQueue = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId);
 		// prod version
-		ws = new WebSocket("wss://localhost:4000/ws/tour/?uid=" + playerId);
+		// ws = new WebSocket("wss://localhost:4000/ws/tour/?uid=" + playerId);
 		
 		// dev version
-		// ws = new WebSocket("ws://localhost:4000/ws/tour/?uid=" + playerId);
+		ws = new WebSocket("ws://localhost:4000/ws/tour/?uid=" + playerId);
 		ws.onmessage = handleWebSocketMessage;
 	};
 	joinQueue();

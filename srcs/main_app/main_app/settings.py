@@ -149,10 +149,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 # Uncomment this for dev mode 
-# STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Uncomment this for prod mode
-STATIC_ROOT = path.join(BASE_DIR, 'static/')
+# STATIC_ROOT = path.join(BASE_DIR, 'static/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

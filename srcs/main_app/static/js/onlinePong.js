@@ -128,6 +128,7 @@ onlineGame = () => {
 			}
 		}
 		if (messageData.type === "scoreUpdate") {
+			console.log("score reset received, ", messageData.ballDir);
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
 			reset(ballSpeed * messageData.ballDir);
@@ -301,20 +302,29 @@ onlineGame = () => {
 
 		// Check if ball goes out of bounds on left or right side of canvas
 		if (ballXaxis - ballRadius <= 0) {
-			ballXaxis = canvasW / 2;
-			ballYaxis = canvasH / 2;
 			if (playerId == rightPlayerId) {
+				console.log("i scored on left");
+				ballXaxis = canvasW / 2;
+				ballYaxis = canvasH / 2;
 				gameRunning = false;
 				sendScoredEvent();
 			}
+			else {
+				console.log("opponent scored on left")
+				ballSpeedXaxis = -ballSpeedXaxis;
+			}
 		}
 		else if (ballXaxis + ballRadius >= canvasW) {
-			ballXaxis = canvasW / 2;
-			ballYaxis = canvasH / 2;
-
 			if (playerId == leftPlayerId) {
+				console.log("i scored on right");
+				ballXaxis = canvasW / 2;
+				ballYaxis = canvasH / 2;
 				gameRunning = false;
 				sendScoredEvent();
+			}
+			else {
+				console.log("opponent scored on right")
+				ballSpeedXaxis = -ballSpeedXaxis;
 			}
 		}
 	}
@@ -387,10 +397,10 @@ onlineGame = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId);
 		// prod version
-		ws = new WebSocket("wss://localhost:2000/ws/game/?uid=" + playerId);
+		// ws = new WebSocket("wss://localhost:2000/ws/game/?uid=" + playerId);
 		
 		// dev version
-		// ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
+		ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
 		
 		console.log("Socket established, ws = ", ws);
 		ws.onmessage = handleWebSocketMessage;
