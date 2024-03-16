@@ -3,7 +3,10 @@ import os
 import requests
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from . import AUTH_URL, USER_API_URL
+from . import AUTH_URL, USER_API_URL, REDIRECT_URI
+import logging 
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 def loginPage(request):
@@ -26,7 +29,7 @@ def authenticate(request):
         'client_id': (None, os.environ['INTRA_UID']),
         'client_secret': (None, os.environ['INTRA_SECRET']),
         'code': (None, request.GET.get('code')),
-        'redirect_uri': (None, 'http://127.0.0.1:8000/authenticate'),
+        'redirect_uri': (None, REDIRECT_URI),
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
     if response.status_code == 200:
@@ -47,6 +50,7 @@ def authenticate(request):
                 'X-UID': UID,
                 'X-TOKEN': access_token
             }
+
             user_api_response = requests.get(USER_API_URL + '/users/api/' + UID, headers=headers)
             request.session['userData'] = user_api_response.json()
             request.session['logged_in'] = True

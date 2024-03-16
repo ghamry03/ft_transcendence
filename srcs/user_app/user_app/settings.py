@@ -92,6 +92,19 @@ DATABASES = {
     }
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',  # Adjust the log level as needed
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -139,5 +152,9 @@ REST_FRAMEWORK = {
     ),
 }
 
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
+MEDIA_URL = "media/"     # e.g. localhost:80/media/image.jpg
+
+# directory where all files uploaded by users(media files) are going to be put
+# MEDIA_ROOT = "/vol/media"
 MEDIA_ROOT = path.join(BASE_DIR, 'media/')

@@ -7,6 +7,9 @@ from .models import User
 from .serializers import UserSerializer
 from user_app.permissions import IsRequestedUser
 from django.core.exceptions import ValidationError
+import logging
+
+logger = logging.getLogger(__name__)
 
 # List view of all Users
 class UsersListApiView(APIView):
@@ -50,6 +53,7 @@ class UserDetailApiView(APIView):
         """
         try:
             user_query = self.getObjectById(user_id)
+
         except:
             req_uid = request.META.get('HTTP_X_UID')
             req_token = request.META.get('HTTP_X_TOKEN')

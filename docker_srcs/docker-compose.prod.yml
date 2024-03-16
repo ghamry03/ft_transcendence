@@ -6,12 +6,22 @@ services:
         container_name: nginx
         restart: on-failure
         volumes:
-            - ./server/conf.d:/etc/nginx/conf.d
+            - ../srcs/main_app/static/:/vol/static
+            - ../srcs/user_app/media/:/vol/media
         ports:
             - "80:80"
+            - "443:443"
+            - "3000:3000"
+            - "4000:4000"
+            - "8002:8002"
+            - "2000:2000"
+            - "5000:5000"
         depends_on:
             - mainapp
             - userapp
+            - tourapp
+            - gameapp
+            - friendsapp
         networks:
             - user_app_network
 
@@ -24,10 +34,15 @@ services:
         restart: on-failure
         expose:
           - 8000
-        command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
         depends_on:
             postgres:
                 condition: service_healthy
+            userapp:
+                condition: service_started
+            gameapp:
+                condition: service_started
+            tourapp:
+                condition: service_started
         env_file:
             - ./.env
         networks:
@@ -42,14 +57,37 @@ services:
         restart: on-failure
         expose:
           - 2000
-        # command: gunicorn game_app.wsgi:application --bind 0.0.0.0:2000
         depends_on:
             userapp:
+                condition: service_healthy
+            tourapp:
                 condition: service_healthy
         env_file:
             - ./.env
         networks:
             - user_app_network
+
+    tourapp:
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/tour_app/Dockerfile.prod
+        image: tourapp
+        container_name: tourapp
+        restart: on-failure
+        expose:
+          - 4000
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:4000/tour/health"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
 
     userapp:
         build:
@@ -60,14 +98,20 @@ services:
         restart: on-failure
         expose:
           - 3000
-        command: gunicorn userapp.wsgi:application --bind 0.0.0.0:3000
         depends_on:
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
+        volumes:
+            - ../srcs/user_app/media:/home/user_app/media
         networks:
             - user_app_network
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:3000/users/health"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
 
     postgres:
         build: ./postgres
@@ -76,7 +120,6 @@ services:
         restart: on-failure
         volumes:
             - ../srcs/postgres/data:/var/lib/postgresql/data
-            # - postgres_data:/var/lib/postgresql/data
         healthcheck:
             test: pg_isready -U postgres
             interval: 5s
@@ -87,13 +130,24 @@ services:
         networks:
             - user_app_network
 
-# volumes:
-#     postgres_data:
-#         driver: local
-#         driver_opts:
-#             o: bind
-#             type: none
-#             device: ../srcs/postgres/data
+    friendsapp:
+        build:
+          context: ../
+          dockerfile: ./docker_srcs/friends_app/Dockerfile.prod
+        image: friendsapp
+        container_name: friendsapp
+        restart: always
+        expose:
+          - 8002
+        depends_on:
+            postgres:
+                condition: service_healthy
+            userapp:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
 
 networks:
     user_app_network:
