@@ -9,4 +9,5 @@ urlpatterns = [
     path('topbar/', views.topBar, name='topBar'),
     path('playerInfo/', views.getOpponentInfo, name='getOpponentInfo'),
     path('profile/<int:uid>/', views.profile, name='profile'),
+    path('unknownUserImg/', views.getUnknownUserImg, name='getUnknownUserImg'),
 ]

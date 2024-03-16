@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
 import requests
-from . import USER_API_URL
+from . import MEDIA_SERVICE_URL, USER_API_URL
+
 
 # Create your views here.
 def index(request):
@@ -12,7 +13,8 @@ def topBar(request):
         return render(request, 'topBar.html')
 
     return render(request, 'topBar.html', {
-        'userData': request.session['userData']
+        'userData': request.session['userData'],
+        'userServiceUrl': MEDIA_SERVICE_URL,
     })
 
 def homePage(request):
@@ -34,13 +36,20 @@ def getOpponentInfo(request):
     ownerUid = request.GET.get('ownerUid')
     targetUid = request.GET.get('targetUid')
     token = request.session['access_token']
-    # token = request.GET.get('token')
     headers = {
         'X-UID': ownerUid,
         'X-TOKEN': token
     }
-    opponentInfo = requests.get('http://userapp:3000/users/api/' + targetUid, headers=headers)
-    return JsonResponse(opponentInfo.json())
+    response = requests.get(USER_API_URL + '/users/api/' + targetUid, headers=headers)
+    opponentInfo = response.json()
+    opponentInfo['image'] = MEDIA_SERVICE_URL + opponentInfo['image']
+    return JsonResponse(opponentInfo)
+
+def getUnknownUserImg(request):
+    response = requests.head(USER_API_URL + '/media/unknownuser.png')
+    if response.status_code == 200:
+        return HttpResponse(MEDIA_SERVICE_URL + '/media/unknownuser.png')
+    return HttpResponseNotFound("The requested resource was not found.")
 
 def profile(request, uid):
     headers = {

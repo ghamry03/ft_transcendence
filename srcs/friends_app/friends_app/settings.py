@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('FAPI_DJANGO_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(env("DEBUG", default=0))
 
 ALLOWED_HOSTS = ['*']
 
