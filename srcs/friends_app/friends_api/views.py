@@ -1,61 +1,121 @@
 # friends/views.py
-from rest_framework import generics
-from django.shortcuts import get_object_or_404
+import requests
+from rest_framework import generics, status
+from rest_framework.response import Response
 from django.db.models import Q
 from .models import Friend
 from .serializers import FriendSerializer
-from .exceptions import BadRequest
+import logging
+from . import USER_API_URL
 
+logger = logging.getLogger(__name__)
 class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FriendSerializer
     lookup_field = 'id'
 
-    def getFriendList(self, id):
-        try:
-            objs = Friend.objects.filter(Q(first_id=int(id)) | Q(second_id=int(id)))
-            return objs
-        except ValueError:
-            raise BadRequest(detail="bad request: `id` must be a number")
-        except TypeError:
-            raise BadRequest(detail="bad request: `id` is required")
+    def post(self, request, *args, **kwargs):
+        logger.debug(f"POST Request: {request.body}")
+        sessionId = request.data.get('session_id', None)
+        access_token = request.data.get('access_token', None)
+        first_id = request.data.get('first_id', None)
 
-
-    def getFriendRecordByPK(self, id):
-        try:
-            return Friend.objects.filter(pk=id)
-        except (Friend.DoesNotExist, ValueError):
-            raise BadRequest(detail="bad request: `id` must be a number")
-
-    def getFriendRecordByUID(self, id):
-        id2 = self.request.data.get('second_id')
-        try:
-            return Friend.objects.filter((Q(first_id=int(id)) & Q(second_id=int(id2))) | (Q(first_id=int(id2)) & Q(second_id=int(id))))
-        except ValueError:
-            raise BadRequest(detail="bad request: `id` & `second_id` must be numbers.")
-
-
-    def get_queryset(self):
-        id = self.request.data.get('id')
-        op_type = self.request.data.get('type')
-
-        operations = {
-            1: self.getFriendList,
-            2: self.getFriendRecordByPK,
-            3: self.getFriendRecordByUID
-        }
-
-        filter_op = operations.get(op_type)
-
-        if filter_op is not None:
-            return filter_op(id)
+        serializer = FriendSerializer(data=request.data, context={
+            'sessionId': sessionId,
+            'access_token': access_token,
+            'requester_uid': first_id,
+            })
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            raise BadRequest(detail="bad request: `type` must be one of the following 1 | 2 | 3")
+            logger.debug(f"Serializer validation failed: {serializer.errors}")
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self, request, *args, **kwargs):
+        first_user = request.data.get('first_user', None)
+        second_user = request.data.get('second_user', None)
+        relationship = request.data.get('relationship', None)
 
-    def get_object(self):
-        queryset = self.get_queryset()
-        lookup_value = self.request.data.get("id")
-        obj = get_object_or_404(queryset, **{self.lookup_field: lookup_value})
-        return obj
+        obj = Friend.objects.filter(
+            Q(first_id=first_user, second_id=second_user) | 
+            Q(first_id=second_user, second_id=first_user)
+        ).first()
 
-    def perform_create(self, serializer):
-        serializer.save()
+        if not obj:
+            return Response({"error": "Friend relationship not found."}, status=status.HTTP_404_NOT_FOUND)
+        obj.relationship = int(relationship)
+        obj.save()
+        return Response(status=status.HTTP_200_OK)
+    
+    def delete(self, request, *args, **kwargs):
+        first_user = request.data.get('first_user', None)
+        second_user = request.data.get('second_user', None)
+
+        obj = Friend.objects.filter(
+            Q(first_id=first_user, second_id=second_user) | 
+            Q(first_id=second_user, second_id=first_user)
+        ).first()
+
+        if not obj:
+            return Response({"error": "Friend relationship not found."}, status=status.HTTP_404_NOT_FOUND)
+        obj.delete()
+        return Response(status=status.HTTP_200_OK)
+    
+    def get_user_info(self, owneruid, access_token, uid):
+        headers = {
+            'X-UID': owneruid,
+            'X-TOKEN': access_token
+        }
+        base_url = f"{USER_API_URL}users/api/{uid}/"
+        
+        response = requests.get(base_url, headers=headers)
+        if response.status_code != 200:
+            return None
+        return response.json()
+
+    def get(self, request, *args, **kwargs):
+        logger.debug(f'This is the request: {request.headers} {request.body}')
+        uid = request.data.get('uid', None)
+        access_token = request.data.get('access_token', None)
+        ownerUID = request.data.get('ownerUID', None)
+        logger.debug(f'This is the request params: {uid} {ownerUID} ')
+        
+        if not uid or not ownerUID:
+            return Response(
+                {"error": "The 'uid' & 'ownerUID' query parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if uid == ownerUID:
+            queryset = Friend.objects.filter(Q(first_id=ownerUID) | Q(second_id=ownerUID))
+            friendsList = []
+            for friend in queryset:
+                if f'{friend.first_id}' == ownerUID:
+                    target = friend.second_id
+                else:
+                    target = friend.first_id
+                resp = self.get_user_info(ownerUID, access_token, target)
+                if resp:
+                    resp['relationship'] = friend.relationship
+                    if (f'{friend.first_id}' == ownerUID):
+                        resp["initiator"] = 1
+                    else:
+                        resp["initiator"] = 0
+                    logger.debug(f'This is the returned friend: {resp}')
+                    friendsList.append(resp)
+            data = {"friendsList": friendsList}
+        else:
+            '''
+            curl -X GET -H "Content-Type: application/json" -d '{
+                "uid": "123", "ownerUID":"123" ,  "access_token": "xxxxxxxxxxx"}' /api/friends/ 
+            '''
+            obj = Friend.objects.filter(
+            Q(first_id=uid, second_id=ownerUID) | 
+            Q(first_id=ownerUID, second_id=uid)
+        ).first()
+            if obj:
+                data = {'isFriend': True}
+            else:
+                data = {'isFriend': False}
+            
+        return Response(data, status=status.HTTP_200_OK)

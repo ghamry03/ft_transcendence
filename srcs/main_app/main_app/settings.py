@@ -33,6 +33,10 @@ DEBUG = bool(os.environ.get("DEBUG", default=0))
 
 ALLOWED_HOSTS = ['*']
 
+# Allowed hostanme to make call to session data api endpoint
+ALLOWED_HOSTNAMES_FOR_API = ['friendsapp:3000']
+
+
 
 # Application definition
 

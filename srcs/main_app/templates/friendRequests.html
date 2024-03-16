@@ -1,0 +1,27 @@
+{% extends "baseForm.html"%}
+{% load static %}
+{% block formId %}friendRequestsPop{% endblock %}
+{% block formId2 %}friendRequestsPop{% endblock %}
+
+{% block form %}
+    <div class="formBase pixelCard">
+        <h3 class="formTitle">
+            Friend Requests
+        </h3>
+        <div class="row justify-content-center  mt-3">
+            <div class="col-8">
+                <div id="requestUsers">
+                    {% include 'friendRequestList.html' %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5 justify-content-center">
+            <div class="col-8 d-flex justify-content-end ">
+                <input class="formDone" type="button" value="Done" data-bs-toggle="collapse" data-bs-target="#friendRequestsPop"
+                    aria-expanded="false" aria-controls="friendRequestsPop">
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

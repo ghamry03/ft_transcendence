@@ -1,12 +1,14 @@
-function fetchMainContent(pageUrl, container) {
+function fetchMainContent(pageUrl, container=null) {
   return new Promise((resolve) => {
     fetch(pageUrl)
       .then(response => response.text())
       .then(data => {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
-        document.getElementById(container).innerHTML = doc;
-        resolve();  
+        if (container != null) {
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
+          document.getElementById(container).innerHTML = doc;
+          resolve();  
+        }
       });
   });
 }
@@ -97,8 +99,7 @@ const injections = [
         .then(() => fetchMainContent('/topbar', 'topBar'))
         .then(() => fetchMainContent('/cards', 'homeContentArea'))
         .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
-        .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
-        .then(() => injectScript('/static/js/searchQuery.js', 'homeContentArea', 'searchQuery'));
+        .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'));
     }
   },
   {
@@ -156,9 +157,26 @@ const injections = [
   {
     pattern: /^\/searchUsers\/.*$/,
     handler: (url) => {
-      console.log(url);
       if (url != "/searchUsers/")
         fetchMainContent(url, 'searchUsers');
+    }
+  },
+  {
+    pattern: /^\/add\/.*$/,
+    handler: (url) => {
+      fetchMainContent(url);
+    }
+  },
+  {
+    pattern: /^\/accept\/.*$/,
+    handler: (url) => {
+      fetchMainContent(url);
+    }
+  },
+  {
+    pattern: /^\/reject\/.*$/,
+    handler: (url) => {
+      fetchMainContent(url);
     }
   }
 ];
