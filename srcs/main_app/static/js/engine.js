@@ -99,7 +99,7 @@ const injections = {
       .then(() => updateStatus(1));
   },
   '/edit_profile': () => {
-    fetchMainContent("/edit_profile", "edit_profile_form");
+    editForm();
   }
 }
 
