@@ -1,0 +1,6 @@
+AUTH_URL = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-0ddaf921e5492df40a174c01c6e982998ac8a8405a4f53a5066bc62006e749b7&redirect_uri=https%3A%2F%2F127.0.0.1%2Fauthenticate%2F&response_type=code'
+REDIRECT_URI = 'https://127.0.0.1/authenticate/'
+MEDIA_SERVICE_URL = 'https://127.0.0.1:5000'
+USER_API_URL = 'http://userapp:3000/'
+FRIEND_API_URL = 'http://friendsapp:8002/'
+TOURNAMENT_HISOTRY_URL = 'http://tourapp:4000/'

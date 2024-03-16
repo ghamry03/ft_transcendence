@@ -10,9 +10,7 @@ from rest_framework import status
 import logging
 
 from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch, TournamentRank
-from tour_api.serializer import TournamentSerializer, GameSerializer
-from user_api.serializers import UserSerializer
-# from tour_api.serializer import TournamentSerializer, GameSerializer, UserSerializer
+from tour_api.serializer import TournamentSerializer, GameSerializer, UserSerializer
 from django.http import HttpResponseBadRequest
 
 logger = logging.getLogger(__name__)

@@ -3,18 +3,17 @@ from django.urls import reverse # Used to generate URLs by reversing the URL pat
 from rest_framework import serializers
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from user_api.models import User
 
-# class User(models.Model):
-#     uid = models.BigIntegerField(primary_key=True)
-#     username = models.CharField(unique=True, max_length=64)
-#     first_name = models.CharField(max_length=64)
-#     image = models.CharField(max_length=100)
-#     status = models.SmallIntegerField()
+class UserApiUser(models.Model):
+    uid = models.BigIntegerField(primary_key=True)
+    username = models.CharField(unique=True, max_length=64)
+    first_name = models.CharField(max_length=64)
+    image = models.CharField(max_length=100)
+    status = models.SmallIntegerField()
 
-#     class Meta:
-#         managed = False
-#         db_table = 'user_api_user'
+    class Meta:
+        managed = False
+        db_table = 'user_api_user'
 
 class TourGameTournament(models.Model):
     starttime = models.DateTimeField()
@@ -43,7 +42,7 @@ class Game(models.Model):
 class PlayerMatch(models.Model):
     id = models.AutoField(primary_key=True)
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True)
-    player = models.ForeignKey(User, on_delete=models.CASCADE, null=True) # on deletion of the referenced object, this value will be set to null 
+    player = models.ForeignKey(UserApiUser, on_delete=models.CASCADE, null=True) # on deletion of the referenced object, this value will be set to null 
     score = models.IntegerField(null=True)
     def __str__(self):
         """String for representing the Model object."""

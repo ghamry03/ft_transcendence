@@ -11,8 +11,7 @@ from django.contrib.sessions.models import Session
 
 logger = logging.getLogger(__name__)
 
-from . import FRIEND_API_URL, TOURNAMENT_HISOTRY_URL, USER_API_URL
-from . import MEDIA_SERVICE_URL, USER_API_URL
+from . import FRIEND_API_URL, TOURNAMENT_HISOTRY_URL, USER_API_URL, MEDIA_SERVICE_URL
 
 
 # Create your views here.
@@ -34,7 +33,7 @@ def homePage(request):
     uid = request.session['userData']['uid']
 
     friendsList = requests.get(
-        FRIEND_API_URL + "api/friends/",
+        'http://friendsapp:8002/' + "api/friends/",
         headers=headers,
         json={
             "uid": f"{uid}",
@@ -47,7 +46,7 @@ def homePage(request):
         TOURNAMENT_HISOTRY_URL + "api/tourhistory/" + f'{uid}'
     ).json()
 
-    context = {"userData": request.session["userData"], "friendsList": friendsList['friendsList'] }
+    context = {"userData": request.session["userData"], "friendsList": friendsList['friendsList'], "friendRequests": friendsList['friendRequests']}
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
     httpResponse.set_cookie('uid' , uid)
@@ -85,7 +84,7 @@ def searchUsers(request, username):
         'X-TOKEN': request.session['access_token']
     }
 
-    base_url = USER_API_URL + 'users/api/'
+    base_url = USER_API_URL + '/users/api/'
     
     response = requests.get(base_url, headers=headers)
     

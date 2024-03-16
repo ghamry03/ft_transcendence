@@ -15,11 +15,8 @@
             data-bs-target="#friendRequestsPop">
                 <div class="col-3 flex-grow-1">
                     {% load static %}
-                    <div class="position-relative ">
+                    <div class="position-relative d-inline-block {% if friendRequests != 0 %} friendRequestButton {% endif %} ">
                         <img src="{% static 'imgs/invites_button.svg'%}" />
-                        <span class="position-absolute top-100 start-100 translate-middle p-1 bg-danger border border-light rounded-circle badge">
-                            <span class="visually-hidden">Friend Requests</span>
-                        </span>
                     </div>
                 </div>
                 <div class="align-items-center friendName title col-9">

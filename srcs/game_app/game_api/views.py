@@ -11,7 +11,6 @@ from rest_framework import status
 import logging
 
 from online.models import PlayerMatch, Game, TourGameTournament
-from user_api.models import User
 from game_api.serializer import MatchSerializer, GameSerializer
 
 logger = logging.getLogger(__name__)

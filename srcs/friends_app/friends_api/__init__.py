@@ -1,1 +1,1 @@
-from friends_app import *
+from friends_app.constants import *

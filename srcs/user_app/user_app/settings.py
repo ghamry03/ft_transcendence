@@ -95,11 +95,6 @@ DATABASES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'filters': {
-        'health_check_filter': {
-            '()': 'user_app.logging_filters.RequestFilter',
-        },
-    },
     'formatters': {
         'color': {
             '()': 'user_app.CustomFormatter.ColorLogFormatter',

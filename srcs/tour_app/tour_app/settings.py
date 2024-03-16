@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'rest_framework',
 	'tour_game',
-    'user_api',
 	'tour_api',
 ]
 

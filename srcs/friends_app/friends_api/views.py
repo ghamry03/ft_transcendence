@@ -6,7 +6,7 @@ from django.db.models import Q
 from .models import Friend
 from .serializers import FriendSerializer
 import logging
-from . import USER_API_URL
+from . import USER_API_URL, MEDIA_SERVICE_URL
 
 logger = logging.getLogger(__name__)
 class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView):
@@ -89,6 +89,7 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
         if uid == ownerUID:
             queryset = Friend.objects.filter(Q(first_id=ownerUID) | Q(second_id=ownerUID))
             friendsList = []
+            friendRequests = 0;
             for friend in queryset:
                 if f'{friend.first_id}' == ownerUID:
                     target = friend.second_id
@@ -97,13 +98,16 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
                 resp = self.get_user_info(ownerUID, access_token, target)
                 if resp:
                     resp['relationship'] = friend.relationship
+                    resp['image'] = f'{MEDIA_SERVICE_URL}{resp['image']}'
                     if (f'{friend.first_id}' == ownerUID):
                         resp["initiator"] = 1
                     else:
+                        if friend.relationship == 1:
+                            friendRequests += 1
                         resp["initiator"] = 0
                     logger.debug(f'This is the returned friend: {resp}')
                     friendsList.append(resp)
-            data = {"friendsList": friendsList}
+            data = {"friendsList": friendsList, "friendRequests": friendRequests}
         else:
             '''
             curl -X GET -H "Content-Type: application/json" -d '{
