@@ -1,31 +1,40 @@
 tournament = () => {
 
+	// Class for managing asynchronous locks
 	class AsyncLock {
 		constructor() {
+			// Indicates whether the lock is currently acquired
 			this.locked = false;
+			// Queue to hold pending requests for the lock
 			this.queue = [];
 		}
 
+		// Method to acquire the lock asynchronously
 		async acquire() {
 			return new Promise((resolve, reject) => {
 				if (!this.locked) {
 					this.locked = true;
 					resolve();
 				} else {
+					// If locked, add resolver function to the queue
 					this.queue.push(resolve);
 				}
 			});
 		}
 
+		// Method to release the lock
 		release() {
 			if (this.queue.length > 0) {
+				// If queue is not empty, release to the next waiting task
 				const resolve = this.queue.shift();
 				resolve();
 			} else {
+				// If no pending tasks, release the lock
 				this.locked = false;
 			}
 		}
 	}
+
 
 	const WIN_SCORE = 8;
 
@@ -43,13 +52,11 @@ tournament = () => {
 	var rightScore;
 	const paddleHScale = 0.2
 	const paddleWScale = 0.015
-	const remoteCanvasH = 510;
 
 	var animationId = 0;
 
 	var canvasW;
 	var canvasH;
-	var scaleFactor;
 
 	// Paddles
 	var paddleHeight;
@@ -78,9 +85,8 @@ tournament = () => {
 	var ballSpeedXaxis;
 	var ballSpeedYaxis;
 	var lost = false;
-	var pendingScoreUpdate = false;
-	var scoreChanged = false;
 
+	// This function removes the bracket from view and inserts the game canvas, or vice versa
 	async function toggleBracket() {
 		await lock.acquire()
 		try {
@@ -100,7 +106,6 @@ tournament = () => {
 				round2Container.style.display = "flex";
 				round3Container.style.display = "flex";
 				statusBox.style.display = "block";
-				// startNextRound();
 			}
 			else {
 				round1Container.style.display = "none";
@@ -115,6 +120,7 @@ tournament = () => {
 		}
 	}
 
+	// This function retrieves the value of a cookie by its name from the browser's cookies
 	function getCookie(cname) {
 		let name = cname + "=";
 		let decodedCookie = decodeURIComponent(document.cookie);
@@ -131,6 +137,7 @@ tournament = () => {
 		return "";
 	}
 
+	// This function fetches a player image given their UID
 	async function getImage(targetUid) {
 		try {
 			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
@@ -141,6 +148,7 @@ tournament = () => {
 		}
 	}
 
+	// This function fetches the username of a player given their UID
 	async function getUserName(targetUid) {
 		try {
 			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
@@ -151,27 +159,27 @@ tournament = () => {
 		}
 	}
 
-
+	// Checks if a socket is open and ready to send/receive info
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
+	// Adds the image of user to a given image placeholder
 	async function addImage(playerId, imgId) {
-		
 		const imgUrl = await getImage(playerId);
-		console.log("new player image url = ", imgUrl);
 		var playerImg = document.getElementById(imgId);
 		playerImg.src = imgUrl;
 		playerImg.setAttribute("data-uid", playerId);
 	}
 
+	// Adds player images to the bracket one by one, 
+	// Called when a player first joins, to load existing players
 	async function addPlayerImages(playerList) {
 		await lock.acquire()
 		try {
 			var i = 0;
 			var playerImages = bracket.children;
 			for (const playerId of playerList) {
-				// await addImage(playerId);
 				if (playerId == 0)
-					break
+					break;
 				const imgUrl = await getImage(playerId);
 				playerImages[i].firstElementChild.setAttribute("src", imgUrl);
 				playerImages[i].firstElementChild.setAttribute("data-uid", playerId);
@@ -182,23 +190,29 @@ tournament = () => {
 		}
 	}
 
+	// Removes a player image from the bracket
+	// Called when someone leaves the queue 
 	async function removePlayer(playerId) {
 		await lock.acquire()
 		try {
 			var disconnectedPlayer = document.querySelector('[data-uid="' + playerId + '"]');
-			disconnectedPlayer.src = "https://i.imgur.com/BPukfZQ.png";
+			const response = await fetch('unknownUserImg/');
+			if (!response.ok) {
+				disconnectedPlayer.src = "https://i.imgur.com/BPukfZQ.png";
+			}
+			else {
+				const imgUrl = await response.text();
+				console.log('Unknown user image url: ', imgUrl);
+				disconnectedPlayer.src = imgUrl;
+			}
+		} catch(error) {
+			console.log("Unknown user image not found");
 		} finally {
 			lock.release()
 		}
 	}
 
-	async function printNames(playerList) {
-		for (uid of playerList) {
-			var name = await getUserName(uid);
-			console.log(name);
-		}
-	}
-
+	// Show final results of the tournament including winner image and username
 	async function showWinner(uid) {
 		userName = await getUserName(uid);
 		const imgUrl = await getImage(uid);
@@ -219,9 +233,9 @@ tournament = () => {
 			statusBox.appendChild(divElement);
 	}
 
+	// Countdown animation that plays before a match starts
 	function countdown(parent, callback) {
 		var texts = ['Match starting!'];
-		// var texts = ['Match found!', '3', '2', '1', 'GO'];
 		
 		var paragraph = null;
 		
@@ -247,11 +261,16 @@ tournament = () => {
 	}
 
 	async function startMatch(leftPlayerId, rightPlayerId) {
+		// Hide the bracket
 		await toggleBracket();
-		var leftImage = document.getElementById("leftImage");
-		var rightImage = document.getElementById("rightImage");
+
+		// Set key press listeners for paddle movement
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);
+		
+		// Display both players images 
+		var leftImage = document.getElementById("leftImage");
+		var rightImage = document.getElementById("rightImage");
 		getImage(leftPlayerId)
 			.then(imgUrl => {
 				console.log("Image URL:", imgUrl);
@@ -262,6 +281,10 @@ tournament = () => {
 				console.log("Image URL:", imgUrl);
 				rightImage.src = imgUrl;
 			});
+			
+		// ----- Setting all game params to starting values -----
+
+		// Canvas 
 		canvas = document.getElementById("gameCanvas");
 		leftScore = document.getElementById("leftScore");
 		rightScore = document.getElementById("rightScore");
@@ -271,12 +294,14 @@ tournament = () => {
 		canvas.width = canvasW;
 		canvas.height = canvasH;
 
+
 		// Paddle
 		paddleHeight = Math.floor(canvasH * paddleHScale);
 		paddleWidth = Math.floor(canvasW * paddleWScale);
 		leftPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
 		rightPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
 		paddleSpeed = canvasH * 0.01;
+
 		// Ball
 		ballXaxis = Math.floor(canvasW / 2);
 		ballYaxis = Math.floor(canvasH / 2);
@@ -284,29 +309,37 @@ tournament = () => {
 		ballSpeed = canvasW * 0.006;
 		ballSpeedXaxis = ballSpeed;
 		ballSpeedYaxis = ballSpeed;
+
+		// Keys
 		leftWPressed = false;
 		leftSPressed = false;
 		rightWPressed = false;
 		rightSPressed = false;
+
 		// Scores
 		leftPlayerScore = 0;
 		rightPlayerScore = 0;
-		pendingScoreUpdate = false;
-		scoreChanged = false;
+		// pendingScoreUpdate = false;
+		// scoreChanged = false;
+
+		// Draw the initial screen for the game with start positions of paddles and ball
 		draw();
+
+		// Start the match countdown and animation
 		gameRunning = true;
 		countdown(document.getElementById("readyGo"), animateGame);
 	}
 
+	// Handler for checkbox if a user is ready to start their assigned match
 	checkBox.addEventListener('change', function() {
 		if (checkBox.checked) {
-			console.log('CheckBox is checked!');
 			checkForm.style.display = "none";
 			updateTourStatus("Waiting for opponent...");
 			sendReadyEvent();
 		}
 	});
 
+	// Update the tour status when the next round is ready and let the user confirm 
 	function startNextRound() {
 		roundNo++;
 		updateTourStatus("Round " + roundNo + " starting, get ready!");
@@ -314,6 +347,7 @@ tournament = () => {
 		checkForm.style.display = "block";
 	}
 
+	// Handler for all websocket messages that come from the server
 	const handleWebSocketMessage = (event) => {
 		const messageData = JSON.parse(event.data);
 		
@@ -337,7 +371,6 @@ tournament = () => {
 				rightPlayerScore = messageData.rightScore;
 				newspeed = ballSpeed * messageData.ballDir;
 				reset(ballSpeed * messageData.ballDir);
-				// console.log("score update reset ", newspeed);
 				gameRunning = true;
 				// scoreChanged = true;
 				break;
@@ -387,10 +420,12 @@ tournament = () => {
 				console.log("Opponent has disconnected");
 				// add an modal saying the opponent disconnected and they win by default
 				if (gameRunning) {
-					if (leftPlayerId == playerId)
+					if (leftPlayerId == playerId) {
 						leftPlayerScore = WIN_SCORE;
-					else
+					}
+					else {
 						rightPlayerScore = WIN_SCORE;
+					}
 					reset(ballSpeed);
 					draw();
 					requestAnimationFrame(endMatch);
@@ -409,6 +444,7 @@ tournament = () => {
 		}
 	}
 
+	// Sends a key update to the server
 	function sendKeyUpdate(key, keyDown)
 	{
 		if (isOpen(ws)) {
@@ -427,6 +463,7 @@ tournament = () => {
 		}
 	}
 
+	// Sends a player scored event to the server
 	function sendScoredEvent()
 	{
 		if (isOpen(ws)) {
@@ -443,6 +480,7 @@ tournament = () => {
 		}
 	}
 	
+	// Sends a player ready event to the server
 	function sendReadyEvent()
 	{
 		if (isOpen(ws)) {
@@ -464,27 +502,31 @@ tournament = () => {
 		}
 	}
 
-	function endMatch()
-	{
-		if (leftPlayerScore == WIN_SCORE && leftPlayerId == playerId 
-			|| rightPlayerScore == WIN_SCORE && rightPlayerId == playerId) {
+	// Ends the match and updates UI accordingly
+	function endMatch() {
+		// Checks if the left player or right player wins the match
+		if ((leftPlayerScore == WIN_SCORE && leftPlayerId == playerId) || 
+			(rightPlayerScore == WIN_SCORE && rightPlayerId == playerId)) {
+			// Display victory message and prepare for next round
 			setTimeout(function() {
 				updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
 				alert("You win! Proceed to next round...");
 				toggleBracket();
-			  }, 0)
-		}
-		else {
+			}, 0);
+		} else {
+			// Display defeat message and prepare for result display
 			setTimeout(function() {
 				updateTourStatus("You lost at round " + roundNo);
 				alert("You lose. Proceed to results...");
 				toggleBracket();
-			  }, 0)
+			}, 0);
 			lost = true;
 		}
+		// Marks the game as not running
 		gameRunning = false;
 	}
 
+	// Key down handler
 	function keyDownHandler(e)
 	{
 		if (e.key === "w" && !wPressed)
@@ -499,7 +541,7 @@ tournament = () => {
 		}
 	}
 
-	// Key release
+	// Key up handler
 	function keyUpHandler(e)
 	{
 		if (e.key === "w" && wPressed)
@@ -514,7 +556,7 @@ tournament = () => {
 		}
 	}
 
-	// Reset ball
+	// Reset ball position to the center of the canvas and set the new ball direction 
 	async function reset (newBallSpeed) {
 		ballXaxis = canvasW / 2;
 		ballYaxis = canvasH / 2;

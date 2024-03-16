@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
 import requests
 from . import USER_SERVICE_URL, USER_API_URL
 
@@ -36,7 +36,6 @@ def getOpponentInfo(request):
     ownerUid = request.GET.get('ownerUid')
     targetUid = request.GET.get('targetUid')
     token = request.session['access_token']
-    # token = request.GET.get('token')
     headers = {
         'X-UID': ownerUid,
         'X-TOKEN': token
@@ -45,3 +44,9 @@ def getOpponentInfo(request):
     opponentInfo = response.json()
     opponentInfo['image'] = USER_SERVICE_URL + opponentInfo['image']
     return JsonResponse(opponentInfo)
+
+def getUnknownUserImg(request):
+    response = requests.head(USER_API_URL + '/media/unknownuser.png')
+    if response.status_code == 200:
+        return HttpResponse(USER_SERVICE_URL + '/media/unknownuser.png')
+    return HttpResponseNotFound("The requested resource was not found.")
