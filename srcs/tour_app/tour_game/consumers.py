@@ -4,7 +4,6 @@ import asyncio
 import logging
 import uuid
 from . import tour_db
-from .models import Tournament
 import requests
 from .PlayerQueue import PlayerQueue
 
@@ -230,6 +229,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         playerId = int(clientData.get("playerId"))
         player = self.players.get(playerId, None)
+        # Ensuring that they are an active player
         if not player:
             self.logger.info("Not an active player")
             return

@@ -1,20 +1,19 @@
-onlineGame = () => {	
+onlineGame = () => {
+
+	// Initialize all game variables
 	const canvas = document.getElementById("gameCanvas");
 	const leftScore = document.getElementById("leftScore");
 	const rightScore = document.getElementById("rightScore");
 	const ctx = canvas.getContext("2d");
 	const playerId = getCookie("uid");
-	const token = getCookie("token");
 	
 	const paddleHScale = 0.2
 	const paddleWScale = 0.015
-	const remoteCanvasH = 510;
 	
 	var animationId;
 
 	const canvasW = canvas.getBoundingClientRect().width;
 	const canvasH = canvas.getBoundingClientRect().height;
-
 	canvas.width = canvasW;
 	canvas.height = canvasH;
 	
@@ -32,26 +31,24 @@ onlineGame = () => {
 	var ballSpeed = canvasW * 0.006;
 	var ballSpeedXaxis = ballSpeed;
 	var ballSpeedYaxis = ballSpeed;
+
 	// Score
 	var leftPlayerScore = 0;
 	var rightPlayerScore = 0;
 	const WIN_SCORE = 6;
 
-	var wPressed = false;
-	var sPressed = false;
-
-	// socket info 
-	// var ws;
-	var leftPlayerId;
-	var rightPlayerId;
-	var leftPlayerImg;
-	var rightPlayerImg;
+	// Keys
 	var leftWPressed = false;
 	var leftSPressed = false;
 	var rightWPressed = false;
 	var rightSPressed = false;
+	var wPressed = false;
+	var sPressed = false;
 	var gameRunning = false;
-
+	var leftPlayerId;
+	var rightPlayerId;
+	
+	// This function retrieves the value of a cookie by its name from the browser's cookies
 	function getCookie(cname) {
 		let name = cname + "=";
 		let decodedCookie = decodeURIComponent(document.cookie);
@@ -68,7 +65,8 @@ onlineGame = () => {
 		return "";
 	}
 	
-	async function getImage(ownerUid, targetUid, token) {
+	// This function fetches a player image given their UID
+	async function getImage(ownerUid, targetUid) {
 		try {
 			const response = await fetch('playerInfo/?ownerUid=' + ownerUid + "&targetUid=" + targetUid);
 			const jsonResponse = await response.json();
@@ -78,9 +76,9 @@ onlineGame = () => {
 		}
 	}
 	
+	// Countdown animation that plays before a match starts
 	function countdown(parent, callback) {
 		var texts = ['Match found!', '3', '2', '1', 'GO'];
-		// var texts = ['Match found!'];
 		
 		// This will store the paragraph we are currently displaying
 		var paragraph = null;
@@ -99,7 +97,6 @@ onlineGame = () => {
 			// Trim array
 			var text = texts.shift();
 			
-			// Create a paragraph to add to the DOM
 			// This new paragraph will trigger an animation
 			paragraph = document.createElement("div");
 			paragraph.textContent = text;
@@ -110,8 +107,10 @@ onlineGame = () => {
 		var interval = setInterval( count, 1000 );  
 	}
 
+	// Checks if a socket is open and ready to send/receive info
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
-	
+
+	// Handler for all websocket messages that come from the server
 	const handleWebSocketMessage = (event) => {
 		const messageData = JSON.parse(event.data);
 		if (messageData.type === "keyUpdate") {
@@ -157,12 +156,12 @@ onlineGame = () => {
 			countdown(document.getElementById("readyGo"), animateGame);
 			var leftImage = document.getElementById("leftImage");
 			var rightImage = document.getElementById("rightImage");
-			getImage(playerId, leftPlayerId, token)
+			getImage(playerId, leftPlayerId)
 				.then(imgUrl => {
 					console.log("left image found: ", imgUrl);
 					leftImage.src = imgUrl;
 				});
-			getImage(playerId, rightPlayerId, token)
+			getImage(playerId, rightPlayerId)
 				.then(imgUrl => {
 					console.log("right image found: ", imgUrl);
 					rightImage.src = imgUrl;
@@ -176,24 +175,30 @@ onlineGame = () => {
 		}
 	};
 
+	// Ends the match and updates UI accordingly
 	function endMatch()
 	{
+		// Checks if the left player or right player wins the match
 		if (leftPlayerScore == WIN_SCORE && leftPlayerId == playerId 
 			|| rightPlayerScore == WIN_SCORE && rightPlayerId == playerId) {
+			// Display victory message and prepare for next round
 			setTimeout(function() {
 				alert("You win!");
 				cancelAnimationFrame(animationId);
 			  }, 0)
 		}
 		else {
+			// Display defeat message and prepare for result display
 			setTimeout(function() {
 				alert("You lose.");
 				cancelAnimationFrame(animationId);
 			  }, 0)
 		}
+		// Marks the game as not running
 		gameRunning = false;
 	}
 
+	// Sends a key update to the server
 	function sendKeyUpdate(key, keyDown)
 	{
 		if (isOpen(ws)) {
@@ -208,6 +213,7 @@ onlineGame = () => {
 		}
 	}
 	
+	// Sends a player scored event to the server
 	function sendScoredEvent(key, keyDown)
 	{
 		if (isOpen(ws)) {
@@ -220,6 +226,7 @@ onlineGame = () => {
 		}
 	}
 
+	// Key down handler
 	function keyDownHandler(e)
 	{
 		if (e.key === "w" && !wPressed)
@@ -234,7 +241,7 @@ onlineGame = () => {
 		}
 	}
 
-	// Key release
+	// Key up handler
 	function keyUpHandler(e)
 	{
 		if (e.key === "w" && wPressed)
@@ -249,6 +256,8 @@ onlineGame = () => {
 		}
 	}
 
+	// This function is called in the animation loop for every frame update
+	// The paddle positions and ball positions are updated here
 	function update()
 	{
 		if (gameRunning == false) {
@@ -291,14 +300,6 @@ onlineGame = () => {
 				ballSpeedXaxis = -ballSpeedXaxis;
 
 		// Check if ball goes out of bounds on left or right side of canvas
-		// if (ballXaxis - ballRadius <= 0) {
-		// 	if (playerId == rightPlayerId)
-		// 		sendScoredEvent();
-		// }
-		// else if (ballXaxis + ballRadius >= canvasW) {
-		// 	if (playerId == leftPlayerId)
-		// 		sendScoredEvent();
-		// }
 		if (ballXaxis - ballRadius <= 0) {
 			ballXaxis = canvasW / 2;
 			ballYaxis = canvasH / 2;
@@ -318,6 +319,7 @@ onlineGame = () => {
 		}
 	}
 
+	// Animation loop that keeps the game animation running
 	const animateGame = (time) => {
 		update();
 		draw();
@@ -325,7 +327,7 @@ onlineGame = () => {
 		animationId = requestAnimationFrame(animateGame);
 	};
 
-	// Reset ball
+	// Reset ball position to the center of the canvas and set the new ball direction 
 	const reset = (newBallSpeed) => {
 		ballXaxis = canvasW / 2;
 		ballYaxis = canvasH / 2;
@@ -333,6 +335,7 @@ onlineGame = () => {
 		ballSpeedYaxis = newBallSpeed;
 	}
 
+	// Draws all updated paddle positions, ball position the canvas. Also updates the score elements
 	const draw = () => {
 		// Clear canvas
 		ctx.clearRect(0, 0, canvasW, canvasH);
@@ -382,7 +385,7 @@ onlineGame = () => {
 	// Entrypoint
 	const joinQueue = () => {
 		// Set up WebSocket connection
-		console.log("uid = ", playerId, " token = ", token);
+		console.log("uid = ", playerId);
 		// prod version
 		ws = new WebSocket("wss://localhost:2000/ws/game/?uid=" + playerId);
 		
@@ -391,10 +394,12 @@ onlineGame = () => {
 		
 		console.log("Socket established, ws = ", ws);
 		ws.onmessage = handleWebSocketMessage;
-		// Keyboard events
+		
+		// Set key handlers for the game 
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);
 	};
+
 	draw();
 	joinQueue();
 

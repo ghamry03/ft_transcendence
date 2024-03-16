@@ -564,6 +564,9 @@ tournament = () => {
 		ballSpeedYaxis = newBallSpeed;
 	}
 
+	
+	// This function is called in the animation loop for every frame update
+	// The paddle positions and ball positions are updated here
 	function update()
 	{
 		// if (pendingScoreUpdate) {
@@ -635,12 +638,14 @@ tournament = () => {
 		}
 	}
 
+	// Animation loop that keeps the game animation running
 	const animateGame = (time) => {
 		update();
 		draw();
 		animationId = requestAnimationFrame(animateGame);
 	};
 
+	// Draws all updated paddle positions, ball position the canvas. Also updates the score elements
 	const draw = () => {
 		// Clear canvas
 		ctx.clearRect(0, 0, canvasW, canvasH);

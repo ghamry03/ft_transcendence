@@ -2,9 +2,7 @@ import json
 import asyncio
 import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import UserApiUser, Game, PlayerMatch
-from django.utils import timezone
-from asgiref.sync import sync_to_async
+from . import game_db
 
 class RemotePlayerConsumer(AsyncWebsocketConsumer):
 
@@ -14,45 +12,13 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
     logger = logging.getLogger(__name__)
     WIN_SCORE = 6
 
-    @sync_to_async
-    def createGame(self, pid1, pid2):
-        game = Game.objects.create(
-            starttime=timezone.now()
-        )
-        player1 = UserApiUser.objects.get(uid=int(pid1))
-        PlayerMatch.objects.create(
-            game=game,
-            player=player1,
-            score=0
-        )
-        player2 = UserApiUser.objects.get(uid=int(pid2))
-        PlayerMatch.objects.create(
-            game=game,
-            player=player2,
-            score=0
-        )
-        self.logger.info("Created new game record in database")
-        return game.id
-    
-    @sync_to_async
-    def endGame(self, gid, pid1, pid2, score1, score2):
-        game = Game.objects.get(id=int(gid))
-        game.endtime = timezone.now()
-        game.save()
-
-        player1 = PlayerMatch.objects.get(game=gid, player=pid1)
-        player1.score = score1
-        player1.save()
-
-        player2 = PlayerMatch.objects.get(game=gid, player=pid2)
-        player2.score = score2
-        player2.save()
-        self.logger.info("game with gid %d ended", gid)
-
+	# Called when the websocket is handshaking as part of the connection process
     async def connect(self):
         
         await self.accept()
         self.player_id = self.scope['query_string'].decode('utf-8').split('=')[1]
+
+        # Check if player is already in queue or in another active tournament in another session
         if self.player_id in self.queue or self.player_id in self.players:
             self.logger.info("Same user already in game or queue")
             await self.send(
@@ -62,13 +28,13 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
             self.logger.info("Player %s joined", self.player_id)
             queuedPlayerId = None
             async with self.update_lock:
-                # search for a match in the queue
+                # Search for a match in the queue
                 if len(self.queue) > 0:
                     queuedPlayerId = self.queue[0]
                     self.logger.info("Found a player %s with no opponent", queuedPlayerId)
-                    gid = await self.createGame(queuedPlayerId, self.player_id)
+                    gid = await game_db.createGame(queuedPlayerId, self.player_id)
 
-                    # moving queued player from queue to player pool
+                    # Moving queued player from queue to player pool
                     self.queue.pop(0)
                     self.players[queuedPlayerId] = {
                         "id": queuedPlayerId,
@@ -78,39 +44,43 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                         "gid": gid
                     }
                     
-                    # adding new player to the opponent's group
+                    # Adding new player to the opponent's group
                     await self.channel_layer.group_add(
                         queuedPlayerId, self.channel_name
                     )
 
-                    # adding new player to player pool
+                    # Adding new player to player pool
                     self.players[self.player_id] = { # add new player to player pool
                         "id": self.player_id,
                         "opponentId": queuedPlayerId,
                         "score": 0,
                         "groupOwner": queuedPlayerId,
                         "gid": gid
-                    }               
-                    # asyncio.create_task(self.game_loop(queuedPlayerId, self.player_id))
+                    }
+
+                    # Broadcast to both players that match has been found
                     await self.channel_layer.group_send(
                         queuedPlayerId,
                         {"type": "matchFound", "left": int(queuedPlayerId), "right": int(self.player_id)},
                     )
                 else:
+                    # Add the player to queue
                     self.queue.append(self.player_id)
                     await self.channel_layer.group_add(
                         self.player_id, self.channel_name
                     )
-
             self.logger.info("Queue len = %d", len(self.queue))
 
+    # Called when the WebSocket closes for any reason
     async def disconnect(self, close_code=None):
-        # this is a check for duplicate tab we so dont disconnect the other tab
+        # This is a check for duplicate tab we so dont disconnect the other tab
         if close_code == 3001: 
             return 
         async with self.update_lock:
+            # If player is in queue
             if self.player_id in self.queue:
                 self.queue.pop(self.queue.index(self.player_id))
+            # If player is in an active game
             elif self.player_id in self.players:
                 groupOwner = self.players[self.player_id]["groupOwner"]
                 opponentId = self.players[self.player_id]["opponentId"]
@@ -134,22 +104,25 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                         {"type": "disconnected"}
                     )
                     del self.players[opponentId]
-                    await self.endGame(gid, self.player_id, opponentId, score1, score2)
+                    await game_db.endGame(gid, self.player_id, opponentId, score1, score2)
 
-
+	# Called when the server receives a message from the WebSocket
     async def receive(self, text_data):
         clientData = json.loads(text_data)
         msg_type = clientData.get("type")
 
         playerId = clientData.get("playerId")
         player = self.players.get(playerId, None)
+        # Ensuring that they are an active player
         if not player:
             self.logger.info("not a player")
             return
         opponent = self.players[player["opponentId"]]
+        # Received a keypress event from one of the players
         if msg_type == "keypress":
             key = clientData.get("key")
             keyDown = clientData.get("keyDown")
+            # Forward the key press event to both players so the paddle will move on their ends
             await self.channel_layer.group_send(
                 player["groupOwner"],
                 { 
@@ -159,7 +132,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     "isLeft": playerId == player["groupOwner"],
                 },
             )
-
+        # A player has scored
         elif msg_type == "playerScored":
             player["score"] += 1
             leftScore = 0
@@ -190,15 +163,13 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 await self.channel_layer.group_discard(
                     player["groupOwner"], self.channel_name
                 )
-                await self.endGame(player["gid"], self.player_id, opponent["id"], player["score"], opponent["score"])
+                # Update game ending info in the db
+                await game_db.endGame(player["gid"], self.player_id, opponent["id"], player["score"], opponent["score"])
                 opponentId = self.players[self.player_id]["opponentId"]
                 self.players[opponentId]["opponentId"] = None
                 del self.players[self.player_id]
-                
-                # await self.channel_layer.group_discard(
-                #     player["groupOwner"], opponent["channel"]
-                # )
                 self.logger.info("Match ended %d %d", player["score"], opponent["score"])
+            # Forward the new scores to both players and continue the game
             else:
                 await self.channel_layer.group_send(
                     player["groupOwner"], 
@@ -210,6 +181,8 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     }
                 )
                 self.logger.info("Sent score update back %d %d", player["score"], opponent["score"])
+    
+    # ------------- All handlers for the broadcast messages sent by the server -------------
     
     async def matchFound(self, event):
         await self.send(
