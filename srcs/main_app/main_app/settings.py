@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ['*']
 # Allowed hostanme to make call to session data api endpoint
 ALLOWED_HOSTNAMES_FOR_API = ['friendsapp:3000']
 
-
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 

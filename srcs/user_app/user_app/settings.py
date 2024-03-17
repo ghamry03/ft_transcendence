@@ -33,6 +33,7 @@ DEBUG = os.environ.get("DEBUG", "0") != "0"
 ALLOWED_HOSTS = ['*']
 AUTH_URL = ""
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -162,7 +163,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-# MEDIA_URL = '/media/'
 MEDIA_URL = "media/"     # e.g. localhost:80/media/image.jpg
 
 # directory where all files uploaded by users(media files) are going to be put

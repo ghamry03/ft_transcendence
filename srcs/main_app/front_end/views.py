@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 from . import FRIEND_API_URL, TOURNAMENT_HISOTRY_URL, USER_API_URL, MEDIA_SERVICE_URL
 
 import json
-from . import USER_API_URL
+from . import MEDIA_SERVICE_URL, USER_API_URL
+
 
 # Create your views here.
 def index(request):
@@ -26,7 +27,6 @@ def topBar(request):
 
     return render(request, 'topBar.html', {
         'userData': request.session['userData'],
-        'MEDIA_URL': MEDIA_SERVICE_URL,
     })
 
 def homePage(request):
@@ -71,7 +71,7 @@ def getOpponentInfo(request):
     }
     response = requests.get(USER_API_URL + '/users/api/' + targetUid, headers=headers)
     opponentInfo = response.json()
-    opponentInfo['image'] = MEDIA_SERVICE_URL + opponentInfo['image']
+    opponentInfo['image'] = opponentInfo['image']
     return JsonResponse(opponentInfo)
 
 def getUnknownUserImg(request):
@@ -193,27 +193,24 @@ def profile(request, uid):
         'intra_url': json['intra_url'],
         'status': json['status'],
         'type': profile_type,
-        'MEDIA_URL': MEDIA_SERVICE_URL
     }
     return render(request, 'profileContent.html', context)
 
 def updateStatus(request, status):
     headers = {
-        'X-UID': str(request.session['userData']['uid']),
-        'X-TOKEN': request.session['access_token']
-    }
+            'X-UID': str(request.session['userData']['uid']),
+            'X-TOKEN': request.session['access_token']
+            }
     data = { 'status': status }
     response = requests.post(
-        USER_API_URL + '/users/api/' + str(request.session['userData']['uid']) + '/',
-        headers=headers,
-        data=data
-    )
+            USER_API_URL + '/users/api/' + str(request.session['userData']['uid']) + '/',
+            headers=headers,
+            data=data
+            )
     return JsonResponse({'message': 'status updated'});
 
 def edit_profile(request):
-    print(request)
     if request.method == 'POST':
-        # print(pretty_request(request))
         headers = {
             'X-UID': str(request.session['userData']['uid']),
             'X-TOKEN': request.session['access_token']
@@ -240,22 +237,14 @@ def edit_profile(request):
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': 'Failed to connect to the API.', 'details': str(e)}, status=500)
 
-
-        print("1")
         try:
             response_data = api_response.json()
         except json.JSONDecodeError as e:
             response_data = {'error': 'Failed to pasrse response'}
-            print("1.5")
             return JsonResponse(response_data, status=api_response.status_code)
 
-        print("2")
         if api_response.status_code == 200:
             request.session['userData'] = response_data
             return JsonResponse({'message': 'Form submitted successfully'})
 
-        print("3")
         return JsonResponse(response_data, status=api_response.status_code)
-
-    else:
-        return render(request, 'editProfileContent.html')

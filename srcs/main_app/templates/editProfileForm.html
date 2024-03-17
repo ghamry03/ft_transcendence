@@ -5,14 +5,14 @@
 
 {% block form %}
 <div class="formBase editProfile pixelCard d-flex flex-column overflow-auto">
-    <form class="needs-validation h-100" style="margin: 20px" id="edit_form">
+    <form class="needs-validation h-100" style="margin: 20px" id="edit_profile_form">
         <div class="alert alert-danger fade" id="generalError"></div>
         {% csrf_token %}
         <div class="container-fluid h-100 d-flex flex-column mh-100">
             <div class="row">
                 <!-- profile picture -->
                 <div class="col-12 col-xl-6">
-                    <image id="profileImage" class="img-fluid rounded" src="http://localhost:3000/{{userData.image}}">
+                    <image id="profileImage" class="img-fluid rounded" src="{{userData.image}}">
                     <input id="imageInput" name="image" class="form-control" type="file" accept="image/*" onchange="previewImage()">
                     <div class="invalid-feedback"></div>
                 </div>
@@ -55,12 +55,10 @@
             <!-- buttons -->
             <div class="row flex-row-reverse">
                 <div class="col-7 col-xl-4">
-                    <!-- <button id="primary-btn" class="btn w-100">Save changes</button> -->
-                    <button type="submit" id="primary-btn" class="btn w-100">Save changes</button>
-                    <!-- <input type="submit" value="Save changes"> -->
+                    <button type="button" id="primary-btn" class="btn w-100" onclick="submitForm()">Save changes</button>
                 </div>
                 <div class="col-5 col-xl-2">
-                    <button id="secondry-btn" class="btn w-100">Cancel</button>
+                    <button type="button" id="secondry-btn" class="btn w-100" onclick="cancelFormButton()">Cancel</button>
                 </div>
             </div>
         </div>
