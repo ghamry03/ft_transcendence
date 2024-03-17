@@ -116,8 +116,8 @@ const injections = [
         .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
         .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
         .then(() => updateStatus(1));
+        window.addEventListener('unload', updateStatusUnload);
     }
-      window.addEventListener('unload', updateStatusUnload);
   },
   {
     pattern: /^\/cards$/,
@@ -175,8 +175,8 @@ const injections = [
       removeScript('offline');
       removeScript('online');
       removeScript('tournament');
+      window.removeEventListener('unload', updateStatusUnload);
     },
-    window.removeEventListener('unload', updateStatusUnload);
     // window.removeEventListener('unload')
   },
   {
