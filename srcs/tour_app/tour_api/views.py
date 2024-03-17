@@ -74,6 +74,7 @@ class TournamentHistoryApiView(APIView):
 		logger.info(games)
 		tournament_details = []
 		for game in games:
+			logger.debug(game.game.tournament)
 			tid = game.game.tournament.id
 			time_passed = calculate_time_passed(self, game.game.endtime)
 			rank = get_rank(user_id, tid)
