@@ -18,6 +18,6 @@ RUN chmod a+x /entrypoint.prod.sh
 COPY ./srcs/tour_app .
 RUN chown -R app:app $HOME
 USER app
-EXPOSE 4000
+EXPOSE 8004
 
 ENTRYPOINT [ "/entrypoint.prod.sh"]

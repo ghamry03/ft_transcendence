@@ -26,7 +26,7 @@ def topBar(request):
 
     return render(request, 'topBar.html', {
         'userData': request.session['userData'],
-        'userServiceUrl': MEDIA_SERVICE_URL,
+        'MEDIA_URL': MEDIA_SERVICE_URL,
     })
 
 def homePage(request):
@@ -192,7 +192,8 @@ def profile(request, uid):
         'campus': json['campus_name'],
         'intra_url': json['intra_url'],
         'status': json['status'],
-        'type': profile_type
+        'type': profile_type,
+        'MEDIA_URL': MEDIA_SERVICE_URL
     }
     return render(request, 'profileContent.html', context)
 

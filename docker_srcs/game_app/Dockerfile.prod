@@ -20,6 +20,6 @@ RUN chmod a+x /entrypoint.prod.sh
 COPY ./srcs/game_app .
 RUN chown -R app:app $HOME
 USER app
-EXPOSE 2000
+EXPOSE 8003
 
 ENTRYPOINT [ "/entrypoint.prod.sh"]
