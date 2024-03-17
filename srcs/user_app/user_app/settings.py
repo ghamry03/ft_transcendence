@@ -105,7 +105,6 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'filters': ['health_check_filter'],
             'formatter': 'color',
         },
         # ... other handlers

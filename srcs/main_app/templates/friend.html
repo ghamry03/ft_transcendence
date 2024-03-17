@@ -1,10 +1,12 @@
-<div class="friend row g-0 m-0" uid="{{uid}}">
+<div class="friend row g-0 m-0">
     <div class="col-3 friendImg">
         <div class="position-relative d-inline-block ">
             <img src="{{imgURL}}">
         </div>
     </div>
     <div class="align-items-center friendName col-9">
-        <p class="m-0">{{name}}</p>
+        <p class="m-0" data-bs-toggle="collapse"
+        data-bs-target="#profilePop"
+        onclick="engine('/profile/{{uid}}');">{{name}}</p>
     </div>
 </div>

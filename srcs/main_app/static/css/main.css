@@ -55,10 +55,30 @@ body {
 }
 
 .mainContainer {
-  max-width: 1440px;
   width: 100vw;
   background-color: var(--dark-purple-bg);
-  min-height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+#homeContentArea{
+  height: 80vh;
+  max-height: 80vh;
+}
+
+#homeContentArea{
+  height: 80vh;
+  max-height: 80vh;
+}
+
+#homeContentArea{
+  height: 80vh;
+  max-height: 80vh;
+}
+
+#homeContentArea{
+  height: 80vh;
+  max-height: 80vh;
 }
 
 #homeContentArea{

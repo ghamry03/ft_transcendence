@@ -20,6 +20,10 @@ function injectScript(src, container, id) {
   document.getElementById(container).appendChild(scriptElement);
 }
 
+function updateStatus(status) {
+  fetch('/status/' + status.toString());
+}
+
 const cleanScript = {
   'token': () => {
     clearInterval(pid);
@@ -99,7 +103,8 @@ const injections = [
         .then(() => fetchMainContent('/topbar', 'topBar'))
         .then(() => fetchMainContent('/cards', 'homeContentArea'))
         .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
-        .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'));
+        .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
+        .then(() => updateStatus(1));
     }
   },
   {
@@ -108,50 +113,69 @@ const injections = [
       removeScript('online');
       removeScript('offline');
       removeScript('tournament');
-      fetchMainContent('/cards', 'homeContentArea');
+      fetchMainContent('/cards', 'homeContentArea')
+      .then(() => updateStatus(1));
     }
   },
   {
     pattern: /^\/offline$/,
     handler: () => {
       fetchMainContent('/offline', 'homeContentArea')
-        .then(() => injectScript('/static/js/offlinePong.js', 'homeContentArea', 'offline'));
+        .then(() => injectScript('/static/js/offlinePong.js', 'homeContentArea', 'offline'))
+      .then(() => updateStatus(2));
     }
   },
   {
     pattern: /^\/online$/,
     handler: () => {
       fetchMainContent('/online', 'homeContentArea')
-        .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'));
+        .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'))
+      .then(() => updateStatus(2));
     }
   },
   {
     pattern: /^\/tournament$/,
     handler: () => {
       fetchMainContent('/tournament', 'homeContentArea')
-        .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'));
+        .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'))
+      .then(() => updateStatus(2));
     }
   },
   {
     pattern: /^\/tourGame$/,
     handler: () => {
-      return fetchMainContent('/online', 'gameBox');
+      return fetchMainContent('/online', 'gameBox')
+      .then(() => updateStatus(2));
     }
   },
   {
     pattern: /^\/login$/,
     handler: () => {
-      fetchMainContent("/login", 'mainContainer');
+      fetchMainContent("/login", 'mainContainer')
     }
   },
   {
     pattern: /^\/logout$/,
     handler: () => {
-      fetchMainContent("/logout", 'mainContainer');
+      fetchMainContent("/logout", 'mainContainer')
+      .then(() => updateStatus(0));
       removeScript('token');
       removeScript('offline');
       removeScript('online');
       removeScript('tournament');
+    },
+  },
+  {
+    pattern: /^\/profile\/.*$/,
+    handler: (url) => {
+        fetchMainContent(url, 'profileContent')
+        .then(() => updateStatus(1));
+    }
+  },
+  {
+    pattern: /^\/edit_profile\/.*$/,
+    handler: (url) => {
+        editform();
     }
   },
   {
@@ -208,3 +232,17 @@ window.addEventListener('popstate', (event) => {
     engine(state.pageUrl, false);
   }
 });
+
+window.addEventListener("unload", (e) => {
+  updateStatus(0);
+})
+
+window.onbeforeunload = function (e) {
+  updateStatus(0);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", '/', false); // Synchronous request to the root URL
+  xhr.send(null);
+
+  return ''; // For some browsers
+};

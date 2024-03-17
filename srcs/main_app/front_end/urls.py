@@ -14,4 +14,7 @@ urlpatterns = [
     path('playerInfo/', views.getOpponentInfo, name='getOpponentInfo'),
     path('unknownUserImg/', views.getUnknownUserImg, name='getUnknownUserImg'),
     path('api/session-data/', views.SessionDataView.as_view(), name='session-data'),
+    path('profile/<int:uid>/', views.profile, name='profile'),
+    path('status/<int:status>/', views.updateStatus, name='status'),
+    path('edit_profile/', views.edit_profile, name='edit_profile')
 ]
