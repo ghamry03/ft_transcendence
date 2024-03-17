@@ -10,6 +10,6 @@ urlpatterns = [
     path('playerInfo/', views.getOpponentInfo, name='getOpponentInfo'),
     path('profile/<int:uid>/', views.profile, name='profile'),
     path('status/<int:status>/', views.updateStatus, name='status'),
-    path('edit_profile/', views.edit_profile, name='edit_profile')
-    path('unknownUserImg/', views.getUnknownUserImg, name='getUnknownUserImg'),
+    path('edit_profile/', views.edit_profile, name='edit_profile'),
+    path('unknownUserImg/', views.getUnknownUserImg, name='getUnknownUserImg')
 ]

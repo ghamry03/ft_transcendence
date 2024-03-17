@@ -12,7 +12,7 @@
             <div class="row">
                 <!-- profile picture -->
                 <div class="col-12 col-xl-6">
-                    <image id="profileImage" class="img-fluid rounded" src="http://localhost:3000/{{userData.image}}">
+                    <image id="profileImage" class="img-fluid rounded" src="{{MEDIA_URL}}{{userData.image}}">
                     <input id="imageInput" name="image" class="form-control" type="file" accept="image/*" onchange="previewImage()">
                     <div class="invalid-feedback"></div>
                 </div>
