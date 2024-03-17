@@ -33,6 +33,7 @@ DEBUG = os.environ.get("DEBUG", "0") != "0"
 ALLOWED_HOSTS = ['*']
 AUTH_URL = ""
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 

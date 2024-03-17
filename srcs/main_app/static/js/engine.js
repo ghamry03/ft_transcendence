@@ -19,7 +19,18 @@ function injectScript(src, container, id) {
 }
 
 function updateStatus(status) {
-  fetch('/status/' + status.toString());
+  fetch('/status/' + status.toString() + '/', {
+  })
+  // const data = new FormData();
+  // data.append('status', status.toString());
+  // navigator.sendBeacon('/status/', data);
+  // console.log("how many times?");
+}
+
+function updateStatusUnload(e) {
+  fetch('/status/0/', {
+    keepalive: true
+  });
 }
 
 const cleanScript = {
@@ -56,6 +67,7 @@ const injections = {
       .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
       .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
         .then(() => updateStatus(1));
+      window.addEventListener('unload', updateStatusUnload);
   },
   '/cards': () => {
     removeScript('online');
@@ -93,14 +105,13 @@ const injections = {
     removeScript('offline')
     removeScript('online')
     removeScript('tournament');
+    window.removeEventListener('unload', updateStatusUnload);
+    // window.removeEventListener('unload')
   },
   '/profile': (uid) => {
     fetchMainContent("/profile/" + uid.toString() + "/" , 'profileContent')
       .then(() => updateStatus(1));
   },
-  '/edit_profile': () => {
-    editForm();
-  }
 }
 
 function engine(pageUrl, param=null, addToHistory=true) {
@@ -123,16 +134,3 @@ window.addEventListener('popstate', (event) => {
   }
 });
 
-window.addEventListener("unload", (e) => {
-  updateStatus(0);
-})
-
-window.onbeforeunload = function (e) {
-  updateStatus(0);
-
-  var xhr = new XMLHttpRequest();
-  xhr.open("GET", '/', false); // Synchronous request to the root URL
-  xhr.send(null);
-
-  return ''; // For some browsers
-};

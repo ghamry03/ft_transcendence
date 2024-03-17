@@ -78,15 +78,15 @@ def profile(request, uid):
 
 def updateStatus(request, status):
     headers = {
-        'X-UID': str(request.session['userData']['uid']),
-        'X-TOKEN': request.session['access_token']
-    }
+            'X-UID': str(request.session['userData']['uid']),
+            'X-TOKEN': request.session['access_token']
+            }
     data = { 'status': status }
     response = requests.post(
-        USER_API_URL + '/users/api/' + str(request.session['userData']['uid']) + '/',
-        headers=headers,
-        data=data
-    )
+            USER_API_URL + '/users/api/' + str(request.session['userData']['uid']) + '/',
+            headers=headers,
+            data=data
+            )
     return JsonResponse({'message': 'status updated'});
 
 def edit_profile(request):

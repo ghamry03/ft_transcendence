@@ -27,37 +27,43 @@ function resetFormValidation(form) {
     alert.innerHTML = '';
 }
 
-function editForm() {
-    form = document.getElementById("edit_form");
-    form.addEventListener("submit", function(event) {
+function cancelFormButton() {
+    console.log('inside');
+    form = document.getElementById("edit_profile_form");
+    resetFormValidation(form);
+    form.reset();
+    element = document.getElementById("edit_profile");
+    var myCollapse = new bootstrap.Collapse(element);
+    myCollapse.toggle();
+}
 
-        event.preventDefault();
-        resetFormValidation(form);
+function submitForm() {
+    form = document.getElementById("edit_profile_form");
 
-        const formData = new FormData(this);
+    resetFormValidation(form);
 
-        fetch('/edit_profile/', {
-            method: 'POST',
-            body: formData,
-        })
-            .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, body: data })))
-            .then(data => {
-                if (data.ok) {
-                    form.reset();
+    const formData = new FormData(form);
 
-                    // const getCookie = name => (document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)') || []).pop() || null;
-                    // engine('/profile', getCookie('uid'));
-                    fetchMainContent('/topbar', 'topBar');
-
-                    element = document.getElementById("edit_profile");
-                    var myCollapse = new bootstrap.Collapse(element);
-                    myCollapse.toggle();
-                } else {
-                    handleServerSideErrors(form, data.body);
-                }
-            })
-            .catch(error => console.log('error: ' + error));
+    fetch('/edit_profile/', {
+        method: 'POST',
+        body: formData,
     })
+        .then(response => response.json().then(data => ({ status: response.status, ok: response.ok, body: data })))
+        .then(data => {
+            if (data.ok) {
+                form.reset();
+
+                fetchMainContent('/topbar', 'topBar');
+
+                element = document.getElementById("edit_profile");
+                var myCollapse = new bootstrap.Collapse(element);
+                myCollapse.toggle();
+
+            } else {
+                handleServerSideErrors(form, data.body);
+            }
+        })
+        .catch(error => console.log('error: ' + error));
 }
 
 function handleServerSideErrors(form, errors) {
