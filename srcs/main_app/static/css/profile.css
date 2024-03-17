@@ -68,3 +68,28 @@
 	float: left;
 	text-decoration-line: underline;
 }
+
+.editProfile {
+	width: 40vw;
+	height: 50vh;
+}
+
+.editProfile label,input,button {
+	font-family: 'bpdots';
+	font-size: 0.5vw;
+	color: black;
+}
+
+.editProfile #primary-btn {
+	width: 100%;
+	background: var(--Beach-bunny-Accent, #F5BB76);
+	color: black;
+	border: 2px solid black;
+}
+
+.editProfile #secondry-btn {
+	width: 100%;
+	background: var(--Beach-bunny-Card, #FCF9F4); 
+	color: black;
+	border: 2px solid black;
+}
