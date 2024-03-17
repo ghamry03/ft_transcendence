@@ -1,7 +1,7 @@
 FROM nginx:latest
 
 WORKDIR /etc/nginx/conf.d
-RUN rm /etc/nginx/conf.d/default.conf
+RUN [ -f /etc/nginx/conf.d/default.conf ] && rm /etc/nginx/conf.d/default.conf || exit 0
 COPY ./conf.d/. /etc/nginx/conf.d/
 
 RUN apt update && apt install ca-certificates -y && apt install nano -y

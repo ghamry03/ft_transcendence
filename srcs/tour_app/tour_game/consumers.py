@@ -165,7 +165,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.logger.info("Ending round")
         
         # Save game results to db
-        requests.get('http://gameapp:2000/game/endGame/' 
+        requests.get('http://gameapp:8003/game/endGame/' 
                     + str(winner['gid']) + '/' 
                     + str(winner["id"]) + '/' 
                     + str(loser["id"]) + '/'
@@ -361,7 +361,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     break
 
                 # Register the new game in the db and create new channel group for the match
-                gameIdResponse = requests.get('http://gameapp:2000/game/createGame/' + str(pid1) + '/' + str(pid2) + '/' + str(tid) + '/')
+                gameIdResponse = requests.get('http://gameapp:8003/game/createGame/' + str(pid1) + '/' + str(pid2) + '/' + str(tid) + '/')
                 gid = int(gameIdResponse.text)
                 groupName = str(pid1) + "_" + str(pid2)
                 

@@ -1,6 +1,6 @@
 {% load static %}
 <div class="container-fluid d-flex flex-grow-1 mh-100">
-    <div class="row flex-grow-1">
+    <div class="row flex-grow-1" style="margin: 20px.">
 
         <!-- Profile pic, name, login -->
         <div
@@ -9,7 +9,7 @@
         >
             <!-- img -->
             <div class="d-flex justify-content-center" style="margin-bottom: 25px;">
-                <img class="img-fluid" src="http://localhost:3000/{{image}}" style="border-radius: 25px;">
+                <img class="img-fluid" src="{{MEDIA_URL}}{{image}}" style="border-radius: 25px;">
             </div>
 
             <!-- username -->
