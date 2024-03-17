@@ -1,5 +1,6 @@
 Django==4.2.7
 djangorestframework==3.14.0
+gunicorn==21.2.0
 psycopg2-binary==2.9.9 # to connect the django app to the database
-requests
-pillow
+requests==2.31.0
+pillow==10.2.0

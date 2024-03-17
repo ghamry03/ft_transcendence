@@ -9,7 +9,7 @@
         {{ userData.username }}
     </h1>
     <img
-        src="http://localhost:3000/{{userData.image}}"
+        src="{{MEDIA_URL}}{{userData.image}}"
         class="profilePic align-middle"
     />
 </div>

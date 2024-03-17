@@ -2,24 +2,29 @@ FROM python:3.12.0-bullseye
 
 RUN addgroup --system app && adduser --system --group app
 
-ENV HOME=/home/game_app
-# ENV DJANGO_SETTINGS_MODULE=game_app.settings
-
+ENV HOME=/home/friends_app
+ENV USER_HOME=/home/user_app
 RUN mkdir -p $HOME
+RUN mkdir -p $USER_HOME
+
 WORKDIR $HOME
-COPY docker_srcs/game_app/requirements.txt ./
+COPY docker_srcs/friends_app/requirements.txt ./
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY docker_srcs/game_app/entrypoint.prod.sh /
+COPY docker_srcs/friends_app/entrypoint.prod.sh /
 RUN chmod a+x /entrypoint.prod.sh
 
-COPY ./srcs/game_app .
+COPY ./srcs/friends_app .
+COPY ./srcs/user_app $USER_HOME
+
 RUN chown -R app:app $HOME
+RUN chown -R app:app $USER_HOME
+
 USER app
-EXPOSE 8003
+EXPOSE 8002
 
 ENTRYPOINT [ "/entrypoint.prod.sh"]

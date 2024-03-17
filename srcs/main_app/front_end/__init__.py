@@ -1,1 +1,1 @@
-from main_app import *
+from main_app.constants import *

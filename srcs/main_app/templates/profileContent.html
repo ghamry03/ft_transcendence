@@ -1,15 +1,15 @@
 {% load static %}
 <div class="container-fluid d-flex flex-grow-1 mh-100">
-    <div class="row flex-grow-1">
+    <div class="row flex-grow-1" style="margin: 20px.">
 
         <!-- Profile pic, name, login -->
         <div
-            class="col-12 col-lg-3 border mh-100"
-            style="padding: 8px; background-color: #D4BBFE; border-radius: 25px"
+            class="col-12 col-lg-3 mh-100 d-flex flex-column flex-grow-1"
+            style="padding: 8px; background-color: #D4BBFE; border-radius: 25px; overflow: scroll;"
         >
             <!-- img -->
             <div class="d-flex justify-content-center" style="margin-bottom: 25px;">
-                <img class="img-fluid" src="http://localhost:3000/{{image}}" style="border-radius: 25px;">
+                <img class="img-fluid" src="{{MEDIA_URL}}{{image}}" style="border-radius: 25px;">
             </div>
 
             <!-- username -->
@@ -61,7 +61,7 @@
         </div>
 
         <!-- match history -->
-        <div class="col-12 col-lg-6 d-flex card border mh-100">
+        <div class="col-12 col-lg-6 d-flex card mh-100">
             <div id="matchHistoryDash" class="d-flex flex-grow-1 mh-100" style="">
                 <div class="content flex-grow-1">
                     <div class="titleSection">
@@ -177,7 +177,7 @@
         </div>
 
         <!-- tour history -->
-        <div class="col-12 col-lg-3 d-flex card border mh-100">
+        <div class="col-12 col-lg-3 d-flex card mh-100">
             <div id="tournamentHistoryDash" class="d-flex flex-grow-1 mh-100">
                 <div class="content flex-grow-1">
                     <div class="titleSection">
