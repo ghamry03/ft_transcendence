@@ -14,11 +14,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 2000
+EXPOSE 8003
 
 COPY entrypoint.sh /
 RUN chmod a+x /entrypoint.sh
 ENTRYPOINT [ "/entrypoint.sh"]
 
-# CMD python manage.py runserver 0.0.0.0:2000
+# CMD python manage.py runserver 0.0.0.0:8003
 # CMD [ "/bin/bash" ]

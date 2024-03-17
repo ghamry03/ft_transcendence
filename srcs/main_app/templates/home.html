@@ -8,13 +8,42 @@
 </div>
 <div class="row g-0">
     <div class="col-2 flex-grow-1">
-        <div class="navigationBar row m-0">
-            <div class="col">
+        <div class="navigationBar">
+            <div class="friend friendRequest row g-0 m-0">
+                <div class="col-3">
+                    {% load static %}
+                    <img src="{% static 'imgs/invites_button.svg'%}">
+                </div>
+                <div class="align-items-center friendName title col-9">
+                    <p class="m-0">friend requests</p>
+                </div>
+            </div>
+
+            <!--INJECT THE FRIENDS HERE -->
+            <div class="friendInjection">
+
+                <!-- {% include 'friend.html' with uid=123 imgURL="http://localhost:8001/media/kamin.jpg" name="kamin"%} -->
 
             </div>
+            <!--END OF FRIENDS INJECTION-->
+
+            <!--ADD FRIEND HERE-->
+            <div class="friend friendRequest friendAdd row g-0 m-0" data-bs-toggle="collapse" data-bs-target="#addFriendPop">
+                <div class="col-3">
+                    {% load static %}
+                    <img src="{% static 'imgs/add_friend.svg'%}">
+                </div>
+                <div class="align-items-center friendName title col-9">
+                    <p class="m-0">add friends</p>
+                </div>
+            </div>
+            <!--END OF ADD FRIEND-->
+
         </div>
     </div>
     <div id="homeContentArea" class="welcomeBar col-8"></div>
 
     <div class="col-2"></div>
 </div>
+
+{% include 'profile.html'%}

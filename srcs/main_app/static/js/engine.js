@@ -49,7 +49,8 @@ const injections = {
     fetchMainContent('/home', 'mainContentArea')
       .then(() => fetchMainContent('/topbar', 'topBar'))
       .then(() => fetchMainContent('/cards', 'homeContentArea'))
-      .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'));
+      .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
+      .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'));
   },
   '/cards': () => {
     removeScript('online');
@@ -81,11 +82,14 @@ const injections = {
     removeScript('offline')
     removeScript('online')
     removeScript('tournament');
+  },
+  '/profile': (uid) => {
+    fetchMainContent("/profile/" + uid.toString() + "/" , 'profileContent');
   }
 }
 
-function engine(pageUrl, addToHistory=true) {
-  let promise = injections[pageUrl]();
+function engine(pageUrl, param=null, addToHistory=true) {
+  let promise = injections[pageUrl](param);
   if (addToHistory) {
     if (pageUrl == '/home') {
       pageUrl = '/cards';
@@ -103,3 +107,6 @@ window.addEventListener('popstate', (event) => {
     engine(state.pageUrl, false);
   }
 });
+
+function profileInjection(uid) {
+}

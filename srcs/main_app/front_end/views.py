@@ -14,7 +14,7 @@ def topBar(request):
 
     return render(request, 'topBar.html', {
         'userData': request.session['userData'],
-        'userServiceUrl': MEDIA_SERVICE_URL,
+        'MEDIA_URL': MEDIA_SERVICE_URL,
     })
 
 def homePage(request):
@@ -50,3 +50,20 @@ def getUnknownUserImg(request):
     if response.status_code == 200:
         return HttpResponse(MEDIA_SERVICE_URL + '/media/unknownuser.png')
     return HttpResponseNotFound("The requested resource was not found.")
+
+def profile(request, uid):
+    headers = {
+        'X-UID': str(request.session['userData']['uid']),
+        'X-TOKEN': request.session['access_token']
+    }
+    response = requests.get(USER_API_URL + '/users/api/' + str(uid), headers=headers)
+    json = response.json()
+    context = {
+        'image': json['image'],
+        'username': json['username'],
+        'full_name': f"{json['first_name']} {json['last_name']}",
+        'campus': json['campus_name'],
+        'intra_url': json['intra_url'],
+        'MEDIA_URL': MEDIA_SERVICE_URL
+    }
+    return render(request, 'profileContent.html', context)

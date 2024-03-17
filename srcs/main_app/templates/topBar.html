@@ -1,11 +1,15 @@
-<div>
-  {% include "loginButton.html" with title="Logout" onClick="engine('/logout')" %}
-  <!-- <a onclick="engine('/login','false',0)" >logout</a> -->
+{% load static %}
+<div
+    id="profileImg" class="d-flex"
+    data-bs-toggle="collapse"
+    data-bs-target="#profilePop"
+    onclick="engine('/profile', '{{userData.uid}}' );"
+>
+    <h1 id="userName" class="align-self-center align-middle">
+        {{ userData.username }}
+    </h1>
+    <img
+        src="{{MEDIA_URL}}{{userData.image}}"
+        class="profilePic align-middle"
+    />
 </div>
-<h1 id="userName" class="align-self-center align-middle">
-  {{ userData.username }}
-</h1>
-<img
-  src="{{userServiceUrl}}{{userData.image}}"
-  class="profilePic align-middle"
-/>
