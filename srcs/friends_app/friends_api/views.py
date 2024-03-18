@@ -6,7 +6,7 @@ from django.db.models import Q
 from .models import Friend
 from .serializers import FriendSerializer
 import logging
-from . import USER_API_URL, MEDIA_SERVICE_URL
+from . import USER_API_URL
 
 logger = logging.getLogger(__name__)
 class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView):
@@ -50,15 +50,21 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
     def delete(self, request, *args, **kwargs):
         first_user = request.data.get('first_user', None)
         second_user = request.data.get('second_user', None)
+        flag = request.data.get('clean', None)
 
-        obj = Friend.objects.filter(
-            Q(first_id=first_user, second_id=second_user) | 
-            Q(first_id=second_user, second_id=first_user)
-        ).first()
-
-        if not obj:
-            return Response({"error": "Friend relationship not found."}, status=status.HTTP_404_NOT_FOUND)
-        obj.delete()
+        if flag:
+            obj = Friend.objects.filter(
+                Q(first_id=first_user) | 
+                Q(second_id=first_user)).first()
+            for record in obj:
+                record.delete()
+        else:
+            obj = Friend.objects.filter(
+                Q(first_id=first_user, second_id=second_user) | 
+                Q(first_id=second_user, second_id=first_user)).first()
+            if not obj:
+                return Response({"error": "Friend relationship not found."}, status=status.HTTP_404_NOT_FOUND)
+            obj.delete()
         return Response(status=status.HTTP_200_OK)
     
     def get_user_info(self, owneruid, access_token, uid):
