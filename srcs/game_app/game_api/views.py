@@ -132,7 +132,7 @@ class CreateGameApiView(APIView):
 			player=player1,
 			score=0
 		)
-		player2 = User.objects.get(uid=pid2, on_delete=models.CASCADE)
+		player2 = UserApiUser.objects.get(uid=pid2, on_delete=models.CASCADE)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player2,
