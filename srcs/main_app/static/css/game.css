@@ -37,8 +37,8 @@
   
 .onlineGame canvas {
 	background: #1B102E;
-	border-radius: 5%;
-	padding: 20px;
+	/* border-radius: 5%; */
+	/* padding: 20px; */
 }
 
 .onlineGame #readyGo {
