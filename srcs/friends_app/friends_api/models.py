@@ -31,7 +31,6 @@
 #     )
 
 from django.db import models
-from user_api.models import User
 
 # Create your models here.
 

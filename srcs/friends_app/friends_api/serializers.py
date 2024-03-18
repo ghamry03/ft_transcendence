@@ -3,8 +3,6 @@ from rest_framework import serializers
 from friends_api.models import Friend
 from django.db import connections
 from django.core.exceptions import ValidationError
-from user_api.serializers import UserSerializer
-from user_api.models import User
 from . import USER_API_URL
 
 import logging
