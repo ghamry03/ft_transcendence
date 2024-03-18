@@ -59,8 +59,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
-MEDIA_URL = 'http://localhost:3000/media/'
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
