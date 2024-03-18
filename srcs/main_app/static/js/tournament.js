@@ -370,16 +370,18 @@ tournament = () => {
 				console.log("score reset received, ", messageData.ballDir);
 				leftPlayerScore = messageData.leftScore;
 				rightPlayerScore = messageData.rightScore;
-				reset(ballSpeed * messageData.ballDir);
-				gameRunning = true;
+				reset(ballSpeed * messageData.ballDir).then(() => {
+					gameRunning = true;
+				});
 				break;
 			case "matchEnded":
 				leftPlayerScore = messageData.leftScore;
 				rightPlayerScore = messageData.rightScore;
-				reset(ballSpeed);
-				gameRunning = true;
-				draw();
-				requestAnimationFrame(endMatch);
+				reset(ballSpeed).then(() => {
+					// gameRunning = true;
+					draw();
+					requestAnimationFrame(endMatch);
+				});
 				break;
 			case "roundStarting":
 				console.log("Round starting... Left = ", messageData.leftPlayer, " Right = ", messageData.rightPlayer);
@@ -424,9 +426,10 @@ tournament = () => {
 					else {
 						rightPlayerScore = WIN_SCORE;
 					}
-					reset(ballSpeed);
-					draw();
-					requestAnimationFrame(endMatch);
+					reset(ballSpeed).then(() => {
+						draw();
+						requestAnimationFrame(endMatch);
+					});
 				}
 				else {
 					updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
@@ -556,94 +559,109 @@ tournament = () => {
 
 	// Reset ball position to the center of the canvas and set the new ball direction 
 	async function reset (newBallSpeed) {
-		ballXaxis = canvasW / 2;
-		ballYaxis = canvasH / 2;
-		ballSpeedXaxis = newBallSpeed;
-		ballSpeedYaxis = newBallSpeed;
+		await lock.acquire()
+		try {
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+			ballSpeedXaxis = newBallSpeed;
+			ballSpeedYaxis = newBallSpeed;
+		} finally {
+			lock.release()
+		}
 	}
 
-	
+	// sidePlayerId - pass in either the rightPlayerId or leftPlayerId
+	function checkScoreSide(sidePlayerId, sideTemp) {
+		console.log("ball hit ", sideTemp)
+		if (playerId == sidePlayerId) {
+			console.log("i scored on ", sideTemp);
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+			gameRunning = false;
+			sendScoredEvent();
+		}
+		else {
+			ballSpeedXaxis = -ballSpeedXaxis;
+			console.log("opponent scored on ", sideTemp, ballSpeedXaxis)
+		}
+	}
+
 	// This function is called in the animation loop for every frame update
 	// The paddle positions and ball positions are updated here
-	function update()
+	async function update()
 	{
-		// if (pendingScoreUpdate) {
-		// 	console.log("scoreChanged = ", scoreChanged);
-		// 	return ;
-		// }
-		if (gameRunning == false) {
-			console.log("stuck here");
-			return ;
-		}
-		// Left paddle movement
-		if (leftWPressed && leftPaddleYaxis > 0)
-			leftPaddleYaxis -= paddleSpeed;
-		else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvasH)
-			leftPaddleYaxis += paddleSpeed;
-		
-		// Right paddle movement
-		if (rightWPressed && rightPaddleYaxis > 0)
-			rightPaddleYaxis -= paddleSpeed;
-		else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvasH)
-			rightPaddleYaxis += paddleSpeed;
-
-		// Move ball
-		ballXaxis += ballSpeedXaxis;
-		ballYaxis += ballSpeedYaxis;
-
-		// Top & bottom collision
-		if (ballYaxis - ballRadius <= 0 ||
-			ballYaxis + ballRadius >= canvasH)
-			ballSpeedYaxis = -ballSpeedYaxis;
-
-		// Left paddle collision
-		if (ballXaxis - ballRadius <= paddleWidth &&
-			ballYaxis >= leftPaddleYaxis &&
-			ballYaxis <= leftPaddleYaxis + paddleHeight)
-			if (ballSpeedXaxis < 0)
-				ballSpeedXaxis = -ballSpeedXaxis;
-
-		// Right paddle collision
-		if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
-			ballYaxis >= rightPaddleYaxis &&
-			ballYaxis <= rightPaddleYaxis + paddleHeight)
-			if (ballSpeedXaxis > 0)
-				ballSpeedXaxis = -ballSpeedXaxis;
-
-		// Check if ball goes out of bounds on left or right side of canvas
-		if (ballXaxis - ballRadius <= 0) {
-			if (playerId == rightPlayerId) {
-				console.log("i scored on left");
-				ballXaxis = canvasW / 2;
-				ballYaxis = canvasH / 2;
-				gameRunning = false;
-				sendScoredEvent();
+		await lock.acquire()
+		try {
+			if (gameRunning == false) {
+				console.log("stuck here");
+				return ;
 			}
-			else {
-				console.log("opponent scored on left")
-				ballSpeedXaxis = -ballSpeedXaxis;
+			// Left paddle movement
+			if (leftWPressed && leftPaddleYaxis > 0) {
+				leftPaddleYaxis -= paddleSpeed;
 			}
-		}
-		else if (ballXaxis + ballRadius >= canvasW) {
-			if (playerId == leftPlayerId) {
-				console.log("i scored on right");
-				ballXaxis = canvasW / 2;
-				ballYaxis = canvasH / 2;
-				gameRunning = false;
-				sendScoredEvent();
+			else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvasH) {
+				leftPaddleYaxis += paddleSpeed;
 			}
-			else {
-				console.log("opponent scored on right")
-				ballSpeedXaxis = -ballSpeedXaxis;
+			
+			// Right paddle movement
+			if (rightWPressed && rightPaddleYaxis > 0) {
+				rightPaddleYaxis -= paddleSpeed;
 			}
+			else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvasH) {
+				rightPaddleYaxis += paddleSpeed;
+			}
+	
+			// Move ball
+			ballXaxis += ballSpeedXaxis;
+			ballYaxis += ballSpeedYaxis;
+	
+			// Top & bottom collision
+			if (ballYaxis - ballRadius <= 0 ||
+				ballYaxis + ballRadius >= canvasH) {
+				ballSpeedYaxis = -ballSpeedYaxis;
+			}
+	
+			// Left paddle collision
+			if (ballXaxis - ballRadius <= paddleWidth &&
+				ballYaxis >= leftPaddleYaxis &&
+				ballYaxis <= leftPaddleYaxis + paddleHeight) {
+				if (ballSpeedXaxis < 0) {
+					ballSpeedXaxis = -ballSpeedXaxis;
+				}
+			}
+	
+			// Right paddle collision
+			if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
+				ballYaxis >= rightPaddleYaxis &&
+				ballYaxis <= rightPaddleYaxis + paddleHeight) {
+				if (ballSpeedXaxis > 0) {
+					ballSpeedXaxis = -ballSpeedXaxis;
+				}
+			}
+	
+			// Check if ball goes out of bounds on left or right side of canvas
+			if (ballXaxis - ballRadius <= 0) {
+				// Check if this player is the right player and forward score info to server accordingly
+				checkScoreSide(rightPlayerId, "left");
+			}
+			else if (ballXaxis + ballRadius >= canvasW) {
+				// Check if this player is the left player and forward score info to server accordingly
+				checkScoreSide(leftPlayerId, "right");
+			}
+		} finally {
+			lock.release()
 		}
 	}
 
 	// Animation loop that keeps the game animation running
 	const animateGame = (time) => {
-		update();
-		draw();
-		animationId = requestAnimationFrame(animateGame);
+		update().then(() => {
+			// Draw the updated frame on the canvas
+			draw();
+			// Start the animation loop
+			animationId = requestAnimationFrame(animateGame);
+		});
 	};
 
 	// Draws all updated paddle positions, ball position the canvas. Also updates the score elements
