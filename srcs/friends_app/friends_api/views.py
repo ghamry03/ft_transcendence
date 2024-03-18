@@ -98,7 +98,7 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
                 resp = self.get_user_info(ownerUID, access_token, target)
                 if resp:
                     resp['relationship'] = friend.relationship
-                    resp['image'] = f'{MEDIA_SERVICE_URL}{resp['image']}'
+                    resp['image'] = f'{resp['image']}'
                     if (f'{friend.first_id}' == ownerUID):
                         resp["initiator"] = 1
                     else:
