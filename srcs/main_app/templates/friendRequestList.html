@@ -3,7 +3,7 @@
     {% if user.uid != uid and user.relationship != 0 and user.initiator == 0 %}
         <div id="fr{{user.uid}}" class="row searchedUser">
             <div class="col-3 ">
-                <object class="circleImg img42" data="http://localhost:3000{{user.image}}" type="image/png">
+                <object class="circleImg img42" data="{{user.image}}" type="image/png">
                     <img class="circleImg img42" src="{% static 'imgs/unknownuser.png' %}">
                 </object>
             </div>

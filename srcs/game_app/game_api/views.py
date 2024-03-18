@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 import logging
 
-from online.models import PlayerMatch, Game, TourGameTournament
+from online.models import PlayerMatch, Game, TourGameTournament, UserApiUser
 from game_api.serializer import MatchSerializer, GameSerializer
 
 logger = logging.getLogger(__name__)
@@ -126,7 +126,7 @@ class CreateGameApiView(APIView):
 			starttime=timezone.now(),
 			tournament=tour
 		)
-		player1 = User.objects.get(uid=pid1, on_delete=models.CASCADE)
+		player1 = UserApiUser.objects.get(uid=pid1, on_delete=models.CASCADE)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player1,

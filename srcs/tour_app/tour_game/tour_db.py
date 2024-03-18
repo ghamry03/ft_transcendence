@@ -23,7 +23,7 @@ def endTournament(tid):
 @sync_to_async
 def updateRank(tid, uid, rank):
 	tour = Tournament.objects.get(id=tid)
-	player = User.objects.get(uid=uid)
+	player = UserApiUser.objects.get(uid=uid)
 	tourRank = TournamentRank.objects.create(
 		player=player,
 		rank=rank,
