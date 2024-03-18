@@ -8,6 +8,7 @@ from django.core.files.temp import NamedTemporaryFile
 from urllib.parse import urlparse
 from django.core.files import File
 from django.conf import settings
+from user_app.constants import FRIEND_API_URL
 
 # Create your models here.
 class User(models.Model):
@@ -36,6 +37,19 @@ class User(models.Model):
         super(User, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+
+        headers = { 'Content-Type': 'application/json' }
+
+        myuid = self.uid
+
+        response = requests.delete(
+            FRIEND_API_URL + "api/friends/",
+            headers=headers,
+            json={
+                "first_user": f'{myuid}',
+                "clean": 1, 
+                },
+        ).json()
         remove(self.image.path)
         return super(User, self).delete(*args, **kwargs)
 
