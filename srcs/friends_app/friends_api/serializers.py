@@ -31,7 +31,6 @@ class FriendSerializer(serializers.ModelSerializer):
         return data
     
     def validate_user_id(self, user_id):
-        sessionUrl = f"http://localhost:8000/api/session-data/?sessionID={self.context.get('session_id', None)}"
         headers = {
             'X-UID': self.context.get('requester_uid', None),
             'X-TOKEN': self.context.get('access_token', None)
