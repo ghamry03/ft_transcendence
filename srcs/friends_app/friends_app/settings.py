@@ -13,9 +13,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import environ
 import os
-import sys
-
-sys.path.append('/home/user_app')
 
 # Initialise environment variables
 env = environ.Env()
