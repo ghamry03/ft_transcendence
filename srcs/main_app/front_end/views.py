@@ -198,9 +198,9 @@ def profile(request, uid):
 
 def updateStatus(request, status):
     headers = {
-            'X-UID': str(request.session['userData']['uid']),
-            'X-TOKEN': request.session['access_token']
-            }
+        'X-UID': str(request.session['userData']['uid']),
+        'X-TOKEN': request.session['access_token']
+    }
     data = { 'status': status }
     response = requests.post(
             USER_API_URL + '/users/api/' + str(request.session['userData']['uid']) + '/',
