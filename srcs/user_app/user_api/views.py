@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import exceptions
 from rest_framework.response import Response
 from rest_framework import status
-from .models import User, ft_user
+from .models import User, FtUser
 from .serializers import UserSerializer
 from user_app.permissions import IsRequestedUser
 from django.core.exceptions import ValidationError
@@ -59,7 +59,7 @@ class UserDetailApiView(APIView):
             req_token = request.META.get('HTTP_X_TOKEN')
             if int(req_uid) == user_id:
                 try:
-                    user_query = ft_user(access_token=req_token)
+                    user_query = FtUser(access_token=req_token)
                     user_query.save()
                 except ValidationError as e:
                     return Response(e.messages, status=status.HTTP_400_BAD_REQUEST)

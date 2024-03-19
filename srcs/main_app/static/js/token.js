@@ -1,6 +1,4 @@
 let pid = setInterval(() => {
-    console.log('inside');
-    console.log('inside');
     fetch("/renew_token")
         .then(response => {
             if (!response.ok) {

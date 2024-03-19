@@ -217,7 +217,6 @@ function showError(errorMessage, buttonText, buttonOnClickFunction) {
 
 
     if (!errorDiv.classList.contains('show')) {
-        console.log("show: " + errorDiv.classList.contains('show'));
         myCollapse.toggle();
     }
 
