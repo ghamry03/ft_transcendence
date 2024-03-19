@@ -70,7 +70,7 @@ def renew_token(request):
 
     files = {
         'grant_type': (None, 'refresh_token'),
-        'refresh_token': (None, request.session['refresh_token'] + 'x'),
+        'refresh_token': (None, request.session['refresh_token']),
         'client_id': (None, os.environ['INTRA_UID']),
         'client_secret': (None, os.environ['INTRA_SECRET'])
     }

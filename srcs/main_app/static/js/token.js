@@ -16,4 +16,4 @@ let pid = setInterval(() => {
                 engine('/logout')
             });
         });
-}, 5000);
+}, 60 * 60 * 1000);
