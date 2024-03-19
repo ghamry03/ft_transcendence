@@ -11,7 +11,6 @@ let pid = setInterval(() => {
         })
         .catch((error) => {
             clearInterval(pid);
-            console.log(error.message);
             showError(`Failed to renew access_token, please logout. [${error.message}]`, 'logout', () => {
                 engine('/logout')
             });

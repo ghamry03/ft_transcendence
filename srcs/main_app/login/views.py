@@ -75,7 +75,6 @@ def renew_token(request):
         'client_secret': (None, os.environ['INTRA_SECRET'])
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
-    print(response.json())
 
     if response.status_code == 200:
         json_response = response.json()
