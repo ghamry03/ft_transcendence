@@ -80,7 +80,7 @@ friends-logs		:
 					docker logs -f friendsapp
 
 psql-us		:
-					$(DOCKER_CMD) exec postgres psql --username=postgres --dbname=usermanagement
+					$(DOCKER_CMD) exec postgres psql --username=mehrin --dbname=usermanagement
 
 psql-fr		:
 					$(DOCKER_CMD) exec postgres psql --username=postgres --dbname=friends

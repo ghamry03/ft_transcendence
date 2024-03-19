@@ -153,7 +153,7 @@ tournament = () => {
 		try {
 			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
 			const jsonResponse = await response.json();
-			return jsonResponse.first_name;
+			return jsonResponse.username;
 		} catch (error) {
 			console.error("Error fetching image:", error);
 		}
@@ -165,9 +165,16 @@ tournament = () => {
 	// Adds the image of user to a given image placeholder
 	async function addImage(playerId, imgId) {
 		const imgUrl = await getImage(playerId);
-		var playerImg = document.getElementById(imgId);
-		playerImg.src = imgUrl;
-		playerImg.setAttribute("data-uid", playerId);
+		const username = await getUserName(playerId);
+		var playerImg = document.getElementById("player" + imgId);
+		var nameElement = document.getElementById("name" + imgId);
+		if (playerImg) {
+			playerImg.src = imgUrl;
+			playerImg.setAttribute("data-uid", playerId);
+		}
+		if (nameElement) {
+			nameElement.innerText = username;
+		}
 	}
 
 	// Adds player images to the bracket one by one, 
@@ -176,13 +183,20 @@ tournament = () => {
 		await lock.acquire()
 		try {
 			var i = 0;
-			var playerImages = bracket.children;
 			for (const playerId of playerList) {
 				if (playerId == 0)
 					break;
-				const imgUrl = await getImage(playerId);
-				playerImages[i].firstElementChild.setAttribute("src", imgUrl);
-				playerImages[i].firstElementChild.setAttribute("data-uid", playerId);
+				var imgElement = document.getElementById("player" + i);
+				if (imgElement) {
+					const imgUrl = await getImage(playerId);
+					imgElement.setAttribute("src", imgUrl);
+					imgElement.setAttribute("data-uid", playerId);
+				}
+				var nameElement = document.getElementById("name" + i);
+				if (nameElement) {
+					const userName = await getUserName(playerId);
+					nameElement.innerText = userName;
+				}
 				i++;
 			}
 		} finally {
@@ -331,13 +345,15 @@ tournament = () => {
 	}
 
 	// Handler for checkbox if a user is ready to start their assigned match
-	checkBox.addEventListener('change', function() {
-		if (checkBox.checked) {
-			checkForm.style.display = "none";
-			updateTourStatus("Waiting for opponent...");
-			sendReadyEvent();
-		}
-	});
+	if (checkBox) {
+		checkBox.addEventListener('change', function() {
+			if (checkBox.checked) {
+				checkForm.style.display = "none";
+				updateTourStatus("Waiting for opponent...");
+				sendReadyEvent();
+			}
+		});
+	}
 
 	// Update the tour status when the next round is ready and let the user confirm 
 	function startNextRound() {
@@ -702,8 +718,8 @@ tournament = () => {
 		// prod version
 
 		var wsScheme = location.protocol === "https:" ? "wss://" : "ws://";
-		ws = new WebSocket(wsScheme + "localhost:8003/ws/game/?uid=" + playerId);
-
+		ws = new WebSocket(wsScheme + "localhost:8004/ws/tour/?uid=" + playerId);
+		console.log(wsScheme, " connected: ", ws);
 		ws.onmessage = handleWebSocketMessage;
 	};
 	joinQueue();

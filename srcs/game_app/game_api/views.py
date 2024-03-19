@@ -126,13 +126,13 @@ class CreateGameApiView(APIView):
 			starttime=timezone.now(),
 			tournament=tour
 		)
-		player1 = UserApiUser.objects.get(uid=pid1, on_delete=models.CASCADE)
+		player1 = UserApiUser.objects.get(uid=pid1)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player1,
 			score=0
 		)
-		player2 = UserApiUser.objects.get(uid=pid2, on_delete=models.CASCADE)
+		player2 = UserApiUser.objects.get(uid=pid2)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player2,
