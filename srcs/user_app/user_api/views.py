@@ -7,9 +7,7 @@ from .models import User, FtUser
 from .serializers import UserSerializer
 from user_app.permissions import IsRequestedUser
 from django.core.exceptions import ValidationError
-import logging
-
-logger = logging.getLogger(__name__)
+from django.db.models import Q
 
 # List view of all Users
 class UsersListApiView(APIView):
@@ -93,6 +91,17 @@ class UserDetailApiView(APIView):
         user_query = self.getObjectById(user_id)
         user_query.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserSearch(APIView):
+    def get(self, request, pattern):
+        users = User.objects.filter(
+            Q(username__icontains=pattern)
+            | Q(first_name__icontains=pattern)
+            | Q(last_name__icontains=pattern)
+        )
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 def health_check(request):
     return JsonResponse({'status': 'ok'})
