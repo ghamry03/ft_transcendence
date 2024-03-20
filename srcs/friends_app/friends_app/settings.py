@@ -13,9 +13,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import environ
 import os
-import sys
-
-sys.path.append('/home/user_app')
 
 # Initialise environment variables
 env = environ.Env()
@@ -47,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user_api',
     'friends_api',
     'rest_framework'
 ]
@@ -61,6 +57,20 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',  # Adjust the log level as needed
+    },
+}
 
 ROOT_URLCONF = 'friends_app.urls'
 

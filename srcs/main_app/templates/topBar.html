@@ -3,7 +3,7 @@
     id="profileImg" class="d-flex"
     data-bs-toggle="collapse"
     data-bs-target="#profilePop"
-    onclick="engine('/profile', '{{userData.uid}}' );"
+    onclick="engine('/profile/{{userData.uid}}');"
 >
     <h1 id="userName" class="align-self-center align-middle">
         {{ userData.username }}

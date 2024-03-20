@@ -96,6 +96,8 @@ clean			:
 
 fclean			:	clean
 					rm -rf srcs/postgres/data
+					rm -rf srcs/game_app/online/migrations/
+					rm -rf srcs/game_app/online/__pycache__/
 					rm -rf srcs/friends_app/friends_api/migrations/
 					rm -rf srcs/friends_app/friends_api/__pycache__/
 					rm -rf srcs/user_app/user_api/migrations/

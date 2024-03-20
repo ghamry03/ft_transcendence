@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch, UserApiUser
 
+
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnlineGame

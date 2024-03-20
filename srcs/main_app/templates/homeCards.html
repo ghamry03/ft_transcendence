@@ -1,50 +1,43 @@
 <div class="row">
-  <div class="col-12">
-    <p id="welcome">Welcome back {{ userData.first_name }}, it's PONGPING time!</p>
-  </div>
-  <!-- <div class="col-2">
+    <div class="col-12">
+        <p id="welcome">
+            Welcome back {{ userData.first_name }}, it's PONGPING time!
+        </p>
+    </div>
+    <!-- <div class="col-2">
 {% include "gameButton.html" %}
 </div> -->
 </div>
 
 <div class="row g-5 m-0">
-  <div class="col-4">
-    {% include "buttonCard.html" with img="imgs/game.svg" title="Play Online" description="Get matched with a random player online" onClick="engine('/online')" %}
-  </div>
-  <div class="col-4">
-    {% include "buttonCard.html" with img="imgs/offline.svg" title="Play Offline" description="Play a match against someone on the same keyboard" onClick="engine('/offline')" %}
-  </div>
-  <div class="col-4">
-    {% include "buttonCard.html" with img="imgs/cup.svg" title="Join a Tournament" description="Compete in a tournament or start your own!" onClick="engine('/tournament')" %}
-  </div>
+    <div class="col-4">
+        {% include "buttonCard.html" with img="imgs/game.svg" title="Play Online" description="Get matched with a random player online" onClick="engine('/online')" %}
+    </div>
+    <div class="col-4">
+        {% include "buttonCard.html" with img="imgs/offline.svg" title="Play Offline" description="Play a match against someone on the same keyboard" onClick="engine('/offline')" %}
+    </div>
+    <div class="col-4">
+        {% include "buttonCard.html" with img="imgs/cup.svg" title="Join a Tournament" description="Compete in a tournament or start your own!" onClick="engine('/tournament')" %}
+    </div>
 </div>
 
-<div class="row g-5 m-0">
-  <div id="matchHistoryDash" class="col-8">
-    <div class="content">
-      <div class="titleSection">
-        <h3 class="title">Match History</h3>
-      </div>
-    </div>
-  </div>
-
-  <div id="tournamentHistoryDash" class="col-4">
-    <div class="content">
-      <div class="titleSection">
-        <h3 class="title">Your Tournaments</h3>
-      </div>
-      <h3>Your Tournaments</h3>
-      <h3>Your Tournaments</h3>
-      <h3>Your Tournaments</h3>
-      <h3>Your Tournaments</h3>
-      <h3>Your Tournaments</h3>
-      <h3>Your Tournaments</h3>
-      <h3>Your Tournaments</h3>
-      <h3>Your Tournaments</h3>
-      <h3>Your Tournaments</h3>
-      <h3>Your Tournaments</h3>
+<div class="row g-5 m-0 flex-grow-1">
+    <div id="matchHistoryDash" class="col-8">
+        <div class="content">
+            <div class="titleSection">
+                <h3 class="title">Match History</h3>
+            </div>
+        </div>
     </div>
 
-  </div>
-
+    <div id="tournamentHistoryDash" class="col-4 d-flex flex-column flex-grow-1 ">
+        <div class="content">
+            <div class="titleSection">
+                <h3 class="title">Your Tournaments</h3>
+            </div>
+            <div id="tournamentHistoryInjection">
+                {% include 'tournamentHistoryEntry.html' with img="http://127.0.0.1:3000/media/{{userData.username}}.jpg" rank=1 date="12/1/2023"%}
+            </div>
+        </div>
+    </div>
 </div>

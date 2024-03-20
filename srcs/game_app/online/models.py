@@ -34,7 +34,7 @@ class Game(models.Model):
     tournament = models.ForeignKey(TourGameTournament, on_delete=models.CASCADE, null=True)
     def __str__(self):
         """String for representing the Model object."""
-        return self.id
+        return str(self.id)
 
     def get_absolute_url(self):
         """Returns the url to access a particular game instance."""
@@ -49,7 +49,7 @@ class PlayerMatch(models.Model):
     score = models.IntegerField(null=True)
     def __str__(self):
         """String for representing the Model object."""
-        return self.id
+        return str(self.id)
 
     def get_absolute_url(self):
         """Returns the url to access a particular genre instance."""

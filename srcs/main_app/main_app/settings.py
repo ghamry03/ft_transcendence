@@ -33,6 +33,9 @@ DEBUG = os.environ.get("DEBUG", "0") != "0"
 
 ALLOWED_HOSTS = ['*']
 
+# Allowed hostanme to make call to session data api endpoint
+ALLOWED_HOSTNAMES_FOR_API = ['friendsapp:8002']
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
@@ -60,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -70,11 +74,13 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'INFO',  # Adjust the log level as needed
+        'level': 'DEBUG',  # Adjust the log level as needed
     },
 }
 
 ROOT_URLCONF = 'main_app.urls'
+
+MEDIA_URL = '/media/'
 
 TEMPLATES = [
     {

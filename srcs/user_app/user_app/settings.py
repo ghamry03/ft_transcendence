@@ -96,16 +96,26 @@ DATABASES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'color': {
+            '()': 'user_app.CustomFormatter.ColorLogFormatter',
+            'fmt': '%(levelname)s %(asctime)s %(module)s %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'color',
         },
+        # ... other handlers
     },
     'root': {
         'handlers': ['console'],
-        'level': 'INFO',  # Adjust the log level as needed
+        'level': 'DEBUG',  # Adjust the log level as needed
     },
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -1,0 +1,20 @@
+{% load static %}
+{% for user in data %}
+    {% if user.uid != uid %}
+        <div class="row searchedUser">
+            <div class="col-3 ">
+                <object class="circleImg img42" data="{{user.image}}" type="image/png">
+                    <img class="circleImg img42" src="{% static 'imgs/unknownuser.png' %}">
+                </object>
+            </div>
+
+            <div class="d-flex align-items-center col-7 friendName flex-grow-1">
+                <a class="m-0" href="{{user.intra_url}}" target="_blank">{{user.username}}</a>
+            </div>
+
+            <div class="col-2 d-flex align-items-center justify-content-end ">
+                <img class="searchButtonFunction" src="{% static 'imgs/add_button.svg' %}" onclick="engine('/add/{{user.uid}}');setAttribute('src', '{% static 'imgs/pending_button.svg' %}');setAttribute('onclick', '')">
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}

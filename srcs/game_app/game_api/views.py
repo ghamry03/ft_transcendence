@@ -1,6 +1,7 @@
 from django.http import Http404, JsonResponse, HttpResponse
 from django.utils.timezone import now
 from django.utils import timezone
+from django.db import models
 
 import requests
 
@@ -125,13 +126,13 @@ class CreateGameApiView(APIView):
 			starttime=timezone.now(),
 			tournament=tour
 		)
-		player1 = UserApiUser.objects.get(uid=pid1)
+		player1 = UserApiUser.objects.get(uid=pid1, on_delete=models.CASCADE)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player1,
 			score=0
 		)
-		player2 = UserApiUser.objects.get(uid=pid2)
+		player2 = UserApiUser.objects.get(uid=pid2, on_delete=models.CASCADE)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player2,

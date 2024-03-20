@@ -1,12 +1,14 @@
-function fetchMainContent(pageUrl, container) {
+function fetchMainContent(pageUrl, container=null) {
   return new Promise((resolve) => {
     fetch(pageUrl)
       .then(response => response.text())
       .then(data => {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
-        document.getElementById(container).innerHTML = doc;
-        resolve();  
+        if (container != null) {
+          var parser = new DOMParser();
+          var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
+          document.getElementById(container).innerHTML = doc;
+          resolve();  
+        }
       });
   });
 }
@@ -59,63 +61,174 @@ function removeScript(id) {
   }
 }
 
-const injections = {
-  '/home': () => {
-    fetchMainContent('/home', 'mainContentArea')
-      .then(() => fetchMainContent('/topbar', 'topBar'))
-      .then(() => fetchMainContent('/cards', 'homeContentArea'))
-      .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
-      .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
+// const injections = {
+//   '/home': () => {
+//     fetchMainContent('/home', 'mainContentArea')
+//       .then(() => fetchMainContent('/topbar', 'topBar'))
+//       .then(() => fetchMainContent('/cards', 'homeContentArea'))
+//       .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
+//       .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
+//       .then(() => injectScript('/static/js/searchQuery.js', 'homeContentArea', 'sideBar'));
+//   },
+//   '/cards': () => {
+//     removeScript('online');
+//     removeScript('offline');
+//     removeScript('tournament');
+//     fetchMainContent('/cards', 'homeContentArea');
+//   },
+//   '/offline': () => {
+//     fetchMainContent('/offline', 'homeContentArea')
+//       .then(() => injectScript('/static/js/offlinePong.js', 'homeContentArea', 'offline'));
+//   },
+//   '/online': () => {
+//     fetchMainContent('/online', 'homeContentArea')
+//       .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'));
+//   },
+//   '/tournament': () => {
+//     fetchMainContent('/tournament', 'homeContentArea')
+//       .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'));
+//   },
+//   '/tourGame': () => {
+//     return fetchMainContent('/online', 'gameBox');
+//   },
+//   '/login': () => {
+//     fetchMainContent("/login", 'mainContainer');
+//   },
+//   '/logout': () => {
+//     fetchMainContent("/logout", 'mainContainer');
+//     removeScript('token');
+//     removeScript('offline')
+//     removeScript('online')
+//     removeScript('tournament');
+//   },
+//   '/searchUsers': (url) => {
+//     fetchMainContent(url, 'searchUsers');
+//   }
+// }
+
+const injections = [
+  {
+    pattern: /^\/home$/,
+    handler: () => {
+      fetchMainContent('/home', 'mainContentArea')
+        .then(() => fetchMainContent('/topbar', 'topBar'))
+        .then(() => fetchMainContent('/cards', 'homeContentArea'))
+        .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
+        .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
         .then(() => updateStatus(1));
-      window.addEventListener('unload', updateStatusUnload);
+        window.addEventListener('unload', updateStatusUnload);
+    }
   },
-  '/cards': () => {
-    removeScript('online');
-    removeScript('offline');
-    removeScript('tournament');
-    fetchMainContent('/cards', 'homeContentArea')
+  {
+    pattern: /^\/cards$/,
+    handler: () => {
+      removeScript('online');
+      removeScript('offline');
+      removeScript('tournament');
+      fetchMainContent('/cards', 'homeContentArea')
       .then(() => updateStatus(1));
+    }
   },
-  '/offline': () => {
-    fetchMainContent('/offline', 'homeContentArea')
-      .then(() => injectScript('/static/js/offlinePong.js', 'homeContentArea', 'offline'))
+  {
+    pattern: /^\/offline$/,
+    handler: () => {
+      fetchMainContent('/offline', 'homeContentArea')
+        .then(() => injectScript('/static/js/offlinePong.js', 'homeContentArea', 'offline'))
       .then(() => updateStatus(2));
+    }
   },
-  '/online': () => {
-    fetchMainContent('/online', 'homeContentArea')
-      .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'))
+  {
+    pattern: /^\/online$/,
+    handler: () => {
+      fetchMainContent('/online', 'homeContentArea')
+        .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'))
       .then(() => updateStatus(2));
+    }
   },
-  '/tournament': () => {
-    fetchMainContent('/tournament', 'homeContentArea')
-      .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'))
+  {
+    pattern: /^\/tournament$/,
+    handler: () => {
+      fetchMainContent('/tournament', 'homeContentArea')
+        .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'))
       .then(() => updateStatus(2));
+    }
   },
-  '/tourGame': () => {
-    return fetchMainContent('/online', 'gameBox')
+  {
+    pattern: /^\/tourGame$/,
+    handler: () => {
+      return fetchMainContent('/online', 'gameBox')
       .then(() => updateStatus(2));
+    }
   },
-  '/login': () => {
-    fetchMainContent("/login", 'mainContainer')
+  {
+    pattern: /^\/login$/,
+    handler: () => {
+      fetchMainContent("/login", 'mainContainer')
+    }
   },
-  '/logout': () => {
-    fetchMainContent("/logout", 'mainContainer')
+  {
+    pattern: /^\/logout$/,
+    handler: () => {
+      fetchMainContent("/logout", 'mainContainer')
       .then(() => updateStatus(0));
-    removeScript('token');
-    removeScript('offline')
-    removeScript('online')
-    removeScript('tournament');
-    window.removeEventListener('unload', updateStatusUnload);
+      removeScript('token');
+      removeScript('offline');
+      removeScript('online');
+      removeScript('tournament');
+      window.removeEventListener('unload', updateStatusUnload);
+    },
     // window.removeEventListener('unload')
   },
-  '/profile': (uid) => {
-    fetchMainContent("/profile/" + uid.toString() + "/" , 'profileContent')
-      .then(() => updateStatus(1));
+  {
+    pattern: /^\/profile\/.*$/,
+    handler: (url) => {
+        fetchMainContent(url, 'profileContent')
+        .then(() => updateStatus(1));
+    }
   },
-}
+  {
+    pattern: /^\/edit_profile\/.*$/,
+    handler: (url) => {
+        editform();
+    }
+  },
+  {
+    pattern: /^\/searchUsers\/.*$/,
+    handler: (url) => {
+      if (url != "/searchUsers/")
+        fetchMainContent(url, 'searchUsers');
+    }
+  },
+  {
+    pattern: /^\/add\/.*$/,
+    handler: (url) => {
+      fetchMainContent(url);
+    }
+  },
+  {
+    pattern: /^\/accept\/.*$/,
+    handler: (url) => {
+      fetchMainContent(url);
+    }
+  },
+  {
+    pattern: /^\/reject\/.*$/,
+    handler: (url) => {
+      fetchMainContent(url);
+    }
+  }
+];
 
-function engine(pageUrl, param=null, addToHistory=true) {
-  let promise = injections[pageUrl](param);
+
+function engine(pageUrl, addToHistory=true) {
+  var promise;
+  for (let route of injections) {
+    if (route.pattern.test(pageUrl)) {
+      promise = route.handler(pageUrl);
+      break;
+    }
+  }
+  // let promise = injections[pageUrl](pageUrl);
   if (addToHistory) {
     if (pageUrl == '/home') {
       pageUrl = '/cards';
