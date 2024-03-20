@@ -86,7 +86,7 @@ def searchUsers(request, username):
         'X-TOKEN': request.session['access_token']
     }
 
-    base_url = USER_API_URL + 'api/search/'
+    base_url = USER_API_URL + 'api/search/' + username
     
     response = requests.get(base_url, headers=headers)
     
