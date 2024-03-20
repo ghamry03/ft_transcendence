@@ -14,7 +14,7 @@ class UsersListApiView(APIView):
     def get(self, request):
         """
             curl -X GET -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"         \
-                    {URL}/users/api/
+                    {URL}/api/users/
         """
         users = User.objects.all().order_by('uid')
         serializer = UserSerializer(users, many=True)
@@ -26,7 +26,7 @@ class UsersListApiView(APIView):
             curl -X POST -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
                     -F "uid={NEW_USER}" -F "username={NEW_USERNAME}"    \
                     -F "image=@{IMG_PATH}"                              \
-                    {URL}/users/api/
+                    {URL}/api/users/
         """
         serializer = UserSerializer(data=request.data)
 
@@ -47,7 +47,7 @@ class UserDetailApiView(APIView):
     def get(self, request, user_id):
         """
             curl -X GET -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"         \
-                    {URL}/users/api/{TARGET_USER}
+                    {URL}/api/user/{TARGET_USER}
         """
         try:
             user_query = self.getObjectById(user_id)
@@ -71,7 +71,7 @@ class UserDetailApiView(APIView):
             curl -X POST -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
                     -F "uid={NEW_USER}" -F "username={NEW_USERNAME}"    \
                     -F "image=@{IMG_PATH}"                              \
-                    {URL}/users/api/{TARGET_USER}
+                    {URL}/api/user/{TARGET_USER}
         """
         user_query = self.getObjectById(user_id)
         serializer = UserSerializer(
@@ -86,7 +86,7 @@ class UserDetailApiView(APIView):
     def delete(self, request, user_id):
         """
             curl -X DELETE -H "X-UID: {UID}" -H "X-TOKEN: {TOKEN}"        \
-                    {URL}/users/api/{TARGET_USER}
+                    {URL}/api/user/{TARGET_USER}
         """
         user_query = self.getObjectById(user_id)
         user_query.delete()

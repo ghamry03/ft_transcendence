@@ -98,7 +98,7 @@ def get_player_image(self, target_uid, owner_uid, token):
 			'X-TOKEN': token
 		}
 		logger.info(target_uid)
-		opponent_info = requests.get(f'http://userapp:8001/users/api/{target_uid}', headers=headers)
+		opponent_info = requests.get(f'http://userapp:8001/api/user/{target_uid}', headers=headers)
 		logger.info("Fetching image")
 		return opponent_info.json().get('image')
 

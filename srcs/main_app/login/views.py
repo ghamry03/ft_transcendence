@@ -53,7 +53,7 @@ def authenticate(request):
                 'X-TOKEN': access_token
             }
 
-            user_api_response = requests.get(USER_API_URL + 'users/api/' + UID, headers=headers)
+            user_api_response = requests.get(USER_API_URL + 'api/user/' + UID, headers=headers)
             request.session['userData'] = user_api_response.json()
             request.session['logged_in'] = True
             return redirect('/')

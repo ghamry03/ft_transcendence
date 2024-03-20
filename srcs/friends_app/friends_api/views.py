@@ -72,7 +72,7 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
             'X-UID': owneruid,
             'X-TOKEN': access_token
         }
-        base_url = f"{USER_API_URL}users/api/{uid}/"
+        base_url = f"{USER_API_URL}api/user/{uid}/"
         
         response = requests.get(base_url, headers=headers)
         if response.status_code != 200:
