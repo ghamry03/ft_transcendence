@@ -30,7 +30,7 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
         else:
             logger.debug(f"Serializer validation failed: {serializer.errors}")
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
     def put(self, request, *args, **kwargs):
         first_user = request.data.get('first_user', None)
         second_user = request.data.get('second_user', None)
@@ -46,7 +46,7 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
         obj.relationship = int(relationship)
         obj.save()
         return Response(status=status.HTTP_200_OK)
-    
+
     def delete(self, request, *args, **kwargs):
         first_user = request.data.get('first_user', None)
         second_user = request.data.get('second_user', None)
@@ -66,14 +66,14 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
                 return Response({"error": "Friend relationship not found."}, status=status.HTTP_404_NOT_FOUND)
             obj.delete()
         return Response(status=status.HTTP_200_OK)
-    
+
     def get_user_info(self, owneruid, access_token, uid):
         headers = {
             'X-UID': owneruid,
             'X-TOKEN': access_token
         }
         base_url = f"{USER_API_URL}api/user/{uid}/"
-        
+
         response = requests.get(base_url, headers=headers)
         if response.status_code != 200:
             return None
@@ -85,7 +85,7 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
         access_token = request.data.get('access_token', None)
         ownerUID = request.data.get('ownerUID', None)
         logger.debug(f'This is the request params: {uid} {ownerUID} ')
-        
+
         if not uid or not ownerUID:
             return Response(
                 {"error": "The 'uid' & 'ownerUID' query parameters are required."},
@@ -116,16 +116,21 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
             data = {"friendsList": friendsList, "friendRequests": friendRequests}
         else:
             '''
-            curl -X GET -H "Content-Type: application/json" -d '{
-                "uid": "123", "ownerUID":"123" ,  "access_token": "xxxxxxxxxxx"}' /api/friends/ 
+                curl -X GET -H "Content-Type: application/json" -d '{
+                    "uid": "123", "ownerUID":"123" ,  "access_token": "xxxxxxxxxxx"}' /api/friends/ 
             '''
             obj = Friend.objects.filter(
-            Q(first_id=uid, second_id=ownerUID) | 
-            Q(first_id=ownerUID, second_id=uid)
-        ).first()
-            if obj:
-                data = {'isFriend': True}
+                Q(first_id=uid, second_id=ownerUID) |
+                Q(first_id=ownerUID, second_id=uid)
+            ).first()
+            if not obj:
+                return Response(data = {}, status=status.HTTP_200_OK)
+            data = {
+                'relationship': obj.relationship,
+                'initiator': 0
+            }
+            if int(obj.first_id) == int(ownerUID):
+                data['initiator'] = 1
             else:
-                data = {'isFriend': False}
-            
+                data['initiator'] = 0
         return Response(data, status=status.HTTP_200_OK)

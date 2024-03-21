@@ -1,11 +1,13 @@
 from django.urls import path
 
-from .views import views
-from .views import login_views
-from .views import game_views
-from .views import home_views
-from .views import profile_views
-from .views import friends_views
+from .views import (
+        views,
+        login_views,
+        game_views,
+        home_views,
+        profile_views,
+        friends_views
+)
 
 urlpatterns = [
     # views
@@ -32,8 +34,8 @@ urlpatterns = [
 
     # FRIENDS
     path('add/<friendUID>/', friends_views.addUser, name='addUsers'),
-    path('accept/<friendUID>/', friends_views.acceptFriend, name='addUsers'),
-    path('reject/<friendUID>/', friends_views.rejectFriend, name='addUsers'),
+    path('accept/<friendUID>/', friends_views.acceptFriend, name='acceptUsers'),
+    path('reject/<friendUID>/', friends_views.rejectFriend, name='removeUsers'),
     path('searchUsers/<username>/', friends_views.searchUsers, name='searchUsers'),
 
     # GAME

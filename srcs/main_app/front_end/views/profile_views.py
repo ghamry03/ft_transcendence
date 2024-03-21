@@ -2,7 +2,7 @@ import json
 import requests
 from django.http import JsonResponse
 from django.shortcuts import render
-from main_app.constants import USER_API_URL
+from main_app.constants import USER_API_URL, FRIEND_API_URL
 
 def updateStatus(request, status):
     headers = {
@@ -25,13 +25,46 @@ def profile(request, uid):
     response = requests.get(USER_API_URL + 'api/user/' + str(uid), headers=headers)
     json = response.json()
 
-    profile_type = 0 # Current client profile
+    profile_type = -1 # Current client profile
     if uid != request.session['userData']['uid']:
-        # check if it's a friend or not
-        profile_type = 1 # a friend
-        profile_type = 2 # not a friend
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        data = {
+            'ownerUID': request.session['userData']['uid'],
+            'uid': uid,
+            'access_token': request.session['access_token']
+        }
+        friends_response = requests.get(FRIEND_API_URL + 'api/friends/', headers=headers, json=data)
+        print(friends_response)
+        print(friends_response.json())
+        if friends_response:
+            friendsJson = friends_response.json()
+            if not 'relationship' in friendsJson:
+                profile_type = 1
+                relationship = -1
+            else:
+                relationship = int(friendsJson['relationship'])
+
+            if relationship == 0:
+                profile_type = 2
+            elif relationship == 1:
+                initiator = int(friendsJson['initiator'])
+                if initiator == 1:
+                    profile_type = 3
+                elif initiator == 0:
+                    profile_type = 4
+        else:
+            profile_type = -1
+        # profile_type = 1 # add friend
+        # profile_type = 2 # remove friend
+        # profile_type = 3 # cancel request
+        # profile_type = 4 # accept request
+    else:
+        profile_type = 0
 
     context = {
+        'uid': uid,
         'image': json['image'],
         'username': json['username'],
         'full_name': f"{json['first_name']} {json['last_name']}",

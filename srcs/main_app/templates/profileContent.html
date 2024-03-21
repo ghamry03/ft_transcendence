@@ -34,9 +34,20 @@
                     Edit Profile
                 </button>
                 {% elif type == 1 %}
-                    <button class="btn" onclick="">Remove Friend</button>
+                    <button class="btn" onclick="engine('/add/{{uid}}/'); engine('/profile/{{uid}}')">Add Friend</button>
+                {% elif type == 2 %}
+                    <button class="btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Remove Friend Friend</button>
+                {% elif type == 3 %}
+                    <button class="btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Cancel Request</button>
+                {% elif type == 4 %}
+                    <div class="col-9">
+                        <button class="btn" onclick="engine('/accept/{{uid}}/'); engine('/profile/{{uid}}')">Accept Request</button>
+                    </div>
+                    <div class="col-3">
+                        <button class="btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Reject Request</button>
+                    </div>
                 {% else %}
-                    <button class="btn" onclick="">Add Friend</button>
+                    <button type="" class="btn">Unavilable</button>
                 {% endif %}
             </div>
 

@@ -1,7 +1,13 @@
 {% load static %}
 {% for user in friendsList %}
     {% if user.uid != uid and user.relationship != 0 and user.initiator == 0 %}
-        <div id="fr{{user.uid}}" class="row searchedUser">
+        <div
+            id="fr{{user.uid}}"
+            class="row searchedUser"
+            data-bs-toggle="collapse"
+            data-bs-target="#profilePop"
+            onclick="engine('/profile/{{user.uid}}');"
+        >
             <div class="col-3 ">
                 <object class="circleImg img42" data="{{user.image}}" type="image/png">
                     <img class="circleImg img42" src="{% static 'imgs/unknownuser.png' %}">
