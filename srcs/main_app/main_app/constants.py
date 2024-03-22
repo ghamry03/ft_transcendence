@@ -7,6 +7,7 @@ if DEBUG == True:
     USER_API_URL = 'http://userapp:8001/'
     FRIEND_API_URL = 'http://friendsapp:8002/'
     TOURNAMENT_HISOTRY_URL = 'http://tourapp:8004/'
+    MATCH_HISOTRY_URL = 'http://gameapp:8003/'
 else:
     AUTH_URL = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-35b29394fe8563a2ce4ba29874888befc12c95201bf0967654d73ed6aab8c106&redirect_uri=https%3A%2F%2Flocalhost%2Fauthenticate%2F&response_type=code'
     REDIRECT_URI = 'https://localhost/authenticate/'
@@ -14,3 +15,4 @@ else:
     USER_API_URL = 'http://userapp:8001/'
     FRIEND_API_URL = 'http://friendsapp:8002/'
     TOURNAMENT_HISOTRY_URL = 'http://tourapp:8004/'
+    MATCH_HISOTRY_URL = 'http://gameapp:8003/'
