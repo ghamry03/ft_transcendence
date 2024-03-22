@@ -82,6 +82,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 self.queue.pop(self.queue.index(self.player_id))
             # If player is in an active game
             elif self.player_id in self.players:
+                self.logger.info("Player %d disconnected during a match", self.player_id)
                 groupOwner = self.players[self.player_id]["groupOwner"]
                 opponentId = self.players[self.player_id]["opponentId"]
                 if opponentId == None:
@@ -92,7 +93,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 else:
                     # if this player is in a match with another player, we want to let the them know that this player disconnected
                     score1 = self.players[self.player_id]["score"]
-                    score2 = self.players[opponentId]["score"]
+                    # score2 = self.players[opponentId]["score"]
                     gid = self.players[self.player_id]['gid']
 
                     del self.players[self.player_id]
@@ -104,7 +105,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                         {"type": "disconnected"}
                     )
                     del self.players[opponentId]
-                    await game_db.endGame(gid, self.player_id, opponentId, score1, score2)
+                    await game_db.endGame(gid, self.player_id, opponentId, score1, self.WIN_SCORE)
 
 	# Called when the server receives a message from the WebSocket
     async def receive(self, text_data):

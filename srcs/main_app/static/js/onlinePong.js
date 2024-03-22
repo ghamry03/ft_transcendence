@@ -45,6 +45,7 @@ onlineGame = () => {
 	var wPressed = false;
 	var sPressed = false;
 	var gameRunning = false;
+
 	var leftPlayerId;
 	var rightPlayerId;
 	
@@ -77,7 +78,7 @@ onlineGame = () => {
 	}
 	
 	// Countdown animation that plays before a match starts
-	function countdown(parent, callback) {
+	function countdown(parent) {
 		var texts = ['Match found!', '3', '2', '1', 'GO'];
 		
 		// This will store the paragraph we are currently displaying
@@ -91,7 +92,8 @@ onlineGame = () => {
 			if (texts.length === 0) {
 				// If we ran out of text, use the callback to get started
 				clearInterval(interval);
-				callback();
+				gameRunning = true;
+				// callback();
 				return;
 			}
 			// Trim array
@@ -137,8 +139,6 @@ onlineGame = () => {
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
 			reset(ballSpeed);
-			// gameRunning = true;
-			// scoreChanged = true;
 			draw();
 			requestAnimationFrame(endMatch);
 		}
@@ -152,8 +152,10 @@ onlineGame = () => {
 			leftPlayerId = messageData.left;
 			rightPlayerId = messageData.right;
 			console.log("Match found, left = ", leftPlayerId, " right = ", rightPlayerId);
-			gameRunning = true;
-			countdown(document.getElementById("readyGo"), animateGame);
+			gameRunning = false;
+			animateGame();
+			countdown(document.getElementById("readyGo"));
+			// gameRunning = true;
 			var leftImage = document.getElementById("leftImage");
 			var rightImage = document.getElementById("rightImage");
 			getImage(playerId, leftPlayerId)
