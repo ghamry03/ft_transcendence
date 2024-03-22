@@ -93,7 +93,6 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 else:
                     # if this player is in a match with another player, we want to let the them know that this player disconnected
                     score1 = self.players[self.player_id]["score"]
-                    # score2 = self.players[opponentId]["score"]
                     gid = self.players[self.player_id]['gid']
 
                     del self.players[self.player_id]

@@ -45,7 +45,6 @@ onlineGame = () => {
 	var wPressed = false;
 	var sPressed = false;
 	var gameRunning = false;
-
 	var leftPlayerId;
 	var rightPlayerId;
 	
@@ -93,7 +92,6 @@ onlineGame = () => {
 				// If we ran out of text, use the callback to get started
 				clearInterval(interval);
 				gameRunning = true;
-				// callback();
 				return;
 			}
 			// Trim array
@@ -155,7 +153,6 @@ onlineGame = () => {
 			gameRunning = false;
 			animateGame();
 			countdown(document.getElementById("readyGo"));
-			// gameRunning = true;
 			var leftImage = document.getElementById("leftImage");
 			var rightImage = document.getElementById("rightImage");
 			getImage(playerId, leftPlayerId)
