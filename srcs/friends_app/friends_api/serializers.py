@@ -34,7 +34,7 @@ class FriendSerializer(serializers.ModelSerializer):
             'X-TOKEN': self.context.get('access_token', None)
         }
 
-        base_url = f"{USER_API_URL}users/api/{user_id}/"
+        base_url = f"{USER_API_URL}api/user/{user_id}/"
         
         response = requests.get(base_url, headers=headers)
         if response.status_code != 200:

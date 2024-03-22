@@ -69,7 +69,7 @@ def getOpponentInfo(request):
         'X-UID': ownerUid,
         'X-TOKEN': token
     }
-    response = requests.get(USER_API_URL + '/users/api/' + targetUid, headers=headers)
+    response = requests.get(USER_API_URL + 'api/user/' + targetUid, headers=headers)
     opponentInfo = response.json()
     opponentInfo['image'] = opponentInfo['image']
     return JsonResponse(opponentInfo)
@@ -86,7 +86,7 @@ def searchUsers(request, username):
         'X-TOKEN': request.session['access_token']
     }
 
-    base_url = USER_API_URL + '/users/api/'
+    base_url = USER_API_URL + 'api/search/' + username
     
     response = requests.get(base_url, headers=headers)
     
@@ -163,20 +163,21 @@ class SessionDataView(View):
         session_id = request.GET.get('sessionID')
         if not session_id:
             return HttpResponseBadRequest('The sessionID parameter is required.')
-        
+
         try:
             session = Session.objects.get(session_key=session_id)
             session_data = session.get_decoded()
         except Session.DoesNotExist:
             return HttpResponseNotFound('Session data not found.')
-        
+
         return JsonResponse({'sessionData': session_data})
+
 def profile(request, uid):
     headers = {
         'X-UID': str(request.session['userData']['uid']),
         'X-TOKEN': request.session['access_token']
     }
-    response = requests.get(USER_API_URL + '/users/api/' + str(uid), headers=headers)
+    response = requests.get(USER_API_URL + 'api/user/' + str(uid), headers=headers)
     json = response.json()
 
     profile_type = 0 # Current client profile
@@ -198,12 +199,12 @@ def profile(request, uid):
 
 def updateStatus(request, status):
     headers = {
-            'X-UID': str(request.session['userData']['uid']),
-            'X-TOKEN': request.session['access_token']
-            }
+        'X-UID': str(request.session['userData']['uid']),
+        'X-TOKEN': request.session['access_token']
+    }
     data = { 'status': status }
     response = requests.post(
-            USER_API_URL + '/users/api/' + str(request.session['userData']['uid']) + '/',
+            USER_API_URL + 'api/user/' + str(request.session['userData']['uid']) + '/',
             headers=headers,
             data=data
             )
@@ -229,7 +230,7 @@ def edit_profile(request):
 
         try:
             api_response = requests.post(
-                    USER_API_URL + '/users/api/' + str(request.session['userData']['uid']) + '/',
+                    USER_API_URL + 'api/user/' + str(request.session['userData']['uid']) + '/',
                 headers=headers,
                 data=data,
                 files=files,

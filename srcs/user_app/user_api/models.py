@@ -54,7 +54,7 @@ class User(models.Model):
         return super(User, self).delete(*args, **kwargs)
 
 #42 User
-class ft_user(User):
+class FtUser(User):
     class Meta:
         proxy = True
 
@@ -62,41 +62,58 @@ class ft_user(User):
         access_token = kwargs.pop('access_token', None)
         super().__init__(*args, **kwargs)
         if not self.uid and access_token:
-            self.retrieve_from_42(access_token)
+            self._initialize_from_42(access_token)
 
-    def retrieve_from_42(self, access_token):
-        url = 'https://api.intra.42.fr/v2/me'
-        headers = { 'Authorization': 'Bearer ' + access_token }
-        response = requests.get(url, headers=headers)
+    def _make_api_request(self, endpoint, access_token):
+        headers = {'Authorization': f'Bearer {access_token}'}
+        response = requests.get(f'https://api.intra.42.fr/v2/{endpoint}', headers=headers)
         if response.status_code != 200:
-            raise exceptions.AuthenticationFailed('Failed to connect to intra')
-        json_data = response.json()
+            raise exceptions.AuthenticationFailed('Failed to retrieve data from 42API')
+        return response.json()
 
-        self.uid = int(json_data['id'])
-        self.username = json_data['login']
-        self.first_name = json_data['first_name']
-        self.last_name = json_data['last_name']
-        self.campus_name = json_data['campus'][0]['name']
-        self.intra_url = f'https://profile.intra.42.fr/users/{json_data["login"]}'
+    def _update_existing_user_username(self, existing_user, access_token):
+        updated_user_info = self._make_api_request(f'users/{existing_user.uid}', access_token)
+        existing_user.username = updated_user_info['login']
+        existing_user.save()
 
-        image_url = json_data['image']['link']
-        image_response = requests.get(image_url)
-        content = ""
-        if image_response.status_code != 200:
-            imgFile = open(settings.MEDIA_ROOT + 'johndoe.png', 'rb')
-            content = imgFile.read()
-            imgFile.close()
-        else:
-            content = image_response.content
-        img_temp = NamedTemporaryFile(delete=True)
-        img_temp.write(content)
-        img_temp.flush()
+    def _initialize_from_42(self, access_token):
+        user_data = self._make_api_request('me', access_token)
 
-        self.image.save(
-            urlparse(image_url).path.split('/')[-1],
-            File(img_temp),
-            save=True
-        )
+        existing_user = User.objects.filter(username=user_data['login']).first()
+        if existing_user:
+            self._update_existing_user_username(existing_user, access_token)
+
+        self.uid = user_data.get('id')
+        self.username = user_data.get('login')
+        self.first_name = user_data.get('first_name')
+        self.last_name = user_data.get('last_name')
+        self.campus_name = user_data['campus'][0].get('name') if user_data.get('campus') else None
+        self.intra_url = f'https://profile.intra.42.fr/users/{self.username}'
+
+        self._save_profile_image(user_data.get('image', {}).get('link'), access_token)
+
+        self.save()
+
+    def _save_profile_image(self, image_url, access_token):
+            if not image_url:
+                image_path = settings.MEDIA_ROOT + 'johndoe.png'
+                with open(image_path, 'rb') as default_image_file:
+                    image_content = default_image_file.read()
+            else:
+                response = requests.get(image_url, headers={'Authorization': f'Bearer {access_token}'})
+                image_content = response.content if response.status_code == 200 else None
+
+                if not image_content:
+                    image_path = settings.MEDIA_ROOT + 'johndoe.png'
+                    with open(image_path, 'rb') as default_image_file:
+                        image_content = default_image_file.read()
+
+            with NamedTemporaryFile(delete=True) as temp_image_file:
+                temp_image_file.write(image_content)
+                temp_image_file.flush()
+                filename = urlparse(image_url).path.split('/')[-1] if image_url else 'johndoe.png'
+                self.image.save(filename, File(temp_image_file), save=True)
+
 
 class OnlineTournament(models.Model):
     starttime = models.DateTimeField()
