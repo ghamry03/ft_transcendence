@@ -40,7 +40,6 @@ tournament = () => {
 
 	const playerId = getCookie("uid");
 	const lock = new AsyncLock();
-	const bracket = document.getElementById("queue");
 	const gameContainer = document.getElementById("gameBox");
 	const checkBox = document.querySelector('.form-check-input');
 	const checkForm = document.getElementById("readyButton");
@@ -90,11 +89,9 @@ tournament = () => {
 	async function toggleBracket() {
 		await lock.acquire()
 		try {
-			round1Container = document.getElementById("round1Container");
-			round2Container = document.getElementById("round2Container");
-			round3Container = document.getElementById("round3Container");
 			statusBox = document.getElementById("statusBox");
-			if (round1Container.style.display === "none") {
+			bracketContainer = document.getElementById("bracketContainer");
+			if (bracketContainer.style.display === "none") {
 				if (animationId != 0) {
 					cancelAnimationFrame(animationId);
 					animationId = 0;
@@ -102,15 +99,11 @@ tournament = () => {
 				while (gameContainer.firstChild) {
 					gameContainer.firstChild.remove()
 				}
-				round1Container.style.display = "flex";
-				round2Container.style.display = "flex";
-				round3Container.style.display = "flex";
-				statusBox.style.display = "block";
+				bracketContainer.style.display = "";
+				statusBox.style.display = "";
 			}
 			else {
-				round1Container.style.display = "none";
-				round2Container.style.display = "none";
-				round3Container.style.display = "none";
+				bracketContainer.style.display = "none";
 				statusBox.style.display = "none";
 				await engine('/tourGame');
 				console.log("fetched tour game template");
@@ -153,7 +146,7 @@ tournament = () => {
 		try {
 			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
 			const jsonResponse = await response.json();
-			return jsonResponse.first_name;
+			return jsonResponse.username;
 		} catch (error) {
 			console.error("Error fetching image:", error);
 		}
@@ -165,9 +158,16 @@ tournament = () => {
 	// Adds the image of user to a given image placeholder
 	async function addImage(playerId, imgId) {
 		const imgUrl = await getImage(playerId);
-		var playerImg = document.getElementById(imgId);
-		playerImg.src = imgUrl;
-		playerImg.setAttribute("data-uid", playerId);
+		const username = await getUserName(playerId);
+		var playerImg = document.getElementById("player" + imgId);
+		var nameElement = document.getElementById("name" + imgId);
+		if (playerImg) {
+			playerImg.src = imgUrl;
+			playerImg.setAttribute("data-uid", playerId);
+		}
+		if (nameElement) {
+			nameElement.innerText = username;
+		}
 	}
 
 	// Adds player images to the bracket one by one, 
@@ -176,13 +176,20 @@ tournament = () => {
 		await lock.acquire()
 		try {
 			var i = 0;
-			var playerImages = bracket.children;
 			for (const playerId of playerList) {
 				if (playerId == 0)
 					break;
-				const imgUrl = await getImage(playerId);
-				playerImages[i].firstElementChild.setAttribute("src", imgUrl);
-				playerImages[i].firstElementChild.setAttribute("data-uid", playerId);
+				var imgElement = document.getElementById("player" + i);
+				if (imgElement) {
+					const imgUrl = await getImage(playerId);
+					imgElement.setAttribute("src", imgUrl);
+					imgElement.setAttribute("data-uid", playerId);
+				}
+				var nameElement = document.getElementById("name" + i);
+				if (nameElement) {
+					const userName = await getUserName(playerId);
+					nameElement.innerText = userName;
+				}
 				i++;
 			}
 		} finally {
@@ -218,9 +225,9 @@ tournament = () => {
 		const imgUrl = await getImage(uid);
 		checkBox.checked = false;
 		checkForm.style.display = "none";
-		updateTourStatus("Winner of tournament: " + userName);
+		updateTourStatus("Winner of the tournament - " + userName);
 		var divElement = document.createElement("div");
-		divElement.className = "img-cir round";
+		divElement.className = "img-cir round mx-auto";
 
 		var imgElement = document.createElement("img");
 		imgElement.src = imgUrl;
@@ -331,13 +338,15 @@ tournament = () => {
 	}
 
 	// Handler for checkbox if a user is ready to start their assigned match
-	checkBox.addEventListener('change', function() {
-		if (checkBox.checked) {
-			checkForm.style.display = "none";
-			updateTourStatus("Waiting for opponent...");
-			sendReadyEvent();
-		}
-	});
+	if (checkBox) {
+		checkBox.addEventListener('change', function() {
+			if (checkBox.checked) {
+				checkForm.style.display = "none";
+				updateTourStatus("Waiting for opponent...");
+				sendReadyEvent();
+			}
+		});
+	}
 
 	// Update the tour status when the next round is ready and let the user confirm 
 	function startNextRound() {
@@ -702,8 +711,8 @@ tournament = () => {
 		// prod version
 
 		var wsScheme = location.protocol === "https:" ? "wss://" : "ws://";
-		ws = new WebSocket(wsScheme + "localhost:8003/ws/game/?uid=" + playerId);
-
+		ws = new WebSocket(wsScheme + "localhost:8004/ws/tour/?uid=" + playerId);
+		console.log(wsScheme, " connected: ", ws);
 		ws.onmessage = handleWebSocketMessage;
 	};
 	joinQueue();
