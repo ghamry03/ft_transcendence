@@ -4,6 +4,12 @@
          url('../fonts/ps2p.ttf') format("truetype");
 }
 
+@font-face {
+   font-family: 'bpdots';
+   src: local('Bpdots'),
+     url('../fonts/BPdotsSquares-Bold.ttf') format("truetype");
+ }
+ 
 .outer-container {
 	display: flex;
 	justify-content: center;
@@ -12,7 +18,7 @@
 }
 
 .status-container {
-    display: block;
+   display: block;
 	justify-content: center;
 	align-items: center;
 	height: 25%;
@@ -22,7 +28,6 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-
 }
 
 .quarterFinal table:first-child::before{
@@ -197,9 +202,14 @@ tbody{
  }
 
  #tournamentStatus {
-    font-family: 'ps2p';
-    font-size: medium;
-    color: var(--login-text);
+   font-family: 'bpdots';
+   font-size: 20px;
+   color: var(--text-bright);
+   font-style: normal;
+   font-weight: 700;
+   line-height: normal;
+   -webkit-text-stroke-width: 1;
+   -webkit-text-stroke-color: var(--Chat-Chat-text, #000);
  }
 
  td{

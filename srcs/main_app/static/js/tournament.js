@@ -40,7 +40,6 @@ tournament = () => {
 
 	const playerId = getCookie("uid");
 	const lock = new AsyncLock();
-	const bracket = document.getElementById("queue");
 	const gameContainer = document.getElementById("gameBox");
 	const checkBox = document.querySelector('.form-check-input');
 	const checkForm = document.getElementById("readyButton");
@@ -90,11 +89,11 @@ tournament = () => {
 	async function toggleBracket() {
 		await lock.acquire()
 		try {
-			round1Container = document.getElementById("round1Container");
-			round2Container = document.getElementById("round2Container");
-			round3Container = document.getElementById("round3Container");
 			statusBox = document.getElementById("statusBox");
-			if (round1Container.style.display === "none") {
+			bracketContainer = document.getElementById("bracketContainer");
+			console.log("bracketcontainer display = ", bracketContainer.style.display);
+			console.log("status box display = ", statusBox.style.display);
+			if (bracketContainer.style.display === "none") {
 				if (animationId != 0) {
 					cancelAnimationFrame(animationId);
 					animationId = 0;
@@ -102,15 +101,11 @@ tournament = () => {
 				while (gameContainer.firstChild) {
 					gameContainer.firstChild.remove()
 				}
-				round1Container.style.display = "flex";
-				round2Container.style.display = "flex";
-				round3Container.style.display = "flex";
-				statusBox.style.display = "block";
+				bracketContainer.style.display = "";
+				statusBox.style.display = "";
 			}
 			else {
-				round1Container.style.display = "none";
-				round2Container.style.display = "none";
-				round3Container.style.display = "none";
+				bracketContainer.style.display = "none";
 				statusBox.style.display = "none";
 				await engine('/tourGame');
 				console.log("fetched tour game template");

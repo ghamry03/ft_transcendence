@@ -67,8 +67,6 @@
 			<img src="{% static 'imgs/unknownuser.png' %}" alt="Winner" id="winnerImg">
 		</div> 
 	</div>
-	<!-- <p style="color: white;" id="matchStatus"">status</p> 
-	{% comment %} <button onclick="toggleBracket()">Click Me</button> {% endcomment %}
 	<div id="gameBox"></div>
 	
 </div> -->
@@ -150,7 +148,14 @@
 	
 </div> -->
 
-<div class="row" id="">
+<div class="row" id="statusBox">
+	<p id="tournamentStatus">Waiting for players...</p>
+	<div class="form-check" id="readyButton" style="display: none;">
+		<input class="form-check-input" type="checkbox" value="">
+		<label class="form-check-label" for="readyToStart" style="color: white;">Ready</label>
+	</div>
+</div>
+<div class="row" id="bracketContainer">
 	<div class="col-8">
 		<div class="row">
 			<div class="col quarterFinal">
@@ -252,3 +257,4 @@
 		</table>
 	</div>
 </div>
+<div id="gameBox"></div>
