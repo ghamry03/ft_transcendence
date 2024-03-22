@@ -24,10 +24,6 @@ def homePage(request):
             },
     ).json()
 
-    tournamentHistory = requests.get(
-        TOURNAMENT_HISOTRY_URL + "api/tourhistory/" + f'{uid}'
-    ).json()
-
     context = {"userData": request.session["userData"], "friendsList": friendsList['friendsList'], "friendRequests": friendsList['friendRequests']}
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
