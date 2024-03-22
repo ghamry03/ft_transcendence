@@ -1,6 +1,7 @@
 from django.http import Http404, JsonResponse, HttpResponse
 from django.utils.timezone import now
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from django.db import models
 
 import requests
@@ -65,21 +66,27 @@ def calculate_time_passed(self, game_endtime):
 				return "1 second"
 			return f"{time_difference.seconds} seconds"
 
-def get_player_image(self, target_uid, owner_uid, token):
+def get_player_info(self, target_uid, owner_uid, token):
 		headers = {
 			'X-UID': str(owner_uid),
 			'X-TOKEN': token
 		}
 		opponent_info = requests.get(f'http://userapp:8001/api/user/{target_uid}', headers=headers)
 		logger.info("Fetching opponent image")
-		return opponent_info.json().get('image')
+		return opponent_info.json()
 
 class   MatchHistoryApiView(APIView):
 	def get(self, request, user_id):
+		try:
+			user = get_object_or_404(UserApiUser, pk=user_id)
+		except Http404:
+			return JsonResponse({"error": "arch/x86/entry/syscalls/syscall_32.tbl, needed by arch/x86/include/generated/uapi/asm/unistd_32.h, needed by zoulinette/4242/trololol/x86/asm/bin-noob"}, status=status.HTTP_404_NOT_FOUND)
+
+
 		# Retrieve all matches for the user
-		user_matches = PlayerMatch.objects.filter(player = user_id)
-		if not user_matches: # TODO: Return empty response
-			return Response({"message": "No matches found for the given user."}, status=status.HTTP_404_NOT_FOUND)
+		user_matches = PlayerMatch.objects.filter(player=user_id)
+		if not user_matches:
+			return Response({"error": "arch/x86/entry/syscalls/syscall_32.tbl, needed by arch/x86/include/generated/uapi/asm/unistd_32.h, needed by zoulinette/4242/trololol/x86/asm/bin-noob"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 		games_details = []
 		for match in user_matches:
@@ -95,23 +102,25 @@ class   MatchHistoryApiView(APIView):
 			all_player_matches = PlayerMatch.objects.filter(game=game)
 
 			# Extracting user's score and opponents' details
-			opponents_details = []
+			opponent_details = {}
 			for player_match in all_player_matches:
 				if player_match.player.uid != user_id:
-					opponent_image_url = get_player_image(self, 
+					opponent_info = get_player_info(self, 
 					player_match.player.uid, user_id, token)
-					opponents_details.append({
-						"opponent_id": player_match.player.uid,
-						"opponent_score": player_match.score,
-						"opponent_image_url": opponent_image_url
-					})
+					opponent_details = {
+						"uid": player_match.player.uid,
+						"username": opponent_info.get('username'),
+						"score": player_match.score,
+						"intra_url": opponent_info.get('intra_url'),
+						"image": opponent_info.get('image')
+					}
 				else:
 					my_score = player_match.score
 
 			game_data = {
 				"game_id": game.id,
 				"my_score": my_score,
-				"opponents": opponents_details,
+				"opponent": opponent_details,
 				"timePassed": time_passed
 			}
 			games_details.append(game_data)
