@@ -35,7 +35,7 @@
                         {% include 'matchHistoryEntry.html' with img=userData.image myScore=match.my_score theirScore=match.opponents.0.opponent_score theirImg=match.opponents.0.opponent_score.opponent_image_url theirUsername=userData.username time=match.timePassed %}
                     {% endfor %}
                 {% else %}
-                    <p>Participate in matches to check your history {{matchHistory}} sada</p>
+                    <p>Participate in matches to check your history</p>
                     {% include "gameButton.html" with onclick="engine('/online')" content="Join online game" %}
                 {% endif %}
             </div>

@@ -70,7 +70,7 @@ def get_player_image(self, target_uid, owner_uid, token):
 			'X-UID': str(owner_uid),
 			'X-TOKEN': token
 		}
-		opponent_info = requests.get(f'http://userapp:8001/users/api/{target_uid}', headers=headers)
+		opponent_info = requests.get(f'http://userapp:8001/api/user/{target_uid}', headers=headers)
 		logger.info("Fetching opponent image")
 		return opponent_info.json().get('image')
 
@@ -78,8 +78,9 @@ class   MatchHistoryApiView(APIView):
 	def get(self, request, user_id):
 		# Retrieve all matches for the user
 		user_matches = PlayerMatch.objects.filter(player = user_id)
-		if not user_matches: # TODO: Return empty response
-			return Response({"message": "No matches found for the given user."}, status=status.HTTP_404_NOT_FOUND)
+		#TODO: add check fi user exists or not, if not return error status
+		# if not user_matches: # TODO: Return empty response
+		# 	return Response({"message": "No matches found for the given user."}, status=status.HTTP_404_NOT_FOUND)
 
 		games_details = []
 		for match in user_matches:
@@ -126,13 +127,13 @@ class CreateGameApiView(APIView):
 			starttime=timezone.now(),
 			tournament=tour
 		)
-		player1 = UserApiUser.objects.get(uid=pid1, on_delete=models.CASCADE)
+		player1 = UserApiUser.objects.get(uid=pid1)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player1,
 			score=0
 		)
-		player2 = UserApiUser.objects.get(uid=pid2, on_delete=models.CASCADE)
+		player2 = UserApiUser.objects.get(uid=pid2)
 		PlayerMatch.objects.create(
 			game=game,
 			player=player2,

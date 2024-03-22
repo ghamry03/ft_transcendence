@@ -1,189 +1,38 @@
 {% load static %}
 {% load bootstrap5 %} {% bootstrap_css %} {% bootstrap_javascript %}
 
-<!-- <div class="row">
-	<div class="outer-container" id="round1Container">
-		<div class="image-container" id="queue">
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player0">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 1" id="player1">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 2" id="player2">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 3" id="player3">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 4" id="player4">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 5" id="player5">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 6" id="player6">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 7" id="player7">
-			</div>
-			{% comment %} <img src="https://i.imgur.com/BPukfZQ.png" alt="Image 2" id="player2"> {% endcomment %}
-		</div>
+<div class="row" id="statusBox">
+	<p class="mx-auto" id="tournamentStatus">Waiting for players...</p>
+	<div class="mx-auto form-check" id="readyButton" style="display: none;">
+		<input class="mx-auto form-check-input" type="checkbox" value="">
+		<label class="mx-auto form-check-label" for="readyToStart" style="color: white;">Ready</label>
 	</div>
-	<div class="outer-container" id="round2Container">
-		<div class="image-container" id="queue">
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 8" id="player8">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 9" id="player9">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 10" id="player10">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 11" id="player11">
-			</div>
-		</div>
-	</div>
-	<div class="outer-container" id="round3Container">
-		<div class="image-container" id="queue">
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 12" id="player12">
-			</div>
-			<div class="img-cir round">
-				<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 13" id="player13">
-			</div>
-		</div>
-	</div>
-	<div class="status-container" id="statusBox">
-		<p id="tournamentStatus">Waiting for players...</p>
-		<div class="form-check" id="readyButton" style="display: none;">
-			<input class="form-check-input" type="checkbox" value="">
-			<label class="form-check-label" for="readyToStart" style="color: white;">Ready</label>
-		</div>
-		<!-- <div class="img-cir round">
-			<img src="{% static 'imgs/unknownuser.png' %}" alt="Winner" id="winnerImg">
-		</div> 
-	</div>
-	<!-- <p style="color: white;" id="matchStatus"">status</p> 
-	{% comment %} <button onclick="toggleBracket()">Click Me</button> {% endcomment %}
-	<div id="gameBox"></div>
-	
-</div> -->
-
-<!-- <div class="row w-100">
-
-	<div class="col-12">
-		<div class="row rowOne g-0">
-			<div class="col-2 d-block ">
-				<div class="row playerPill g-0">
-					<div class="col-3">
-						<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player1">
-					</div>
-					<div class="col-8 d-flex flex-wrap align-content-center">
-						<p class="playerName">no player</p>
-					</div>
-				</div>
-				<div class="row playerPill g-0 d-flex flex-wrap">
-					<div class="col-3">
-						<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player1">
-					</div>
-					<div class="col-8 d-flex flex-wrap align-content-center">
-						<p class="playerName">no player</p>
-					</div>
-				</div>
-				
-			</div>
-		
-		
-			<div class="col-4 d-inline-flex  align-content-center flex-wrap ">
-				<div class="row playerPill g-0">
-					<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player0">
-				</div>
-			</div>
-			<div class="col-4 d-block">
-				3
-			</div>
-			
-		</div>
-
-		<div class="rowTwo">
-			<div class="row g-0">
-				<div class="col-2 d-block ">
-					<div class="row playerPill g-0">
-						<div class="col-3">
-							<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player1">
-						</div>
-						<div class="col-8 d-flex flex-wrap align-content-center">
-							<p class="playerName">no player</p>
-						</div>
-					</div>
-					<div class="row playerPill g-0 d-flex flex-wrap">
-						<div class="col-3">
-							<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player1">
-						</div>
-						<div class="col-8 d-flex flex-wrap align-content-center">
-							<p class="playerName">no player</p>
-						</div>
-					</div>
-					
-				</div>
-			
-			
-				<div class="col-4 d-inline-flex  align-content-center flex-wrap ">
-					<div class="row playerPill g-0">
-						<img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player0">
-					</div>
-				</div>
-				<div class="col-4 d-block">
-					3
-				</div>
-				
-			</div>
-		</div>
-
-		
-
-	</div>
-	
-</div> -->
-
-<div class="row">
-	<div class="status-container" id="statusBox">
-		<p id="tournamentStatus">Waiting for players...</p>
-		<div class="form-check" id="readyButton" style="display: none;">
-			<input class="form-check-input" type="checkbox" value="">
-			<label class="form-check-label" for="readyToStart" style="color: white;">Ready</label>
-		</div>
 </div>
-
-<div class="row">
+<div class="row" id="bracketContainer">
 	<div class="col-8">
 		<div class="row">
 			<div class="col quarterFinal">
 				<table class="w-75">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player0"></td>
-						<td colspan="12"><p class="playerName">no player</p></td>
+						<td colspan="12"><p class="playerName" id="name0">no player</p></td>
 					</tr>
 
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player1"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name1">no player</p></td>
 					</tr>
 				</table>
 
 				<table class="w-75">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player2"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name2">no player</p></td>
 					</tr>
 
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player3"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name3">no player</p></td>
 					</tr>
 				</table>
 			</div>
@@ -191,12 +40,12 @@
 				<table class="w-75 matchOne">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player8"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name8">no player</p></td>
 					</tr>
 
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player9"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name9">no player</p></td>
 					</tr>
 				</table>
 			</div>
@@ -208,24 +57,24 @@
 				<table class="w-75">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player4"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name4">no player</p></td>
 					</tr>
 					
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player5"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name5">no player</p></td>
 					</tr>
 				</table>
 				
 				<table class="w-75">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player6"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name6">no player</p></td>
 					</tr>
 					
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player7"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name7">no player</p></td>
 					</tr>
 				</table>
 			</div>
@@ -233,12 +82,12 @@
 				<table class="w-75 matchTwo">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player10"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name10">no player</p></td>
 					</tr>
 					
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player11"></td>
-						<td><p class="playerName">no player</p></td>
+						<td><p class="playerName" id="name11">no player</p></td>
 					</tr>
 				</table>
 			</div>
@@ -251,13 +100,14 @@
 		<table class="w-75">
 			<tr class="playerPill">
 				<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player12"></td>
-				<td><p class="playerName">no player</p></td>
+				<td><p class="playerName" id="name12">no player</p></td>
 			</tr>
 			
 			<tr class="playerPill">
 				<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player13"></td>
-				<td><p class="playerName">no player</p></td>
+				<td><p class="playerName" id="name13">no player</p></td>
 			</tr>
 		</table>
 	</div>
 </div>
+<div id="gameBox"></div>

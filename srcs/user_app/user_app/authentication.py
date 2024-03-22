@@ -1,17 +1,29 @@
 from rest_framework import authentication
 from rest_framework import exceptions
 import requests
+from user_api.models import User
 
 
 class api_auth(authentication.BaseAuthentication):
     def authenticate(self, request):
         uid = request.META.get('HTTP_X_UID')
-        token = request.META.get('HTTP_X_TOKEN')
-        # TODO: check if auth type exists ( intra, .. )
-        # auth_type = request.META.get('HTTP_X_TYPE')
-        if not uid or not token:
-            raise exceptions.ParseError('Missing authentication headers')
-        self.validate_uid(uid, token)
+        if not uid:
+            raise exceptions.ParseError('Missing authentication header')
+
+        if request.method == 'GET' and self.UserExist(int(uid)):
+            pass
+        else:
+            token = request.META.get('HTTP_X_TOKEN')
+            if not token:
+                raise exceptions.ParseError('Missing authentication headers')
+            self.validate_uid(uid, token)
+
+    def UserExist(self, requested_uid):
+        try:
+            User.objects.get(uid=requested_uid)
+        except User.DoesNotExist:
+            return False
+        return True
 
     def validate_uid(self, uid, token):
         headers = {
