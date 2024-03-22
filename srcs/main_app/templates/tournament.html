@@ -147,13 +147,15 @@
 	</div>
 	
 </div> -->
-
 <div class="row" id="statusBox">
-	<p id="tournamentStatus">Waiting for players...</p>
-	<div class="form-check" id="readyButton" style="display: none;">
-		<input class="form-check-input" type="checkbox" value="">
-		<label class="form-check-label" for="readyToStart" style="color: white;">Ready</label>
+	<p class="mx-auto" id="tournamentStatus">Waiting for players...</p>
+	<div class="mx-auto form-check" id="readyButton" style="display: none;">
+		<input class="mx-auto form-check-input" type="checkbox" value="">
+		<label class="mx-auto form-check-label" for="readyToStart" style="color: white;">Ready</label>
 	</div>
+	{% comment %} <div class="img-cir round col-md-8 mx-auto">
+		<img src="{% static 'imgs/unknownuser.png' %}" alt="Winner" id="winnerImg">
+	</div> {% endcomment %}
 </div>
 <div class="row" id="bracketContainer">
 	<div class="col-8">

@@ -91,8 +91,6 @@ tournament = () => {
 		try {
 			statusBox = document.getElementById("statusBox");
 			bracketContainer = document.getElementById("bracketContainer");
-			console.log("bracketcontainer display = ", bracketContainer.style.display);
-			console.log("status box display = ", statusBox.style.display);
 			if (bracketContainer.style.display === "none") {
 				if (animationId != 0) {
 					cancelAnimationFrame(animationId);
@@ -227,9 +225,9 @@ tournament = () => {
 		const imgUrl = await getImage(uid);
 		checkBox.checked = false;
 		checkForm.style.display = "none";
-		updateTourStatus("Winner of tournament: " + userName);
+		updateTourStatus("Winner of the tournament - " + userName);
 		var divElement = document.createElement("div");
-		divElement.className = "img-cir round";
+		divElement.className = "img-cir round mx-auto";
 
 		var imgElement = document.createElement("img");
 		imgElement.src = imgUrl;

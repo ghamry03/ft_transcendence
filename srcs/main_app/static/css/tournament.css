@@ -208,8 +208,35 @@ tbody{
    font-style: normal;
    font-weight: 700;
    line-height: normal;
+   text-align : center;
    -webkit-text-stroke-width: 1;
    -webkit-text-stroke-color: var(--Chat-Chat-text, #000);
+ }
+
+ #statusBox {
+   padding-bottom: 5%;
+   text-align: center;
+ }
+
+ .img-cir {
+   border-radius: 50%;
+   position: relative;
+   height: 70px;
+   width: 70px;
+   overflow: hidden;
+   /* rename this */
+  /* margin-left: auto;
+  margin-right: auto; */
+   float: left;
+   margin-right: 10px;
+}
+
+ .img-cir.round img {
+   position: absolute;
+   left: 50%;
+   width: auto;
+   height: 70px;
+   transform: translateX(-50%);
  }
 
  td{
