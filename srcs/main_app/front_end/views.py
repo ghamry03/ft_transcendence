@@ -215,8 +215,8 @@ def updateStatus(request, status):
     uid = userData.get('uid', None)
     access_token = request.session.get('access_token', None)
     headers = {
-        'X-UID': uid,
-        'X-TOKEN': access_token
+        'X-UID': str(uid),
+        'X-TOKEN': str(access_token)
     }
     data = { 'status': status }
     response = requests.post(
