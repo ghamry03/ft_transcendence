@@ -57,7 +57,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                         {
                             "type": "newPlayerJoined", 
                             "newPlayerId": self.playerId, 
-                            "imgId": "player" + str(playerPos)
+                            "imgId": str(playerPos)
                         },
                     )
                     # Send queued players info to new player
@@ -202,7 +202,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 {
                     "type": "newPlayerJoined", 
                     "newPlayerId": winner["id"],
-                    "imgId": "player" + str(newPlayerPos)
+                    "imgId": str(newPlayerPos)
                 }
             )
             
