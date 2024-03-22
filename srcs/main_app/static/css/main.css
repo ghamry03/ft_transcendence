@@ -133,7 +133,7 @@ body {
 .pongping:hover{
   cursor: pointer;
 }
-.pixelCard {
+.containerBorder {
   border-radius: 12px;
     width: 100%;
     margin: 2em auto;
@@ -161,7 +161,7 @@ body {
   -webkit-text-stroke-color: var(--Chat-Chat-text, #000);
 }
 
-.pixelCard h3 {
+.containerBorder h3 {
   text-align: center;
   font-family: 'ps2p';
   font-size: 0.9rem;
@@ -172,11 +172,11 @@ body {
   color: var(--card-font-pink);
 }
 
-.pixelCard .image img{
+.containerBorder .image img{
   max-width: 63px;
 }
 
-.pixelCard .description p{
+.containerBorder .description p{
   font-size: 0.8rem;
 }
 
