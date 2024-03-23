@@ -2,6 +2,8 @@
 	width: 80vw;
 	height: 60vh;
 	overflow: scroll;
+	background: #D4BBFE;
+	padding: 20px 0;
 }
 
 .profile h1 {

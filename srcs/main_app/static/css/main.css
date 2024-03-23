@@ -198,7 +198,7 @@ body {
   line-height: normal;
   text-transform: uppercase;
   padding-bottom: 4px;
-  box-shadow: 
+  box-shadow:
   -8px 0px 0px 0px whitesmoke,
   8px 0px 0px 0px whitesmoke,
   -8px 4px 0px 0px var(--beach-bunny-lavendar-dark),
@@ -389,6 +389,7 @@ body {
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 99;
+  /* padding: 10px; */
 }
 
 .overlay{
@@ -469,7 +470,7 @@ body {
 
 * {
   scrollbar-width: auto;
-  scrollbar-color: #8f54a0 #ffffff;
+  scrollbar-color: #8f54a0 rgba(0, 0, 0, 0);
 }
 
 *::-webkit-scrollbar {
@@ -477,7 +478,8 @@ body {
 }
 
 *::-webkit-scrollbar-track {
-  background: #ffffff;
+  /* background: #ffffff; */
+  background: rgba(0, 0, 0, 0.2);
 }
 
 *::-webkit-scrollbar-thumb {
@@ -542,7 +544,7 @@ body {
   cursor: pointer;
 }
 
-#matchHistoryDash{
+#matchHistoryDash, #tournamentHistoryDash {
   max-height: 100%;
 }
 
