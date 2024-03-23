@@ -1,15 +1,17 @@
 {% load static %}
 <div class="loginPageContent">
     <div class="loginHeader">
-        <div class="loginPage border">
+        <div class="loginPage">
             <h1>PONGPING</h1>
         </div>
     </div>
 
-    <div class="img-container border">
+    <div class="img-container">
         <div class="img-wrapper">
             <img src="/static/imgs/arcade.png" alt="Arcade" class="centered-img">
-            {% include "loginButton.html" with title="Login" link=authUrl %}
+            <div class="loginButtonPos">
+                <button class="btn loginButton w-100 h-100" onclick="location.href='{{authUrl}}'">PLAY</button>
+            </div>
         </div>
     </div>
 </div>

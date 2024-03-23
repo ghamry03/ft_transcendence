@@ -16,19 +16,13 @@
 .loginButtonPos {
   font-size: 5%;
   position: absolute;
-  width: 25%;
-  height: 6%;
+  width: 30%;
+  height: 8%;
   max-width:100%;
   max-height: 100%;
-  bottom: 42%;
+  bottom: 39%;
   left: 50%;
   transform: translateX(-50%);
-}
-
-.loginButton h3 {
-  color: #854D4D;
-  font-family: 'ps2p';
-  font-size: 12px;
 }
 
 .loginPage h1 {
@@ -83,19 +77,18 @@
   flex-direction: column;
 }
 
-.art {
-  width: 4px;
-  height: 4px;
-  box-shadow:
-    -8px 0 red;
-}
-
 .loginButton {
   background-color: var(--loginbtn-bg);
-
-
+  color: #854D4D;
+  font-size: 1vw;
+  border-radius: 20px;
+  font-family: 'ps2p';
+  box-shadow: 0px 15px 0 #B86666;
   transition: all ease-out 0.3s;
 }
 
 .loginButton:hover {
+  translate: 0 10px;
+  box-shadow: 0px 5px 0 #B86666;
 }
+
