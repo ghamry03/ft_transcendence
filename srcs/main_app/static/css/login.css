@@ -83,11 +83,10 @@
     border-radius: 20px;
     font-family: 'ps2p';
     box-shadow: 0px 15px 0 #B86666;
-    transition: all ease-out 0.3s;
+    transition: all ease-out 0.5s;
 }
 
-.loginButton:hover {
-    translate: 0 10px;
+.loginButton:hover, .loginButton:focus {
+    transform: translateY(10px);
     box-shadow: 0px 5px 0 #B86666;
 }
-
