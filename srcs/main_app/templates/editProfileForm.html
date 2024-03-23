@@ -4,7 +4,7 @@
 {% block formId %}edit_profile{% endblock %}
 
 {% block form %}
-<div class="formBase editProfile pixelCard d-flex flex-column overflow-auto">
+<div class="formBase editProfile containerBorder d-flex flex-column overflow-auto">
     <form class="needs-validation h-100" style="margin: 20px" id="edit_profile_form">
         <div class="alert alert-danger fade" id="generalError"></div>
         {% csrf_token %}

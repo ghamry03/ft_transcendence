@@ -11,7 +11,7 @@ from django.contrib.sessions.models import Session
 
 logger = logging.getLogger(__name__)
 
-from . import FRIEND_API_URL, TOURNAMENT_HISOTRY_URL, USER_API_URL, MEDIA_SERVICE_URL
+from . import FRIEND_API_URL, TOURNAMENT_HISOTRY_URL, USER_API_URL, MEDIA_SERVICE_URL, MATCH_HISOTRY_URL
 
 import json
 from . import MEDIA_SERVICE_URL, USER_API_URL
@@ -22,33 +22,28 @@ def index(request):
     return render(request, 'base.html')
 
 def topBar(request):
-    if 'logged_in' not in request.session or request.session['logged_in'] == False:
+    logged_in = request.session.get('logged_in', None)
+    if 'logged_in' not in request.session or logged_in == False:
         return render(request, 'topBar.html')
+    
+    userData = request.session.get('userData', None)
 
     return render(request, 'topBar.html', {
-        'userData': request.session['userData'],
+        'userData': userData,
     })
 
 def homePage(request):
-    headers = { 'Content-Type': 'application/json' }
+    userData = request.session.get('userData', None)
+    uid = userData.get('uid', None)
+    accessToken = request.session.get('access_token', None)
 
-    uid = request.session['userData']['uid']
+    friendsList = getFriendsList(uid, accessToken)
 
-    friendsList = requests.get(
-        'http://friendsapp:8002/' + "api/friends/",
-        headers=headers,
-        json={
-            "uid": f"{uid}",
-            "ownerUID": f"{uid}",
-            "access_token": request.session['access_token']
-            },
-    ).json()
-
-    # tournamentHistory = requests.get(
-    #     TOURNAMENT_HISOTRY_URL + "api/tourhistory/" + f'{uid}'
-    # ).json()
-
-    context = {"userData": request.session["userData"], "friendsList": friendsList['friendsList'], "friendRequests": friendsList['friendRequests']}
+    context = {
+        "userData": userData,
+        "friendsList": friendsList['friendsList'],
+        "friendRequests": friendsList['friendRequests'],
+        }
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
     httpResponse.set_cookie('uid' , uid)
@@ -56,18 +51,27 @@ def homePage(request):
     return httpResponse
 
 def homeCards(request):
+    userData = request.session.get('userData', None)
+    uid = userData.get('uid', None)
+    tournamentHistory = getTournamentHistory(uid)
+    matchHistory = getMatchHistory(uid)
+
+    logger.debug(f'This is the users match history: {matchHistory}');
+    logger.debug(f'This is the users tournament history: {tournamentHistory}');
     context = {
-        'userData': request.session['userData'],
+        'userData': userData,
+        "tournamentHistory": tournamentHistory,
+        "matchHistory": matchHistory,
     }
     return render(request, 'homeCards.html', context)
 
 def getOpponentInfo(request):
     ownerUid = request.GET.get('ownerUid')
     targetUid = request.GET.get('targetUid')
-    token = request.session['access_token']
+    access_token = request.session.get('access_token', None)
     headers = {
         'X-UID': ownerUid,
-        'X-TOKEN': token
+        'X-TOKEN': access_token
     }
     response = requests.get(USER_API_URL + 'api/user/' + targetUid, headers=headers)
     opponentInfo = response.json()
@@ -81,6 +85,7 @@ def getUnknownUserImg(request):
     return HttpResponseNotFound("The requested resource was not found.")
 
 def searchUsers(request, username):
+    userData = request.session.get('userData', None)
     headers = {
         'X-UID': f'{request.session['userData']['uid']}',
         'X-TOKEN': request.session['access_token']
@@ -94,7 +99,7 @@ def searchUsers(request, username):
         data = {
             'status': response.status_code,
             'data': response.json(),
-            'uid': request.session['userData']['uid']
+            'uid': userData.get('uid', None)
             }
         logger.debug(data)
         return render(request, 'searchedUser.html', data)
@@ -104,8 +109,10 @@ def searchUsers(request, username):
     
 def addUser(request, friendUID):
     headers = { 'Content-Type': 'application/json' }
+    userData = request.session.get('userData', None)
+    access_token = request.session.get('access_token', None)
 
-    myuid = request.session['userData']['uid']
+    myuid = userData.get('uid', None)
 
     response = requests.post(
         FRIEND_API_URL + "api/friends/",
@@ -114,7 +121,7 @@ def addUser(request, friendUID):
             "first_id": f'{myuid}',
             "second_id": f'{friendUID}', 
             "session_id": request.session.session_key, 
-            "access_token": request.session['access_token'], 
+            "access_token": access_token, 
             },
     ).json()
 
@@ -122,8 +129,10 @@ def addUser(request, friendUID):
 
 def acceptFriend(request, friendUID):
     headers = { 'Content-Type': 'application/json' }
+    userData = request.session.get('userData', None)
+    access_token = request.session.get('access_token', None)
 
-    myuid = request.session['userData']['uid']
+    myuid = userData.get('uid', None)
 
     response = requests.put(
         FRIEND_API_URL + "api/friends/",
@@ -133,7 +142,7 @@ def acceptFriend(request, friendUID):
             "second_user": f'{friendUID}', 
             "relationship": 0, 
             "session_id": request.session.session_key, 
-            "access_token": request.session['access_token'],
+            "access_token": access_token,
             },
     ).json()
     return HttpResponse()
@@ -141,8 +150,10 @@ def acceptFriend(request, friendUID):
 
 def rejectFriend(request, friendUID):
     headers = { 'Content-Type': 'application/json' }
+    userData = request.session.get('userData', None)
+    access_token = request.session.get('access_token', None)
 
-    myuid = request.session['userData']['uid']
+    myuid = userData.get('uid', None)
 
     response = requests.delete(
         FRIEND_API_URL + "api/friends/",
@@ -151,7 +162,7 @@ def rejectFriend(request, friendUID):
             "first_user": f'{myuid}',
             "second_user": f'{friendUID}', 
             "session_id": request.session.session_key, 
-            "access_token": request.session['access_token'],
+            "access_token": access_token,
             },
     ).json()
     return HttpResponse()
@@ -173,15 +184,17 @@ class SessionDataView(View):
         return JsonResponse({'sessionData': session_data})
 
 def profile(request, uid):
+    userData = request.session.get('userData', None)
+    access_token = request.session.get('access_token', None)
     headers = {
         'X-UID': str(request.session['userData']['uid']),
-        'X-TOKEN': request.session['access_token']
+        'X-TOKEN': access_token
     }
     response = requests.get(USER_API_URL + 'api/user/' + str(uid), headers=headers)
     json = response.json()
-
+    
     profile_type = 0 # Current client profile
-    if uid != request.session['userData']['uid']:
+    if uid != userData.get('uid', None):
         # check if it's a friend or not
         profile_type = 1 # a friend
         profile_type = 2 # not a friend
@@ -198,13 +211,16 @@ def profile(request, uid):
     return render(request, 'profileContent.html', context)
 
 def updateStatus(request, status):
+    userData = request.session.get('userData', None)
+    uid = userData.get('uid', None)
+    access_token = request.session.get('access_token', None)
     headers = {
-        'X-UID': str(request.session['userData']['uid']),
-        'X-TOKEN': request.session['access_token']
+        'X-UID': str(uid),
+        'X-TOKEN': str(access_token)
     }
     data = { 'status': status }
     response = requests.post(
-            USER_API_URL + 'api/user/' + str(request.session['userData']['uid']) + '/',
+            USER_API_URL + 'api/user/' + str(uid) + '/',
             headers=headers,
             data=data
             )
@@ -249,3 +265,34 @@ def edit_profile(request):
             return JsonResponse({'message': 'Form submitted successfully'})
 
         return JsonResponse(response_data, status=api_response.status_code)
+    
+
+def getTournamentHistory(uid):
+    response = requests.get(TOURNAMENT_HISOTRY_URL + f'api/tourhistory/{uid}')
+
+    if response.status_code == 200:
+        return response.json()['data']
+    return None
+
+def getMatchHistory(uid):
+    response = requests.get(MATCH_HISOTRY_URL + f'game/matchhistory/{uid}')
+    if response.status_code == 200:
+        return response.json()
+    return None
+
+def getFriendsList(uid, accessToken):
+    headers = { 'Content-Type': 'application/json' }
+    response = requests.get(
+        'http://friendsapp:8002/' + "api/friends/",
+        headers=headers,
+        json={
+            "uid": f"{uid}",
+            "ownerUID": f"{uid}",
+            "access_token": accessToken
+            },
+    )
+
+    if response.status_code == 200:
+        return response.json()
+    return JsonResponse({})
+

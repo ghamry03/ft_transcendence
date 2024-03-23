@@ -68,26 +68,7 @@ body {
 #homeContentArea{
   height: 80vh;
   max-height: 80vh;
-}
-
-#homeContentArea{
-  height: 80vh;
-  max-height: 80vh;
-}
-
-#homeContentArea{
-  height: 80vh;
-  max-height: 80vh;
-}
-
-#homeContentArea{
-  height: 80vh;
-  max-height: 80vh;
-}
-
-#homeContentArea{
-  height: 80vh;
-  max-height: 80vh;
+  overflow-y: hidden;
 }
 
 .navigationBar {
@@ -146,109 +127,27 @@ body {
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  user-select: none;
 }
 
-.pixelCard {
-  width: 100%;
-  margin: 2em auto;
-  background-color: var(--beach-bunny);
-  box-shadow:
+.pongping:hover{
+  cursor: pointer;
+}
+.containerBorder {
+  border-radius: 12px;
+    width: 100%;
+    margin: 2em auto;
+    background-color: var(--beach-bunny);
+    transition: all ease-out 0.3s;
+    border: solid 2px black;
+    box-shadow: 8px 7px 0px 0px #EF6E7F;
 
-    /*top left & top right border*/
-    -10px 0px 0px var(--beach-bunny),
-    -5px -5px 0px var(--beach-bunny),
-    0px -10px 0px var(--beach-bunny),
-    -10px -5px 0px black,
-    -5px -10px 0px black,
-    0px -15px 0 0 black,
-
-    10px 0px 0px var(--beach-bunny),
-    5px -5px 0px var(--beach-bunny),
-    0px -10px 0px var(--beach-bunny),
-    10px -5px 0px black,
-    5px -10px 0px black,
-    0px -15px 0 0 black,
-
-    /*bottom left & bottom right borders*/
-    -10px 0px 0px var(--beach-bunny),
-    -5px 5px 0px var(--beach-bunny),
-    0px 10px 0px var(--beach-bunny),
-    -10px 5px 0px black,
-    -5px 10px 0px black,
-    0px 15px 0 0 black,
-
-    10px 0px 0px var(--beach-bunny),
-    5px 5px 0px var(--beach-bunny),
-    0px 10px 0px var(--beach-bunny),
-    10px 5px 0px black,
-    5px 10px 0px black,
-    0px 15px 0 0 black,
-    /*left & right black border*/
-    -15px 0 0 0 black,
-    15px 0 0 0 black,
-
-    /*card highlight*/
-    10px 0px 0px var(--beach-bunny),
-    5px 5px 0px var(--beach-bunny),
-    0px 10px 0px var(--beach-bunny),
-    20px 5px 0px var(--beach-bunny-red),
-    20px 10px 0px var(--beach-bunny-red),
-    15px 15px 0px var(--beach-bunny-red),
-    10px 20px 0 0 var(--beach-bunny-red),
-    5px 20px 0 0 var(--beach-bunny-red);
-
-  transition: all ease-out 0.3s;
 }
 
 .pixelHover:hover {
   cursor: pointer;
   background-color: var(--beach-bunny-lavendar);
 
-  box-shadow:
-
-    /*top left & top right border*/
-    -10px 0px 0px var(--beach-bunny-lavendar),
-    -5px -5px 0px var(--beach-bunny-lavendar),
-    0px -10px 0px var(--beach-bunny-lavendar),
-    -10px -5px 0px var(--beach-bunny-lavendar-dark),
-    -5px -10px 0px var(--beach-bunny-lavendar-dark),
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
-
-    10px 0px 0px var(--beach-bunny-lavendar),
-    5px -5px 0px var(--beach-bunny-lavendar),
-    0px -10px 0px var(--beach-bunny-lavendar),
-    10px -5px 0px var(--beach-bunny-lavendar-dark),
-    5px -10px 0px var(--beach-bunny-lavendar-dark),
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
-
-    /*bottom left & bottom right borders*/
-    -10px 0px 0px var(--beach-bunny-lavendar),
-    -5px 5px 0px var(--beach-bunny-lavendar),
-    0px 10px 0px var(--beach-bunny-lavendar),
-    -10px 5px 0px var(--beach-bunny-lavendar-dark),
-    -5px 10px 0px var(--beach-bunny-lavendar-dark),
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
-
-    10px 0px 0px var(--beach-bunny-lavendar),
-    5px 5px 0px var(--beach-bunny-lavendar),
-    0px 10px 0px var(--beach-bunny-lavendar),
-    10px 5px 0px var(--beach-bunny-lavendar-dark),
-    5px 10px 0px var(--beach-bunny-lavendar-dark),
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
-    /*left & right black border*/
-    -15px 0 0 0 var(--beach-bunny-lavendar-dark),
-    15px 0 0 0 var(--beach-bunny-lavendar-dark),
-
-    /*card highlight*/
-    10px 0px 0px var(--beach-bunny-lavendar),
-    5px 5px 0px var(--beach-bunny-lavendar),
-    0px 10px 0px var(--beach-bunny-lavendar),
-    20px 5px 0px var(--beach-bunny-red),
-    20px 10px 0px var(--beach-bunny-red),
-    15px 15px 0px var(--beach-bunny-red),
-    0px 20px 0 0 black,
-    10px 20px 0 0 var(--beach-bunny-red),
-    5px 20px 0 0 black;
 }
 
 .welcomeBar #welcome {
@@ -262,10 +161,10 @@ body {
   -webkit-text-stroke-color: var(--Chat-Chat-text, #000);
 }
 
-.pixelCard h3 {
+.containerBorder h3 {
   text-align: center;
   font-family: 'ps2p';
-  font-size: 18px;
+  font-size: 0.9rem;
   font-style: normal;
   font-weight: 400;
   line-height: 138%;
@@ -273,72 +172,38 @@ body {
   color: var(--card-font-pink);
 }
 
-#matchHistoryDash .content,
-#tournamentHistoryDash .content {
-  background-color: whitesmoke;
-  box-shadow:
-
-    /*top left & top right border*/
-    /*top left & top right border*/
-    -10px 0px 0px whitesmoke,
-    -5px -5px 0px whitesmoke,
-    0px -10px 0px whitesmoke,
-    -10px -5px 0px var(--beach-bunny-lavendar-dark),
-    -5px -10px 0px var(--beach-bunny-lavendar-dark),
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
-
-    10px 0px 0px whitesmoke,
-    5px -5px 0px whitesmoke,
-    0px -10px 0px whitesmoke,
-    10px -5px 0px var(--beach-bunny-lavendar-dark),
-    5px -10px 0px var(--beach-bunny-lavendar-dark),
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
-
-    /*bottom left & bottom right borders*/
-    -10px 0px 0px whitesmoke,
-    -5px 5px 0px whitesmoke,
-    0px 10px 0px whitesmoke,
-    -10px 5px 0px var(--beach-bunny-lavendar-dark),
-    -5px 10px 0px var(--beach-bunny-lavendar-dark),
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
-
-    10px 0px 0px whitesmoke,
-    5px 5px 0px whitesmoke,
-    0px 10px 0px whitesmoke,
-    10px 5px 0px var(--beach-bunny-lavendar-dark),
-    5px 10px 0px var(--beach-bunny-lavendar-dark),
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
-    /*left & right black border*/
-    -15px 0 0 0 var(--beach-bunny-lavendar-dark),
-    15px 0 0 0 var(--beach-bunny-lavendar-dark),
-
-    /*card highlight*/
-    10px 0px 0px whitesmoke,
-    5px 5px 0px whitesmoke,
-    0px 10px 0px whitesmoke,
-    0px 20px 0 0 black,
-    5px 20px 0 0 black;
+.containerBorder .image img{
+  max-width: 63px;
 }
 
-#matchHistoryDash .titleSection,
-#tournamentHistoryDash .titleSection {
+.containerBorder .description p{
+  font-size: 0.8rem;
+}
 
-  box-shadow:
-    -10px 0px 0px whitesmoke,
-    10px 0px 0px whitesmoke,
-    -10px 5px 0px var(--beach-bunny-lavendar-dark),
-    10px 5px 0px var(--beach-bunny-lavendar-dark);
+#matchHistoryDash .content, #tournamentHistoryDash .content{
+  background-color: whitesmoke;
+  border-radius: 12px;
+  border: solid 2px black;
+  box-shadow: 8px 7px 0px 0px var(--beach-bunny-lavendar-dark);
+  height: 100%;
 }
 
 #matchHistoryDash .title,
 #tournamentHistoryDash .title {
   font-family: 'ps2p';
   color: var(--chat-text);
-  font-size: 12px;
+  font-size: 0.8rem;
   font-style: normal;
   font-weight: 400;
   line-height: normal;
   text-transform: uppercase;
+  padding-bottom: 4px;
+  box-shadow: 
+  -8px 0px 0px 0px whitesmoke,
+  8px 0px 0px 0px whitesmoke,
+  -8px 4px 0px 0px var(--beach-bunny-lavendar-dark),
+  8px 4px 0px 0px var(--beach-bunny-lavendar-dark)
+  ;
 }
 
 .loginPage h3 {
@@ -648,6 +513,11 @@ body {
   max-height: 42px;
   min-width: 42px;
   min-height: 42px;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-text-select: none;
+  -webkit-user-select: none;
+  object-fit: cover;
 }
 
 .searchedUser a{
@@ -666,4 +536,21 @@ body {
     background-color: red;
     border-radius: 50%;
     transform: translate(50%, 50%);
+}
+
+.profilePic:hover{
+  cursor: pointer;
+}
+
+#matchHistoryDash{
+  max-height: 100%;
+}
+
+.historySection{
+  max-height: 45%;
+}
+
+#matchHistoryInjection, #tournamentHistoryInjection {
+  overflow-y: auto;
+  max-height: 95%;
 }
