@@ -28,10 +28,10 @@ class SessionDataView(View):
 def getOpponentInfo(request):
     ownerUid = request.GET.get('ownerUid')
     targetUid = request.GET.get('targetUid')
-    token = request.session['access_token']
+    access_token = request.session.get('access_token', None)
     headers = {
         'X-UID': ownerUid,
-        'X-TOKEN': token
+        'X-TOKEN': access_token
     }
     response = requests.get(USER_API_URL + 'api/user/' + targetUid, headers=headers)
     opponentInfo = response.json()

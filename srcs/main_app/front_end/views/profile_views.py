@@ -5,13 +5,16 @@ from django.shortcuts import render
 from main_app.constants import USER_API_URL, FRIEND_API_URL
 
 def updateStatus(request, status):
+    userData = request.session.get('userData', None)
+    uid = userData.get('uid', None)
+    access_token = request.session.get('access_token', None)
     headers = {
-        'X-UID': str(request.session['userData']['uid']),
-        'X-TOKEN': request.session['access_token']
+        'X-UID': str(uid),
+        'X-TOKEN': str(access_token)
     }
     data = { 'status': status }
     response = requests.post(
-            USER_API_URL + 'api/user/' + str(request.session['userData']['uid']) + '/',
+            USER_API_URL + 'api/user/' + str(uid) + '/',
             headers=headers,
             data=data
             )
@@ -74,7 +77,32 @@ def profile(request, uid):
         'type': profile_type,
     }
     return render(request, 'profileContent.html', context)
+# def profile(request, uid):
+#     userData = request.session.get('userData', None)
+#     access_token = request.session.get('access_token', None)
+#     headers = {
+#         'X-UID': str(request.session['userData']['uid']),
+#         'X-TOKEN': access_token
+#     }
+#     response = requests.get(USER_API_URL + 'api/user/' + str(uid), headers=headers)
+#     json = response.json()
+    
+#     profile_type = 0 # Current client profile
+#     if uid != userData.get('uid', None):
+#         # check if it's a friend or not
+#         profile_type = 1 # a friend
+#         profile_type = 2 # not a friend
 
+#     context = {
+#         'image': json['image'],
+#         'username': json['username'],
+#         'full_name': f"{json['first_name']} {json['last_name']}",
+#         'campus': json['campus_name'],
+#         'intra_url': json['intra_url'],
+#         'status': json['status'],
+#         'type': profile_type,
+#     }
+#     return render(request, 'profileContent.html', context)
 def edit_profile(request):
     if request.method == 'POST':
         headers = {

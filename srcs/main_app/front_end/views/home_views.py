@@ -1,30 +1,56 @@
-import requests
+import requests, logging
 
-from main_app.constants import TOURNAMENT_HISOTRY_URL
+from main_app.constants import TOURNAMENT_HISOTRY_URL, MATCH_HISOTRY_URL
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
+logger = logging.getLogger(__name__)
 
 def index(request):
     return render(request, 'base.html')
 
-def homePage(request):
+def getTournamentHistory(uid):
+    response = requests.get(TOURNAMENT_HISOTRY_URL + f'api/tourhistory/{uid}')
+
+    if response.status_code == 200:
+        return response.json()['data']
+    return None
+
+def getMatchHistory(uid):
+    response = requests.get(MATCH_HISOTRY_URL + f'game/matchhistory/{uid}')
+    if response.status_code == 200:
+        return response.json()
+    return None
+
+def getFriendsList(uid, accessToken):
     headers = { 'Content-Type': 'application/json' }
-
-    uid = request.session['userData']['uid']
-
-    friendsList = requests.get(
+    response = requests.get(
         'http://friendsapp:8002/' + "api/friends/",
         headers=headers,
         json={
             "uid": f"{uid}",
             "ownerUID": f"{uid}",
-            "access_token": request.session['access_token']
+            "access_token": accessToken
             },
-    ).json()
+    )
 
-    context = {"userData": request.session["userData"], "friendsList": friendsList['friendsList'], "friendRequests": friendsList['friendRequests']}
+    if response.status_code == 200:
+        return response.json()
+    return JsonResponse({})
+
+def homePage(request):
+    userData = request.session.get('userData', None)
+    uid = userData.get('uid', None)
+    accessToken = request.session.get('access_token', None)
+
+    friendsList = getFriendsList(uid, accessToken)
+
+    context = {
+        "userData": userData,
+        "friendsList": friendsList['friendsList'],
+        "friendRequests": friendsList['friendRequests'],
+        }
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
     httpResponse.set_cookie('uid' , uid)
@@ -32,15 +58,27 @@ def homePage(request):
     return httpResponse
 
 def topBar(request):
-    if 'logged_in' not in request.session or request.session['logged_in'] == False:
+    logged_in = request.session.get('logged_in', None)
+    if 'logged_in' not in request.session or logged_in == False:
         return render(request, 'topBar.html')
 
+    userData = request.session.get('userData', None)
+
     return render(request, 'topBar.html', {
-        'userData': request.session['userData'],
+        'userData': userData,
     })
 
 def homeCards(request):
+    userData = request.session.get('userData', None)
+    uid = userData.get('uid', None)
+    tournamentHistory = getTournamentHistory(uid)
+    matchHistory = getMatchHistory(uid)
+
+    logger.debug(f'This is the users match history: {matchHistory}');
+    logger.debug(f'This is the users tournament history: {tournamentHistory}');
     context = {
-        'userData': request.session['userData'],
+        'userData': userData,
+        "tournamentHistory": tournamentHistory,
+        "matchHistory": matchHistory,
     }
     return render(request, 'homeCards.html', context)

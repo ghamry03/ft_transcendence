@@ -1,0 +1,25 @@
+<div class="tournamentEntry">
+    <div class="row entryBorder">
+        <div class="col-2 d-flex flex-wrap  flex-column justify-content-center">
+            <img src="{{img}}" />
+        </div>
+    
+        <div class="col-2 d-flex flex-wrap  flex-column justify-content-center">
+            <p class="{% if myScore > theirScore %}text-success {% else %}text-danger{% endif %}"">{{myScore}} - {{theirScore}}</p>
+        </div>
+    
+        <div class="col-2 d-flex flex-wrap  flex-column justify-content-center">
+            <img src="{{theirImg}}" />
+        </div>
+    
+        <div class="col-2 d-flex flex-wrap  flex-column justify-content-center">
+            <p>{{theirUsername}}</p>
+        </div>
+    
+        <div class="col d-flex flex-wrap  flex-column justify-content-center ">
+            <span class="tournamentDate">
+                {{time}}
+            </span>
+        </div>
+    </div>
+</div>
