@@ -17,6 +17,7 @@
 
 :root {
   --beach-bunny: #FCF9F4;
+  --beach-bunny-blue: #96EED9;
   --beach-bunny-pink: #EEB3E7;
   --beach-bunny-red: #EF6E7F;
   --beach-bunny-lavendar: #E9DCFF;
@@ -151,6 +152,59 @@ body {
 .pixelCard {
   width: 100%;
   margin: 2em auto;
+  padding: 4%;
+  background-color: var(--beach-bunny-lavendar);
+  box-shadow:
+
+    /*top left & top right border*/
+    -10px 0px 0px var(--beach-bunny-lavendar),
+    -5px -5px 0px var(--beach-bunny-lavendar),
+    0px -10px 0px var(--beach-bunny-lavendar),
+    -10px -5px 0px var(--beach-bunny-lavendar-dark),
+    -5px -10px 0px var(--beach-bunny-lavendar-dark),
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
+
+    10px 0px 0px var(--beach-bunny-lavendar),
+    5px -5px 0px var(--beach-bunny-lavendar),
+    0px -10px 0px var(--beach-bunny-lavendar),
+    10px -5px 0px var(--beach-bunny-lavendar-dark),
+    5px -10px 0px var(--beach-bunny-lavendar-dark),
+    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
+
+    /*bottom left & bottom right borders*/
+    -10px 0px 0px var(--beach-bunny-lavendar),
+    -5px 5px 0px var(--beach-bunny-lavendar),
+    0px 10px 0px var(--beach-bunny-lavendar),
+    -10px 5px 0px var(--beach-bunny-lavendar-dark),
+    -5px 10px 0px var(--beach-bunny-lavendar-dark),
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
+
+    10px 0px 0px var(--beach-bunny-lavendar),
+    5px 5px 0px var(--beach-bunny-lavendar),
+    0px 10px 0px var(--beach-bunny-lavendar),
+    10px 5px 0px var(--beach-bunny-lavendar-dark),
+    5px 10px 0px var(--beach-bunny-lavendar-dark),
+    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
+    /*left & right black border*/
+    -15px 0 0 0 var(--beach-bunny-lavendar-dark),
+    15px 0 0 0 var(--beach-bunny-lavendar-dark),
+
+    /*card highlight*/
+    10px 0px 0px var(--beach-bunny-lavendar),
+    5px 5px 0px var(--beach-bunny-lavendar),
+    0px 10px 0px var(--beach-bunny-lavendar),
+    20px 5px 0px black, /* highlight */
+    20px 10px 0px black, /* highlight */
+    15px 15px 0px black, /* highlight */
+    0px 20px 0 0 black,
+    10px 20px 0 0 black, /* highlight */
+    5px 20px 0 0 black;
+
+  transition: all ease-out 0.3s;
+}
+
+.pixelHover:hover {
+  cursor: pointer;
   background-color: var(--beach-bunny);
   box-shadow:
 
@@ -191,64 +245,11 @@ body {
     10px 0px 0px var(--beach-bunny),
     5px 5px 0px var(--beach-bunny),
     0px 10px 0px var(--beach-bunny),
-    20px 5px 0px var(--beach-bunny-red),
-    20px 10px 0px var(--beach-bunny-red),
-    15px 15px 0px var(--beach-bunny-red),
-    10px 20px 0 0 var(--beach-bunny-red),
-    5px 20px 0 0 var(--beach-bunny-red);
-
-  transition: all ease-out 0.3s;
-}
-
-.pixelHover:hover {
-  cursor: pointer;
-  background-color: var(--beach-bunny-lavendar);
-
-  box-shadow:
-
-    /*top left & top right border*/
-    -10px 0px 0px var(--beach-bunny-lavendar),
-    -5px -5px 0px var(--beach-bunny-lavendar),
-    0px -10px 0px var(--beach-bunny-lavendar),
-    -10px -5px 0px var(--beach-bunny-lavendar-dark),
-    -5px -10px 0px var(--beach-bunny-lavendar-dark),
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
-
-    10px 0px 0px var(--beach-bunny-lavendar),
-    5px -5px 0px var(--beach-bunny-lavendar),
-    0px -10px 0px var(--beach-bunny-lavendar),
-    10px -5px 0px var(--beach-bunny-lavendar-dark),
-    5px -10px 0px var(--beach-bunny-lavendar-dark),
-    0px -15px 0 0 var(--beach-bunny-lavendar-dark),
-
-    /*bottom left & bottom right borders*/
-    -10px 0px 0px var(--beach-bunny-lavendar),
-    -5px 5px 0px var(--beach-bunny-lavendar),
-    0px 10px 0px var(--beach-bunny-lavendar),
-    -10px 5px 0px var(--beach-bunny-lavendar-dark),
-    -5px 10px 0px var(--beach-bunny-lavendar-dark),
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
-
-    10px 0px 0px var(--beach-bunny-lavendar),
-    5px 5px 0px var(--beach-bunny-lavendar),
-    0px 10px 0px var(--beach-bunny-lavendar),
-    10px 5px 0px var(--beach-bunny-lavendar-dark),
-    5px 10px 0px var(--beach-bunny-lavendar-dark),
-    0px 15px 0 0 var(--beach-bunny-lavendar-dark),
-    /*left & right black border*/
-    -15px 0 0 0 var(--beach-bunny-lavendar-dark),
-    15px 0 0 0 var(--beach-bunny-lavendar-dark),
-
-    /*card highlight*/
-    10px 0px 0px var(--beach-bunny-lavendar),
-    5px 5px 0px var(--beach-bunny-lavendar),
-    0px 10px 0px var(--beach-bunny-lavendar),
-    20px 5px 0px var(--beach-bunny-red),
-    20px 10px 0px var(--beach-bunny-red),
-    15px 15px 0px var(--beach-bunny-red),
-    0px 20px 0 0 black,
-    10px 20px 0 0 var(--beach-bunny-red),
-    5px 20px 0 0 black;
+    20px 5px 0px var(--beach-bunny-blue),
+    20px 10px 0px var(--beach-bunny-blue),
+    15px 15px 0px var(--beach-bunny-blue),
+    10px 20px 0 0 var(--beach-bunny-blue),
+    5px 20px 0 0 var(--beach-bunny-blue);    
 }
 
 .welcomeBar #welcome {
@@ -271,6 +272,17 @@ body {
   line-height: 138%;
   /* 24.84px */
   color: var(--card-font-pink);
+}
+
+.pixelCard p {
+  text-align: center;
+  font-family: 'bpdots';
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 138%;
+  /* 24.84px */
+  /* color: var(--card-font-pink); */
 }
 
 #matchHistoryDash .content,
