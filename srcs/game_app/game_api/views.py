@@ -80,13 +80,11 @@ class   MatchHistoryApiView(APIView):
 		try:
 			user = get_object_or_404(UserApiUser, pk=user_id)
 		except Http404:
-			return JsonResponse({"error": "arch/x86/entry/syscalls/syscall_32.tbl, needed by arch/x86/include/generated/uapi/asm/unistd_32.h, needed by zoulinette/4242/trololol/x86/asm/bin-noob"}, status=status.HTTP_404_NOT_FOUND)
+			return JsonResponse({"error": "user not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 		# Retrieve all matches for the user
 		user_matches = PlayerMatch.objects.filter(player=user_id)
-		if not user_matches:
-			return Response({"error": "arch/x86/entry/syscalls/syscall_32.tbl, needed by arch/x86/include/generated/uapi/asm/unistd_32.h, needed by zoulinette/4242/trololol/x86/asm/bin-noob"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 		games_details = []
 		for match in user_matches:
