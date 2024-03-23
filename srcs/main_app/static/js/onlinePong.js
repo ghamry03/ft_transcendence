@@ -49,20 +49,13 @@ onlineGame = () => {
 	var animationId;
 
 	console.log("canvas w and h = ", canvas.width, canvas.height)
-
-	const containerW = gameContainer.getBoundingClientRect().width;
-	const containerH = containerW / 2;
-
-	console.log("container width and height = ", containerW, containerH);
 	const canvasW = canvas.getBoundingClientRect().width;
 	const canvasH = canvas.getBoundingClientRect().height;
 	
-	console.log("w = ", getComputedStyle(canvas).width);
-	console.log("h = ", getComputedStyle(canvas).height);
 	canvas.width = canvasW;
 	canvas.height = canvasH;
+	console.log("canvas w and h = ", canvas.width, canvas.height)
 	
-	console.log("canvas w and h = ", canvasW, canvasH)
 
 	// Paddles
 	var paddleHeight = Math.floor(canvasH * paddleHScale);
