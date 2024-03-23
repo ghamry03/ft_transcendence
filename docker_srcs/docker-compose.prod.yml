@@ -11,11 +11,11 @@ services:
         ports:
             - "80:80"
             - "443:443"
-            - "3000:3000"
-            - "4000:4000"
+            - "8001:8001"
+            - "8004:8004"
             - "8002:8002"
-            - "2000:2000"
-            - "5000:5000"
+            - "8003:8003"
+            - "8005:8005"
         depends_on:
             - mainapp
             - userapp
@@ -24,6 +24,8 @@ services:
             - friendsapp
         networks:
             - user_app_network
+        environment:
+            - DEBUG=0
 
     mainapp:
         build: 
@@ -47,7 +49,9 @@ services:
             - ./.env
         networks:
             - user_app_network
-    
+        environment:
+            - DEBUG=0
+ 
     gameapp:
         build: 
           context: ../
@@ -56,7 +60,7 @@ services:
         container_name: gameapp
         restart: on-failure
         expose:
-          - 2000
+          - 8003
         depends_on:
             userapp:
                 condition: service_healthy
@@ -66,6 +70,8 @@ services:
             - ./.env
         networks:
             - user_app_network
+        environment:
+            - DEBUG=0
 
     tourapp:
         build: 
@@ -77,7 +83,7 @@ services:
         container_name: tourapp
         restart: on-failure
         expose:
-          - 4000
+          - 8004
         depends_on:
             postgres:
                 condition: service_healthy
@@ -86,7 +92,7 @@ services:
         networks:
             - user_app_network
         healthcheck:
-            test: ["CMD", "curl", "--fail", "http://localhost:4000/tour/health"]
+            test: ["CMD", "curl", "--fail", "http://localhost:8004/tour/health"]
             interval: 5s
             timeout: 5s
             retries: 5
@@ -99,7 +105,7 @@ services:
         container_name: userapp
         restart: on-failure
         expose:
-          - 3000
+          - 8001
         depends_on:
             postgres:
                 condition: service_healthy
@@ -110,10 +116,12 @@ services:
         networks:
             - user_app_network
         healthcheck:
-            test: ["CMD", "curl", "--fail", "http://localhost:3000/users/health"]
+            test: ["CMD", "curl", "--fail", "http://localhost:8001/api/health"]
             interval: 5s
             timeout: 5s
             retries: 5
+        environment:
+            - DEBUG=0
 
     postgres:
         build: ./postgres
@@ -131,6 +139,8 @@ services:
             - ./.env
         networks:
             - user_app_network
+        environment:
+            - DEBUG=0
 
     friendsapp:
         build:
@@ -150,6 +160,8 @@ services:
             - ./.env
         networks:
             - user_app_network
+        environment:
+            - DEBUG=0
 
 networks:
     user_app_network:

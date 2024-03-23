@@ -27,12 +27,13 @@ SECRET_KEY = os.environ.get("FE_DJANGO_SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = bool(os.environ.get("DEBUG", default=0))
+DEBUG = os.environ.get("DEBUG", "0") != "0"
 
 # ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", '').split(" ")
 ALLOWED_HOSTS = ['*']
 AUTH_URL = ""
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -95,16 +96,26 @@ DATABASES = {
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'color': {
+            '()': 'user_app.CustomFormatter.ColorLogFormatter',
+            'fmt': '%(levelname)s %(asctime)s %(module)s %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'color',
         },
+        # ... other handlers
     },
     'root': {
         'handlers': ['console'],
-        'level': 'INFO',  # Adjust the log level as needed
+        'level': 'DEBUG',  # Adjust the log level as needed
     },
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -152,7 +163,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-# MEDIA_URL = '/media/'
 MEDIA_URL = "media/"     # e.g. localhost:80/media/image.jpg
 
 # directory where all files uploaded by users(media files) are going to be put

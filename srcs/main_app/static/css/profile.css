@@ -1,0 +1,95 @@
+.profile {
+	width: 80vw;
+	height: 60vh;
+	overflow: scroll;
+}
+
+.profile h1 {
+	color: var(--Dark-Text, #FFFDE1);
+	text-shadow: 0 0.13em 0 #251B2A;
+	-webkit-text-stroke-width: 1px;
+	-webkit-text-stroke-color: #251B2A;
+	font-family: 'ps2p';
+	font-size: 1.5em;
+	font-weight: 400;
+	line-height: normal;
+	text-transform: uppercase;
+}
+
+.profile .card {
+	padding: 20px;
+	min-height: 250px;
+}
+
+.profile .content {
+	min-width: 0;
+	overflow: scroll;
+}
+
+.profile button {
+	width: 100%;
+	background: #FCF9F4;
+	color: #59322B;
+	text-align: center;
+	font-family: "ps2p";
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: normal;
+	text-transform: uppercase;
+}
+
+.profile .d-flex {
+	column-gap: 0.5rem;
+	margin-bottom: 5px;
+}
+
+.profile .d-flex p {
+	color: var(--Beach-bunny-Text, #59322B);
+	font-family: 'bpdots';
+	font-size: 15px;
+	font-size: 1.5em;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	position: relative;
+	float: left;
+	transform: translate(0, 50%);
+}
+
+.profile .d-flex a {
+	color: var(--Beach-bunny-Text, #59322B);
+	font-family: 'bpdots';
+	font-size: 1.5em;
+	font-style: normal;
+	font-weight: 700;
+	line-height: normal;
+	position: relative;
+	float: left;
+	text-decoration-line: underline;
+}
+
+.editProfile {
+	width: 40vw;
+	height: 50vh;
+}
+
+.editProfile label,input,button {
+	font-family: 'bpdots';
+	font-size: 0.5vw;
+	color: black;
+}
+
+.editProfile #primary-btn {
+	width: 100%;
+	background: var(--Beach-bunny-Accent, #F5BB76);
+	color: black;
+	border: 2px solid black;
+}
+
+.editProfile #secondry-btn {
+	width: 100%;
+	background: var(--Beach-bunny-Card, #FCF9F4); 
+	color: black;
+	border: 2px solid black;
+}

@@ -126,7 +126,7 @@ onlineGame = () => {
 	}
 	
 	// Countdown animation that plays before a match starts
-	function countdown(parent, callback) {
+	function countdown(parent) {
 		var texts = ['Match found!', '3', '2', '1', 'GO'];
 		
 		// This will store the paragraph we are currently displaying
@@ -140,7 +140,7 @@ onlineGame = () => {
 			if (texts.length === 0) {
 				// If we ran out of text, use the callback to get started
 				clearInterval(interval);
-				callback();
+				gameRunning = true;
 				return;
 			}
 			// Trim array
@@ -203,8 +203,9 @@ onlineGame = () => {
 			leftPlayerId = messageData.left;
 			rightPlayerId = messageData.right;
 			console.log("Match found, left = ", leftPlayerId, " right = ", rightPlayerId);
-			gameRunning = true;
-			countdown(document.getElementById("readyGo"), animateGame);
+			gameRunning = false;
+			animateGame();
+			countdown(document.getElementById("readyGo"));
 			var leftImage = document.getElementById("leftImage");
 			var rightImage = document.getElementById("rightImage");
 			getImage(playerId, leftPlayerId)
@@ -466,11 +467,9 @@ onlineGame = () => {
 	const joinQueue = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId);
-		// prod version
-		// ws = new WebSocket("wss://localhost:2000/ws/game/?uid=" + playerId);
-		
-		// dev version
-		ws = new WebSocket("ws://localhost:2000/ws/game/?uid=" + playerId);
+
+		wsScheme = location.protocol === "https:" ? "wss://" : "ws://";
+		ws = new WebSocket(wsScheme + "localhost:8003/ws/game/?uid=" + playerId);
 		
 		console.log("Socket established, ws = ", ws);
 		ws.onmessage = handleWebSocketMessage;

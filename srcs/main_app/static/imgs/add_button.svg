@@ -1,0 +1,16 @@
+<svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="13" height="13" transform="matrix(1 0 0 -1 8 21)" fill="#EEB3E7"/>
+<path d="M15.5 15.5V22.5H13.5V15.5H6.5V13.5H13.5L13.5 6.5L15.5 6.5V13.5H22.5V15.5L15.5 15.5Z" fill="#AF7885"/>
+<path d="M8 4L21 4V0L8 0V4Z" fill="#EEB3E7"/>
+<path d="M8 29H21V25H8V29Z" fill="#EEB3E7"/>
+<path d="M8 25H21V21H8V25Z" fill="#EEB3E7"/>
+<rect width="4" height="4" transform="matrix(1 0 0 -1 4 25)" fill="#EEB3E7"/>
+<rect width="4" height="4" transform="matrix(1 0 0 -1 4 8)" fill="#EEB3E7"/>
+<rect width="4" height="4" transform="matrix(1 0 0 -1 21 8)" fill="#EEB3E7"/>
+<rect width="4" height="4" transform="matrix(1 0 0 -1 21 25)" fill="#EEB3E7"/>
+<rect width="4" height="13" transform="matrix(1 0 0 -1 0 21)" fill="#EEB3E7"/>
+<path d="M8 8L21 8V4L8 4V8Z" fill="#EEB3E7"/>
+<rect width="4" height="13" transform="matrix(1 0 0 -1 25 21)" fill="#EEB3E7"/>
+<rect width="4" height="13" transform="matrix(1 0 0 -1 21 21)" fill="#EEB3E7"/>
+<rect width="4" height="13" transform="matrix(1 0 0 -1 4 21)" fill="#EEB3E7"/>
+</svg>

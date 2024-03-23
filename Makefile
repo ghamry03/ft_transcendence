@@ -80,10 +80,10 @@ friends-logs		:
 					docker logs -f friendsapp
 
 psql-us		:
-					$(DOCKER_CMD) exec postgres psql --username=postgres --dbname=usermanagement
+					$(DOCKER_CMD) exec postgres psql --username=mehrin --dbname=usermanagement
 
 psql-fr		:
-					$(DOCKER_CMD) exec postgres psql --username=postgres --dbname=friends
+					$(DOCKER_CMD) exec postgres psql --username=mehrin --dbname=friends
 
 ps				:
 					$(DOCKER_CMD) ps
@@ -96,6 +96,8 @@ clean			:
 
 fclean			:	clean
 					rm -rf srcs/postgres/data
+					rm -rf srcs/game_app/online/migrations/
+					rm -rf srcs/game_app/online/__pycache__/
 					rm -rf srcs/friends_app/friends_api/migrations/
 					rm -rf srcs/friends_app/friends_api/__pycache__/
 					rm -rf srcs/user_app/user_api/migrations/

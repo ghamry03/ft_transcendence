@@ -1,0 +1,13 @@
+{% extends "baseForm.html" %}
+{% load static %}
+
+{% block formId %}profilePop{% endblock %}
+
+{% block form %}
+<div class="formBase profile containerBorder d-flex flex-column">
+    <div class="w-100 h-100 mh-100 d-flex justify-content-center align-items-center" id="profileContent">
+        <div class="spinner-border" role="status"></div>
+    </div>
+</div>
+<div class="overlay"  data-bs-toggle="collapse" data-bs-target="#profilePop"  aria-expanded="false" aria-controls="profilePop"></div>
+{% endblock %}

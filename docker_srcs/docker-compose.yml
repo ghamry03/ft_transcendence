@@ -11,7 +11,6 @@ services:
             - user_app_network
         volumes:
             - ../srcs/main_app/:/home/main_app
-            # - main_app_data:/home/main_app
         depends_on:
             userapp:
                 condition: service_started
@@ -28,10 +27,10 @@ services:
         container_name: gameapp
         restart: on-failure
         ports:
-            - "2000:2000"
+            - "8003:8003"
         volumes:
             - ../srcs/game_app/:/home/game_app
-            # - game_app_data:/home/game_app
+            - ../srcs/user_app/:/home/user_app
         depends_on:
             userapp:
                 condition: service_healthy
@@ -49,10 +48,10 @@ services:
         container_name: tourapp
         restart: on-failure
         ports:
-            - "4000:4000"
+            - "8004:8004"
         volumes:
             - ../srcs/tour_app/:/home/tour_app
-            # - tour_app_data:/home/tour_app
+            - ../srcs/user_app/:/home/user_app
         depends_on:
             postgres:
                 condition: service_healthy
@@ -61,7 +60,7 @@ services:
         networks:
             - user_app_network
         # healthcheck:
-        #     test: ["CMD", "curl", "--fail", "http://localhost:4000/tour/health"]
+        #     test: ["CMD", "curl", "--fail", "http://localhost:8004/tour/health"]
         #     interval: 5s
         #     timeout: 5s
         #     retries: 5
@@ -72,7 +71,7 @@ services:
         container_name: userapp
         restart: on-failure
         ports:
-            - "3000:3000"
+            - "8001:8001"
         volumes:
             - ../srcs/user_app/:/home/user_app
         depends_on:
@@ -83,7 +82,7 @@ services:
         networks:
             - user_app_network
         healthcheck:
-            test: ["CMD", "curl", "--fail", "http://localhost:3000/users/health"]
+            test: ["CMD", "curl", "--fail", "http://localhost:8001/api/health"]
             interval: 5s
             timeout: 5s
             retries: 5

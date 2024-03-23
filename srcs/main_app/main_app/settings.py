@@ -29,11 +29,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('FE_DJANGO_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = bool(os.environ.get("DEBUG", default=0))
+DEBUG = os.environ.get("DEBUG", "0") != "0"
 
 ALLOWED_HOSTS = ['*']
 
+# Allowed hostanme to make call to session data api endpoint
+ALLOWED_HOSTNAMES_FOR_API = ['friendsapp:8002']
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -60,6 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -70,11 +74,13 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'INFO',  # Adjust the log level as needed
+        'level': 'DEBUG',  # Adjust the log level as needed
     },
 }
 
 ROOT_URLCONF = 'main_app.urls'
+
+MEDIA_URL = '/media/'
 
 TEMPLATES = [
     {
@@ -148,11 +154,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Uncomment this for dev mode 
-STATICFILES_DIRS = [BASE_DIR / 'static']
-
-# Uncomment this for prod mode
-# STATIC_ROOT = path.join(BASE_DIR, 'static/')
+if DEBUG:
+    STATICFILES_DIRS = [BASE_DIR / 'static']
+else:
+    STATIC_ROOT = path.join(BASE_DIR, 'static/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

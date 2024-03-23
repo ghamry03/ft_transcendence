@@ -12,9 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import environ
-import sys
-
-sys.path.append('/home/user_app')
+import os
 
 # Initialise environment variables
 env = environ.Env()
@@ -31,11 +29,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('FAPI_DJANGO_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(env("DEBUG", default=0))
+DEBUG = os.environ.get("DEBUG", "0") != "0"
 
 ALLOWED_HOSTS = ['*']
 
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user_api',
     'friends_api',
     'rest_framework'
 ]
@@ -59,6 +57,20 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',  # Adjust the log level as needed
+    },
+}
 
 ROOT_URLCONF = 'friends_app.urls'
 
