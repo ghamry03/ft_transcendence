@@ -38,23 +38,6 @@ def calculate_time_passed(self, game_endtime):
 				return "1 second"
 			return f"{time_difference.seconds} seconds"
 
-# class UpdateRank(APIView):
-# 	# allowed_methods = ['POST', 'OPTIONS'] 
-# 	def get(self, request, tid, uid, rank):
-# 		logger.info("Updating rank")
-# 		try:
-# 			tour = Tournament.objects.get(id=tid)
-# 			tourRank = TournamentRank.objects.create(
-# 				playerID=uid,
-# 				rank=rank,
-# 				tournament=tour
-# 			)
-# 			tourRank.save()
-# 			return JsonResponse({'message': 'User added to ranks successfully.'})
-		
-# 		except Tournament.DoesNotExist:
-# 			return HttpResponseBadRequest('Tournament not found.')
-
 def get_rank(user_id, tournament_id):
     try:
         tournament = TournamentRank.objects.get(tournament=tournament_id)
@@ -70,11 +53,12 @@ def get_rank(user_id, tournament_id):
 
 class TournamentHistoryApiView(APIView):
 	def get(self, request, user_id):
-		games = OnlinePlayermatch.objects.filter(player=user_id)
-		logger.info(games)
+		#Exclude was adding because it was crashing when the queryset included a match that didnt belong to a tournament needs testing
+		games = OnlinePlayermatch.objects.filter(player=user_id).exclude(game__tournament_id__isnull=True)
+		logger.info(f'OnlinePlayerMatch: {games}')
 		tournament_details = []
 		for game in games:
-			logger.debug(game.game.tournament)
+			logger.info(f'this is the tour game: {game.game.tournament}')
 			tid = game.game.tournament.id
 			time_passed = calculate_time_passed(self, game.game.endtime)
 			rank = get_rank(user_id, tid)

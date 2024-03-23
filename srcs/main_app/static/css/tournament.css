@@ -249,8 +249,9 @@ tbody{
 
  .tournamentEntry{
    padding: 12px;
-   margin: 0px calc(calc(-.5* var(--bs-gutter-x)) + 1px);
+   border-bottom: 2px solid #dddbdb;
  }
+
 
  .tournamentEntry p{
    margin: 0px;
