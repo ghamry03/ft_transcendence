@@ -78,8 +78,9 @@ class   MatchHistoryApiView(APIView):
 	def get(self, request, user_id):
 		# Retrieve all matches for the user
 		user_matches = PlayerMatch.objects.filter(player = user_id)
-		if not user_matches: # TODO: Return empty response
-			return Response({"message": "No matches found for the given user."}, status=status.HTTP_404_NOT_FOUND)
+		#TODO: add check fi user exists or not, if not return error status
+		# if not user_matches: # TODO: Return empty response
+		# 	return Response({"message": "No matches found for the given user."}, status=status.HTTP_404_NOT_FOUND)
 
 		games_details = []
 		for match in user_matches:

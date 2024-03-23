@@ -70,11 +70,12 @@ def get_rank(user_id, tournament_id):
 
 class TournamentHistoryApiView(APIView):
 	def get(self, request, user_id):
-		games = OnlinePlayermatch.objects.filter(player=user_id)
-		logger.info(games)
+		#Exclude was adding because it was crashing when the queryset included a match that didnt belong to a tournament needs testing
+		games = OnlinePlayermatch.objects.filter(player=user_id).exclude(game__tournament_id__isnull=True)
+		logger.info(f'OnlinePlayerMatch: {games}')
 		tournament_details = []
 		for game in games:
-			logger.debug(game.game.tournament)
+			logger.info(f'this is the tour game: {game.game.tournament}')
 			tid = game.game.tournament.id
 			time_passed = calculate_time_passed(self, game.game.endtime)
 			rank = get_rank(user_id, tid)
