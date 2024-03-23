@@ -1,0 +1,21 @@
+{% load static %}
+{% for user in friendsList %}
+    {% if user.uid != uid and user.relationship != 0 and user.initiator == 0 %}
+        <div id="fr{{user.uid}}" class="row searchedUser">
+            <div class="col-3 ">
+                <object class="circleImg img42" data="{{user.image}}" type="image/png">
+                    <img class="circleImg img42" src="{% static 'imgs/unknownuser.png' %}">
+                </object>
+            </div>
+
+            <div class="d-flex align-items-center col-7 friendName flex-grow-1">
+                <a class="m-0" href="https://profile.intra.42.fr/users/{{user.username}}" target="_blank">{{user.username}}</a>
+            </div>
+
+            <div class="col-2 d-flex align-items-center justify-content-end ">
+                <img class="searchButtonFunction" src="{% static 'imgs/accept_button.svg' %}" onclick="engine('/accept/{{user.uid}}');document.getElementById('fr{{user.uid}}').remove();">
+                <img class="searchButtonFunction" src="{% static 'imgs/reject_button.svg' %}" onclick="engine('/reject/{{user.uid}}');document.getElementById('fr{{user.uid}}').remove();">
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}

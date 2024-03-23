@@ -15,7 +15,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 # RUN django-admin startproject mysite
 
-EXPOSE 3000
+EXPOSE 8001
 
 # COPY . .
 

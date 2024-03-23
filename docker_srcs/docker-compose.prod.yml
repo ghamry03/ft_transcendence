@@ -6,14 +6,26 @@ services:
         container_name: nginx
         restart: on-failure
         volumes:
-            - ./server/conf.d:/etc/nginx/conf.d
+            - ../srcs/main_app/static/:/vol/static
+            - ../srcs/user_app/media/:/vol/media
         ports:
             - "80:80"
+            - "443:443"
+            - "8001:8001"
+            - "8004:8004"
+            - "8002:8002"
+            - "8003:8003"
+            - "8005:8005"
         depends_on:
             - mainapp
             - userapp
+            - tourapp
+            - gameapp
+            - friendsapp
         networks:
             - user_app_network
+        environment:
+            - DEBUG=0
 
     mainapp:
         build: 
@@ -24,15 +36,22 @@ services:
         restart: on-failure
         expose:
           - 8000
-        command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
         depends_on:
             postgres:
                 condition: service_healthy
+            userapp:
+                condition: service_started
+            gameapp:
+                condition: service_started
+            tourapp:
+                condition: service_started
         env_file:
             - ./.env
         networks:
             - user_app_network
-    
+        environment:
+            - DEBUG=0
+ 
     gameapp:
         build: 
           context: ../
@@ -41,15 +60,40 @@ services:
         container_name: gameapp
         restart: on-failure
         expose:
-          - 2000
-        # command: gunicorn game_app.wsgi:application --bind 0.0.0.0:2000
+          - 8003
         depends_on:
             userapp:
+                condition: service_healthy
+            tourapp:
                 condition: service_healthy
         env_file:
             - ./.env
         networks:
             - user_app_network
+        environment:
+            - DEBUG=0
+
+    tourapp:
+        build: 
+          context: ../
+          dockerfile: ./docker_srcs/tour_app/Dockerfile.prod
+        image: tourapp
+        container_name: tourapp
+        restart: on-failure
+        expose:
+          - 8004
+        depends_on:
+            postgres:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:8004/tour/health"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
 
     userapp:
         build:
@@ -59,15 +103,23 @@ services:
         container_name: userapp
         restart: on-failure
         expose:
-          - 3000
-        command: gunicorn userapp.wsgi:application --bind 0.0.0.0:3000
+          - 8001
         depends_on:
             postgres:
                 condition: service_healthy
         env_file:
             - ./.env
+        volumes:
+            - ../srcs/user_app/media:/home/user_app/media
         networks:
             - user_app_network
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:8001/api/health"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        environment:
+            - DEBUG=0
 
     postgres:
         build: ./postgres
@@ -76,7 +128,6 @@ services:
         restart: on-failure
         volumes:
             - ../srcs/postgres/data:/var/lib/postgresql/data
-            # - postgres_data:/var/lib/postgresql/data
         healthcheck:
             test: pg_isready -U postgres
             interval: 5s
@@ -86,14 +137,29 @@ services:
             - ./.env
         networks:
             - user_app_network
+        environment:
+            - DEBUG=0
 
-# volumes:
-#     postgres_data:
-#         driver: local
-#         driver_opts:
-#             o: bind
-#             type: none
-#             device: ../srcs/postgres/data
+    friendsapp:
+        build:
+          context: ../
+          dockerfile: ./docker_srcs/friends_app/Dockerfile.prod
+        image: friendsapp
+        container_name: friendsapp
+        restart: always
+        expose:
+          - 8002
+        depends_on:
+            postgres:
+                condition: service_healthy
+            userapp:
+                condition: service_healthy
+        env_file:
+            - ./.env
+        networks:
+            - user_app_network
+        environment:
+            - DEBUG=0
 
 networks:
     user_app_network:

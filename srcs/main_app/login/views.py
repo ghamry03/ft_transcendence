@@ -2,18 +2,23 @@ import environ
 import os
 import requests
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from . import AUTH_URL, USER_API_URL, REDIRECT_URI
+import logging
+from time import time
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 def loginPage(request):
     context = {
-        'authUrl': environ.Env()('AUTH_URL')
+        'authUrl': AUTH_URL
     }
     return render(request, 'login.html', context)
 
 def logout(request):
     context = {
-        'authUrl': environ.Env()('AUTH_URL')
+        'authUrl': AUTH_URL
     }
     request.session.flush()
     return render(request, 'login.html', context)
@@ -25,7 +30,7 @@ def authenticate(request):
         'client_id': (None, os.environ['INTRA_UID']),
         'client_secret': (None, os.environ['INTRA_SECRET']),
         'code': (None, request.GET.get('code')),
-        'redirect_uri': (None, 'http://127.0.0.1:8000/authenticate'),
+        'redirect_uri': (None, REDIRECT_URI),
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
     if response.status_code == 200:
@@ -34,6 +39,7 @@ def authenticate(request):
         refresh_token = json_response.get('refresh_token', None)
         request.session['access_token'] = access_token
         request.session['refresh_token'] = refresh_token
+        request.session['token_expiry'] = int(json_response.get('created_at')) + 7200
 
         if access_token:
             headers = {
@@ -46,7 +52,8 @@ def authenticate(request):
                 'X-UID': UID,
                 'X-TOKEN': access_token
             }
-            user_api_response = requests.get(environ.Env()('USER_API_URL') + '/users/api/' + UID, headers=headers)
+
+            user_api_response = requests.get(USER_API_URL + 'api/user/' + UID, headers=headers)
             request.session['userData'] = user_api_response.json()
             request.session['logged_in'] = True
             return redirect('/')
@@ -58,6 +65,9 @@ def authenticate(request):
 
 
 def renew_token(request):
+    if request.session.get('token_expiry', 0) < int(time()):
+        return JsonResponse({'error': 'Token already expired'}, status=400)
+
     files = {
         'grant_type': (None, 'refresh_token'),
         'refresh_token': (None, request.session['refresh_token']),
@@ -65,10 +75,13 @@ def renew_token(request):
         'client_secret': (None, os.environ['INTRA_SECRET'])
     }
     response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
+
     if response.status_code == 200:
         json_response = response.json()
         request.session['access_token'] = json_response.get('access_token', None)
         request.session['refresh_token'] = json_response.get('refresh_token', None)
+        request.session['token_expiry'] = int(json_response.get('created_at')) + 7200
+        return JsonResponse({'message': 'Token renewed successfully'}, status=200)
     else:
-        request.session.flush()
-    return HttpResponse(status=response.status_code)
+        error_message = response.json().get('error', 'intra issue')
+        return JsonResponse({'error': error_message}, status=response.status_code)

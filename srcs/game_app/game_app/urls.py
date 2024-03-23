@@ -16,18 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-# from game_api import urls as game_urls
-from django.views.generic import RedirectView
-
-# Use static() to add URL mapping to serve static files during development (only)
-from django.conf import settings
-from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 	path('game/', include('game_api.urls')),
 ]
-
-# urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

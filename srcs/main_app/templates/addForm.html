@@ -1,0 +1,40 @@
+{% extends "baseForm.html"%}
+{% load static %}
+{% block formId %}addFriendPop{% endblock %}
+{% block formId2 %}addFriendPop{% endblock %}
+{% block formId3 %}addFriendPop{% endblock %}
+
+{% block form %}
+    <div class="formBase pixelCard">
+        <h3 class="formTitle">
+            Add Friend
+        </h3>
+        <form action="javascript:void(0);">
+            <div class="row justify-content-center mt-3">
+                <div class="col-8 pill-border-pink pink-bg">
+                    <div class="input-group searchInput">
+                        <span class="input-group-prepend">
+                            <div class="input-group-text bg-transparent formIcon"><img src="{% static 'imgs/search.svg' %}"></div>
+                        </span>
+                        <input oninput="engine('/searchUsers/' + this.value);" class="form-control py-2" type="search" value="" placeholder="Search Users">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center  mt-3">
+                <div class="col-8">
+                    <div id="searchUsers">
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5 justify-content-center">
+                <div class="col-8 d-flex justify-content-end ">
+                    <input class="formDone" type="button" value="Done"  data-bs-toggle="collapse" data-bs-target="#addFriendPop" aria-expanded="false" aria-controls="addFriendPop" >
+                </div>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}

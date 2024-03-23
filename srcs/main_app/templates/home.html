@@ -1,20 +1,62 @@
 <div class="topBar">
     <div class="row">
         <div class="col-6 d-flex justify-content-start align-middle">
-            <h1 class="pongping align-self-center" onclick="engine('/cards')">pong<br />ping</h1>
+            <h1 class="pongping align-self-center" onclick="engine('/cards')">
+                pong<br />ping
+            </h1>
         </div>
         <div class="col-6 d-flex justify-content-end" id="topBar"></div>
     </div>
 </div>
 <div class="row g-0">
     <div class="col-2 flex-grow-1">
-        <div class="navigationBar row m-0">
-            <div class="col">
-
+        <div class="navigationBar">
+            <div class="friend friendRequest row g-0 m-0" data-bs-toggle="collapse"
+            data-bs-target="#friendRequestsPop">
+                <div class="col-3 flex-grow-1">
+                    {% load static %}
+                    <div class="position-relative d-inline-block {% if friendRequests != 0 %} friendRequestButton {% endif %} ">
+                        <img src="{% static 'imgs/invites_button.svg'%}" />
+                    </div>
+                </div>
+                <div class="align-items-center friendName title col-9">
+                    <p class="m-0">friend requests</p>
+                </div>
             </div>
+
+            <!--INJECT THE FRIENDS HERE -->
+            <div class="friendInjection">
+                {% for friend in friendsList %}
+                    {% if friend.relationship == 0 %}
+                        {% include 'friend.html' with name=friend.username uid=friend.uid imgURL=friend.image %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <!--END OF FRIENDS INJECTION-->
+
+            <!--ADD FRIEND HERE-->
+            <div
+                class="friend friendRequest friendAdd row g-0 m-0"
+                data-bs-toggle="collapse"
+                data-bs-target="#addFriendPop"
+            >
+                <div class="col-3">
+                    {% load static %}
+                    <img src="{% static 'imgs/add_friend.svg'%}" />
+                </div>
+                <div class="align-items-center friendName title col-9">
+                    <p class="m-0">add friends</p>
+                </div>
+            </div>
+            <!--END OF ADD FRIEND-->
         </div>
     </div>
-    <div id="homeContentArea" class="welcomeBar col-8"></div>
+    <div id="homeContentArea" class="welcomeBar col-8  d-flex flex-column "></div>
 
     <div class="col-2"></div>
 </div>
+
+{% include 'profileForm.html'%}
+{% include 'editProfileForm.html' %}
+{% include 'addForm.html'%}
+{% include 'friendRequests.html'%}
