@@ -351,9 +351,15 @@ body {
   border-bottom: solid 2px var(--beach-bunny-lavendar-dark);
 }
 
-.friend {
+.friend , .friendButton{
   margin-top: 10px!important;
 }
+
+.friendButton:last-child{
+  margin-top: 0px!important;
+}
+
+
 
 .friend:hover p{
   text-decoration: underline;
@@ -368,8 +374,8 @@ body {
 
 .friendInjection{
   position: relative;
-  height: 80%;
-  max-height: 80%;
+  height: calc(100% - 128px);
+  overflow-y: auto;
 }
 
 .basePopup{
