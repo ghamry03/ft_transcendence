@@ -1,144 +1,112 @@
 import json
 import requests
-from django.http import JsonResponse
-from django.shortcuts import render
+
 from main_app.constants import USER_API_URL, FRIEND_API_URL
 
+from django.http import JsonResponse
+from django.shortcuts import render
+
+
 def updateStatus(request, status):
-    userData = request.session.get('userData', None)
-    uid = userData.get('uid', None)
-    access_token = request.session.get('access_token', None)
+    user_data = request.session.get('userData')
+    if not user_data:
+        return JsonResponse({'error': 'User data not found'}, status=400)
+
+    uid = user_data.get('uid')
+    access_token = request.session.get('access_token')
+    if not all([uid, access_token]):
+        return JsonResponse({'error': 'Missing UID or access token'}, status=400)
+
     headers = {
         'X-UID': str(uid),
         'X-TOKEN': str(access_token)
     }
-    data = { 'status': status }
-    response = requests.post(
-            USER_API_URL + 'api/user/' + str(uid) + '/',
-            headers=headers,
-            data=data
-            )
-    return JsonResponse({'message': 'status updated'});
+    data = {'status': status}
+    try:
+        requests.post(f"{USER_API_URL}api/user/{uid}/", headers=headers, data=data)
+    except requests.RequestException as e:
+        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+
+    return JsonResponse({'message': 'Status updated'})
 
 def profile(request, uid):
+    user_data = request.session.get('userData')
+    access_token = request.session.get('access_token')
+    if not all([user_data, access_token]):
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
     headers = {
-        'X-UID': str(request.session['userData']['uid']),
-        'X-TOKEN': request.session['access_token']
+        'X-UID': str(user_data['uid']),
+        'X-TOKEN': access_token
     }
-    response = requests.get(USER_API_URL + 'api/user/' + str(uid), headers=headers)
-    json = response.json()
+    response = requests.get(f"{USER_API_URL}api/user/{uid}", headers=headers)
+    profile_data = response.json()
 
-    profile_type = -1 # Current client profile
-    if uid != request.session['userData']['uid']:
-        headers = {
-            'Content-Type': 'application/json',
-        }
-        data = {
-            'ownerUID': request.session['userData']['uid'],
-            'uid': uid,
-            'access_token': request.session['access_token']
-        }
-        friends_response = requests.get(FRIEND_API_URL + 'api/friends/', headers=headers, json=data)
-        print(friends_response)
-        print(friends_response.json())
-        if friends_response:
-            friendsJson = friends_response.json()
-            if not 'relationship' in friendsJson:
-                profile_type = 1
-                relationship = -1
-            else:
-                relationship = int(friendsJson['relationship'])
-
-            if relationship == 0:
-                profile_type = 2
-            elif relationship == 1:
-                initiator = int(friendsJson['initiator'])
-                if initiator == 1:
-                    profile_type = 3
-                elif initiator == 0:
-                    profile_type = 4
-        else:
-            profile_type = -1
-        # profile_type = 1 # add friend
-        # profile_type = 2 # remove friend
-        # profile_type = 3 # cancel request
-        # profile_type = 4 # accept request
-    else:
-        profile_type = 0
+    profile_type = get_profile_type(uid, user_data['uid'], access_token)
 
     context = {
         'uid': uid,
-        'image': json['image'],
-        'username': json['username'],
-        'full_name': f"{json['first_name']} {json['last_name']}",
-        'campus': json['campus_name'],
-        'intra_url': json['intra_url'],
-        'status': json['status'],
+        'image': profile_data['image'],
+        'username': profile_data['username'],
+        'full_name': f"{profile_data['first_name']} {profile_data['last_name']}",
+        'campus': profile_data['campus_name'],
+        'intra_url': profile_data['intra_url'],
+        'status': profile_data['status'],
         'type': profile_type,
     }
     return render(request, 'profileContent.html', context)
-# def profile(request, uid):
-#     userData = request.session.get('userData', None)
-#     access_token = request.session.get('access_token', None)
-#     headers = {
-#         'X-UID': str(request.session['userData']['uid']),
-#         'X-TOKEN': access_token
-#     }
-#     response = requests.get(USER_API_URL + 'api/user/' + str(uid), headers=headers)
-#     json = response.json()
-    
-#     profile_type = 0 # Current client profile
-#     if uid != userData.get('uid', None):
-#         # check if it's a friend or not
-#         profile_type = 1 # a friend
-#         profile_type = 2 # not a friend
 
-#     context = {
-#         'image': json['image'],
-#         'username': json['username'],
-#         'full_name': f"{json['first_name']} {json['last_name']}",
-#         'campus': json['campus_name'],
-#         'intra_url': json['intra_url'],
-#         'status': json['status'],
-#         'type': profile_type,
-#     }
-#     return render(request, 'profileContent.html', context)
-def edit_profile(request):
-    if request.method == 'POST':
-        headers = {
-            'X-UID': str(request.session['userData']['uid']),
-            'X-TOKEN': request.session['access_token']
+def get_profile_type(uid, session_uid, access_token):
+    if uid != session_uid:
+        data = {
+            'ownerUID': session_uid,
+            'uid': uid,
+            'access_token': access_token
         }
+        friends_response = requests.get(f"{FRIEND_API_URL}api/friends/", json=data)
+        if friends_response.ok:
+            friends_data = friends_response.json()
+            relationship = friends_data.get('relationship', -1)
+            return determine_relationship_type(relationship, friends_data)
+        return -1
+    return 0
 
-        data = {}
-        files = {}
+def determine_relationship_type(relationship, friends_data):
+    """Maps relationship status to profile type."""
+    if relationship == 0:
+        return 2  # remove friend
+    elif relationship == 1:
+        initiator = int(friends_data.get('initiator', -1))
+        if initiator == 1:
+            return 3  # cancel request
+        elif initiator == 0:
+            return 4  # accept request
+    return 1  # add friend
 
-        username = request.POST.get('username')
-        if username:
-            data['username'] = username
+def edit_profile(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-        image = request.FILES.get('image')
-        if image:
-            files['image'] = image
+    user_data = request.session.get('userData')
+    access_token = request.session.get('access_token')
+    if not user_data or not access_token:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
 
-        try:
-            api_response = requests.post(
-                    USER_API_URL + 'api/user/' + str(request.session['userData']['uid']) + '/',
-                headers=headers,
-                data=data,
-                files=files,
-            )
-        except requests.exceptions.RequestException as e:
-            return JsonResponse({'error': 'Failed to connect to the API.', 'details': str(e)}, status=500)
+    headers = {
+        'X-UID': str(user_data['uid']),
+        'X-TOKEN': access_token
+    }
 
-        try:
-            response_data = api_response.json()
-        except json.JSONDecodeError as e:
-            response_data = {'error': 'Failed to pasrse response'}
-            return JsonResponse(response_data, status=api_response.status_code)
+    data = request.POST.dict()
+    files = request.FILES.dict()
 
-        if api_response.status_code == 200:
-            request.session['userData'] = response_data
-            return JsonResponse({'message': 'Form submitted successfully'})
-
-        return JsonResponse(response_data, status=api_response.status_code)
+    try:
+        response = requests.post(
+            f"{USER_API_URL}api/user/{user_data['uid']}/",
+            headers=headers, data=data, files=files
+        )
+        response.raise_for_status()  # Raise an error for bad responses
+        request.session['userData'] = response.json()
+        return JsonResponse({'message': 'Profile updated successfully'})
+    except requests.RequestException as e:
+        return JsonResponse({'error': 'Failed to update profile', 'details': str(e)}, status=500)
