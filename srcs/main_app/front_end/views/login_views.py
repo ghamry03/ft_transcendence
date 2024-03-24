@@ -1,13 +1,13 @@
-import environ
 import os
+import environ
 import requests
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
-from . import AUTH_URL, USER_API_URL, REDIRECT_URI
-import logging
 from time import time
 
-logger = logging.getLogger(__name__)
+from main_app.constants import AUTH_URL, USER_API_URL, REDIRECT_URI
+
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
+
 
 # Create your views here.
 def loginPage(request):
@@ -15,14 +15,6 @@ def loginPage(request):
         'authUrl': AUTH_URL
     }
     return render(request, 'login.html', context)
-
-def logout(request):
-    context = {
-        'authUrl': AUTH_URL
-    }
-    request.session.flush()
-    return render(request, 'login.html', context)
-
 
 def authenticate(request):
     files = {
@@ -63,6 +55,12 @@ def authenticate(request):
         pass
     return redirect('/')
 
+def logout(request):
+    context = {
+        'authUrl': AUTH_URL
+    }
+    request.session.flush()
+    return render(request, 'login.html', context)
 
 def renew_token(request):
     if request.session.get('token_expiry', 0) < int(time()):

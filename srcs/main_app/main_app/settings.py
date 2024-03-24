@@ -49,8 +49,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap5',
     'front_end',
-    'login',
-    'game'
 ]
 
 MIDDLEWARE = [

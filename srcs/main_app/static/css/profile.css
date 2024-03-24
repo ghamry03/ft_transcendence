@@ -2,6 +2,9 @@
 	width: 80vw;
 	height: 60vh;
 	overflow: scroll;
+	background: #D4BBFE;
+	padding: 20px 0;
+	overflow: scroll;
 }
 
 .profile h1 {
@@ -41,7 +44,6 @@
 
 .profile .d-flex {
 	column-gap: 0.5rem;
-	margin-bottom: 5px;
 }
 
 .profile .d-flex p {
