@@ -36,7 +36,6 @@ onlineGame = () => {
 
 	// Initialize all game variables
 	const canvas = document.getElementById("gameCanvas");
-	const gameContainer = document.getElementById("gameContainer");
 	const leftScore = document.getElementById("leftScore");
 	const rightScore = document.getElementById("rightScore");
 	const ctx = canvas.getContext("2d");
@@ -48,15 +47,12 @@ onlineGame = () => {
 	
 	var animationId;
 
-	console.log("canvas w and h = ", canvas.width, canvas.height)
 	const canvasW = canvas.getBoundingClientRect().width;
 	const canvasH = canvas.getBoundingClientRect().height;
-	
 	canvas.width = canvasW;
 	canvas.height = canvasH;
 	console.log("canvas w and h = ", canvas.width, canvas.height)
 	
-
 	// Paddles
 	var paddleHeight = Math.floor(canvasH * paddleHScale);
 	var paddleWidth = Math.floor(canvasW * paddleWScale);
@@ -64,8 +60,6 @@ onlineGame = () => {
 	var rightPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
 	var paddleSpeed = canvasH * 0.01;
 	
-	console.log("paddle w and h = ", paddleWidth, paddleHeight);
-
 	// Ball
 	var ballXaxis = Math.floor(canvasW / 2);
 	var ballYaxis = Math.floor(canvasH / 2);
@@ -183,11 +177,8 @@ onlineGame = () => {
 			}
 		}
 		if (messageData.type === "scoreUpdate") {
-			console.log("score reset received, ", messageData.ballDir);
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
-			// reset(ballSpeed * messageData.ballDir);
-			// gameRunning = true;
 			reset(ballSpeed * messageData.ballDir).then(() => {
 				gameRunning = true;
 			});
@@ -195,16 +186,12 @@ onlineGame = () => {
 		else if (messageData.type === "matchEnded") {
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
-			// reset(ballSpeed);
-			// draw();
-			// requestAnimationFrame(endMatch);
 			reset(ballSpeed).then(() => {
 				draw();
 				requestAnimationFrame(endMatch);
 			});
 		}
 		else if (messageData.type === "inGame") {
-			// console.log("you're queued or have another ongoing match on another tab or computer", playerId);
 			ws.close(3001, "Player already in-game");
 			alert("You have a game running on another session!");
 			engine('/cards');
@@ -220,12 +207,10 @@ onlineGame = () => {
 			var rightImage = document.getElementById("rightImage");
 			getImage(playerId, leftPlayerId)
 				.then(imgUrl => {
-					console.log("left image found: ", imgUrl);
 					leftImage.src = imgUrl;
 				});
 			getImage(playerId, rightPlayerId)
 				.then(imgUrl => {
-					console.log("right image found: ", imgUrl);
 					rightImage.src = imgUrl;
 				});
 		}
@@ -235,10 +220,6 @@ onlineGame = () => {
 				cancelAnimationFrame(animationId);
 				engine('/cards');
 			});
-			// reset(ballSpeed);
-			// alert("Opponent disconnected from the game");
-			// cancelAnimationFrame(animationId);
-			// engine('/cards');
 		}
 	};
 
@@ -250,7 +231,7 @@ onlineGame = () => {
 			|| rightPlayerScore == WIN_SCORE && rightPlayerId == playerId) {
 			// Display victory message and prepare for next round
 			setTimeout(function() {
-				alert("You win!");
+				alert("You win! Returning to home screen...");
 				cancelAnimationFrame(animationId);
 				engine('/cards');
 			  }, 0)
@@ -258,7 +239,7 @@ onlineGame = () => {
 		else {
 			// Display defeat message and prepare for result display
 			setTimeout(function() {
-				alert("You lose.");
+				alert("You lose. Returning to home screen...");
 				cancelAnimationFrame(animationId);
 				engine('/cards');
 			  }, 0)
@@ -326,29 +307,20 @@ onlineGame = () => {
 	}
 
 	// sidePlayerId - pass in either the rightPlayerId or leftPlayerId
-	function checkScoreSide(sidePlayerId, sideTemp) {
-		console.log("ball hit ", sideTemp)
+	function checkScoreSide(sidePlayerId, ballHitRight) {
 		if (playerId == sidePlayerId) {
-			console.log("i scored on ", sideTemp);
 			ballXaxis = canvasW / 2;
 			ballYaxis = canvasH / 2;
 			gameRunning = false;
 			sendScoredEvent();
 		}
 		else {
-			if (sideTemp == "right") {
-				if (ballSpeedXaxis < 0) 
-					console.log("case 1 detected!!!!!!!!!!!!!!!!!!!!!!!");
+			if (ballHitRight == true) {
 				ballSpeedXaxis = -ballSpeed;
 			}
 			else {
-				if (ballSpeedXaxis > 0) {
-					console.log("case 2 detected!!!!!!!!!!!!!!!!!!!!!!!");
-				}
-
 				ballSpeedXaxis = ballSpeed;
 			}
-			console.log("opponent scored on ", sideTemp, ballSpeedXaxis)
 		}
 	}
 
@@ -358,9 +330,7 @@ onlineGame = () => {
 	{
 		await lock.acquire()
 		try {
-		
 			if (gameRunning == false) {
-				// console.log("stuck here");
 				return ;
 			}
 			// Left paddle movement
@@ -410,11 +380,11 @@ onlineGame = () => {
 			// Check if ball goes out of bounds on left or right side of canvas
 			if (ballXaxis - ballRadius <= 0) {
 				// Check if this player is the right player and forward score info to server accordingly
-				checkScoreSide(rightPlayerId, "left");
+				checkScoreSide(rightPlayerId, false);
 			}
 			else if (ballXaxis + ballRadius >= canvasW) {
 				// Check if this player is the left player and forward score info to server accordingly
-				checkScoreSide(leftPlayerId, "right");
+				checkScoreSide(leftPlayerId, true);
 			}
 		} finally {
 			lock.release()
@@ -429,11 +399,6 @@ onlineGame = () => {
 			// Start the animation loop
 			animationId = requestAnimationFrame(animateGame);
 		});
-		// update();
-		// // Draw the updated frame on the canvas
-		// draw();
-		// // Start the animation loop
-		// animationId = requestAnimationFrame(animateGame);
 	};
 
 
@@ -514,17 +479,4 @@ onlineGame = () => {
 		console.log('DESTROYED');
 	};
 }
-
-function docReady(fn) {
-	// see if DOM is already available
-	if (document.readyState === "complete" || document.readyState === "interactive") {
-		// call on next available tick
-		setTimeout(fn, 1);
-	} else {
-		document.addEventListener("DOMContentLoaded", fn);
-	}
-} 
-
-docReady( function() {
-	onlineGame();
-});
+onlineGame();

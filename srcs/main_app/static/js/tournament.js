@@ -106,7 +106,6 @@ tournament = () => {
 				bracketContainer.style.display = "none";
 				statusBox.style.display = "none";
 				await engine('/tourGame');
-				console.log("fetched tour game template");
 			}
 		} finally {
 			lock.release()
@@ -280,12 +279,10 @@ tournament = () => {
 		var rightImage = document.getElementById("rightImage");
 		getImage(leftPlayerId)
 			.then(imgUrl => {
-				console.log("Image URL:", imgUrl);
 				leftImage.src = imgUrl;
 			});
 		getImage(rightPlayerId)
 			.then(imgUrl => {
-				console.log("Image URL:", imgUrl);
 				rightImage.src = imgUrl;
 			});
 			
@@ -376,7 +373,6 @@ tournament = () => {
 				}
 				break;
 			case "scoreUpdate":
-				console.log("score reset received, ", messageData.ballDir);
 				leftPlayerScore = messageData.leftScore;
 				rightPlayerScore = messageData.rightScore;
 				reset(ballSpeed * messageData.ballDir).then(() => {
@@ -417,9 +413,9 @@ tournament = () => {
 				addImage(newPlayerId, messageData.imgId);
 				break;
 			case "inGame":
-				console.log("You're queued or have another ongoing tournament on another tab or computer", playerId);
 				ws.close(3001, "Player already in-game");
-				// show error pop up and redirect them back to home page 
+				alert("You have a tournament running on another session!");
+				engine('/cards');
 				break;
 			case "playerLeftQueue":
 				console.log("Player ", messageData.playerId, " has left the queue");
@@ -580,21 +576,23 @@ tournament = () => {
 	}
 
 	// sidePlayerId - pass in either the rightPlayerId or leftPlayerId
-	function checkScoreSide(sidePlayerId, sideTemp) {
-		console.log("ball hit ", sideTemp)
+	function checkScoreSide(sidePlayerId, ballHitRight) {
 		if (playerId == sidePlayerId) {
-			console.log("i scored on ", sideTemp);
 			ballXaxis = canvasW / 2;
 			ballYaxis = canvasH / 2;
 			gameRunning = false;
 			sendScoredEvent();
 		}
 		else {
-			ballSpeedXaxis = -ballSpeedXaxis;
-			console.log("opponent scored on ", sideTemp, ballSpeedXaxis)
+			if (ballHitRight == true) {
+				ballSpeedXaxis = -ballSpeed;
+			}
+			else {
+				ballSpeedXaxis = ballSpeed;
+			}
 		}
 	}
-
+	
 	// This function is called in the animation loop for every frame update
 	// The paddle positions and ball positions are updated here
 	async function update()
@@ -602,7 +600,7 @@ tournament = () => {
 		await lock.acquire()
 		try {
 			if (gameRunning == false) {
-				console.log("stuck here");
+				// console.log("stuck here");
 				return ;
 			}
 			// Left paddle movement
@@ -652,11 +650,11 @@ tournament = () => {
 			// Check if ball goes out of bounds on left or right side of canvas
 			if (ballXaxis - ballRadius <= 0) {
 				// Check if this player is the right player and forward score info to server accordingly
-				checkScoreSide(rightPlayerId, "left");
+				checkScoreSide(rightPlayerId, false);
 			}
 			else if (ballXaxis + ballRadius >= canvasW) {
 				// Check if this player is the left player and forward score info to server accordingly
-				checkScoreSide(leftPlayerId, "right");
+				checkScoreSide(leftPlayerId, true);
 			}
 		} finally {
 			lock.release()
