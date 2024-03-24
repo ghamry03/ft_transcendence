@@ -1,11 +1,11 @@
 {% load static %}
-<div class="container-fluid d-flex flex-grow-1 mh-100">
-    <div class="row flex-grow-1" style="margin: 20px.">
+<div class="container-fluid d-flex flex-grow-1 mh-100 pt-3 pb-3">
+    <div class="row flex-grow-1 g-3 g-lg-1 mw-100">
 
         <!-- Profile pic, name, login -->
         <div
             class="col-12 col-lg-3 mh-100 d-flex flex-column flex-grow-1"
-            style="padding: 8px; background-color: #D4BBFE; border-radius: 25px; overflow: scroll;"
+            style="overflow: scroll"
         >
             <!-- img -->
             <div class="d-flex justify-content-center" style="margin-bottom: 25px;">
@@ -13,7 +13,7 @@
             </div>
 
             <!-- username -->
-            <div class="d-flex">
+            <div class="d-flex mb-3">
                 <h1 class="text-truncate text-nowrap">{{username}}</h1>
                 {% if status == 1 %}
                     <img src="{% static 'imgs/online_status.svg' %}" alt="online" class="img-fluid" style="height: 100%; width: auto;">
@@ -25,7 +25,7 @@
             </div>
 
             <!-- button -->
-            <div class="d-flex" id="button">
+            <div class="d-flex mb-3" id="button">
                 {% if type == 0 %}
                     <button class="btn"
                     data-bs-toggle="collapse"
@@ -34,9 +34,20 @@
                     Edit Profile
                 </button>
                 {% elif type == 1 %}
-                    <button class="btn" onclick="">Remove Friend</button>
+                    <button class="btn" onclick="engine('/add/{{uid}}/'); engine('/profile/{{uid}}')">Add Friend</button>
+                {% elif type == 2 %}
+                    <button class="btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Remove Friend Friend</button>
+                {% elif type == 3 %}
+                    <button class="btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Cancel Request</button>
+                {% elif type == 4 %}
+                    <div class="col-9">
+                        <button class="btn" onclick="engine('/accept/{{uid}}/'); engine('/profile/{{uid}}')">Accept Request</button>
+                    </div>
+                    <div class="col-3">
+                        <button class="btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Reject Request</button>
+                    </div>
                 {% else %}
-                    <button class="btn" onclick="">Add Friend</button>
+                    <button type="" class="btn">Unavilable</button>
                 {% endif %}
             </div>
 
@@ -60,9 +71,9 @@
         </div>
 
         <!-- match history -->
-        <div class="col-12 col-lg-6 d-flex card mh-100">
-            <div id="matchHistoryDash" class="d-flex flex-grow-1 mh-100" style="">
-                <div class="content flex-grow-1">
+        <div class="col-12 col-lg-6 d-flex mh-100">
+            <div id="matchHistoryDash" class="d-flex flex-grow-1 mh-100">
+                <div class="content flex-grow-1 p-2">
                     <div class="titleSection">
                         <h3 class="title">Match History</h3>
                     </div>
@@ -176,9 +187,9 @@
         </div>
 
         <!-- tour history -->
-        <div class="col-12 col-lg-3 d-flex card mh-100">
+        <div class="col-12 col-lg-3 d-flex mh-100">
             <div id="tournamentHistoryDash" class="d-flex flex-grow-1 mh-100">
-                <div class="content flex-grow-1">
+                <div class="content flex-grow-1 p-2">
                     <div class="titleSection">
                         <h3 class="title">Your Tournaments</h3>
                     </div>
