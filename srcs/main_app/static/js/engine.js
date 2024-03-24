@@ -192,6 +192,7 @@ const injections = [
 
 function engine(pageUrl, addToHistory=true) {
     var promise;
+    console.log('LEMEEEE IN');
     for (let route of injections) {
         if (route.pattern.test(pageUrl)) {
             promise = route.handler(pageUrl);

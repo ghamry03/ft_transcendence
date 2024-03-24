@@ -1,13 +1,7 @@
 {% load static %}
 {% for user in friendsList %}
     {% if user.uid != uid and user.relationship != 0 and user.initiator == 0 %}
-        <div
-            id="fr{{user.uid}}"
-            class="row searchedUser"
-            data-bs-toggle="collapse"
-            data-bs-target="#profilePop"
-            onclick="engine('/profile/{{user.uid}}');"
-        >
+        <div id="fr{{user.uid}}" class="row searchedUser">
             <div class="col-3 ">
                 <object class="circleImg img42" data="{{user.image}}" type="image/png">
                     <img class="circleImg img42" src="{% static 'imgs/unknownuser.png' %}">
@@ -15,7 +9,14 @@
             </div>
 
             <div class="d-flex align-items-center col-7 friendName flex-grow-1">
-                <a class="m-0" href="https://profile.intra.42.fr/users/{{user.username}}" target="_blank">{{user.username}}</a>
+                <a
+                    class="m-0"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#profilePop"
+                    onclick="engine('/profile/{{user.uid}}');"
+                >
+                    {{user.username}}
+                </a>
             </div>
 
             <div class="col-2 d-flex align-items-center justify-content-end ">
