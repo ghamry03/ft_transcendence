@@ -78,8 +78,6 @@ services:
           context: ../
           dockerfile: ./docker_srcs/tour_app/Dockerfile.prod
         image: tourapp
-        volumes:
-            - ../srcs/tour_app/:/home/tour_app
         container_name: tourapp
         restart: on-failure
         expose:

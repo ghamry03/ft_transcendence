@@ -53,7 +53,7 @@ offlineGame = () => {
   // Score
   var leftPlayerScore = 0;
   var rightPlayerScore = 0;
-  var maxScore = 3;
+  var maxScore = 8;
 
   // Keyboard events
   document.addEventListener("keydown", keyDownHandler);

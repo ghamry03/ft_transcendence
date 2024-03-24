@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY docker_srcs/tour_app/entrypoint.prod.sh /
 RUN chmod a+x /entrypoint.prod.sh
 
-# COPY ./srcs/tour_app .
+COPY ./srcs/tour_app .
 RUN chown -R app:app $HOME
 USER app
 EXPOSE 8004
