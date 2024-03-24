@@ -191,7 +191,6 @@ const injections = [
 
 
 function engine(pageUrl, addToHistory=true) {
-    console.log(pageUrl)
     var promise;
     for (let route of injections) {
         if (route.pattern.test(pageUrl)) {
