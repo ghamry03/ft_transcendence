@@ -25,29 +25,35 @@ offlineGame = () => {
     document.location.reload();
   });
 
-  // Canvas
-  var padding = 30;
-  // var canvasHeight = canvas.height - padding;
-  // var canvasWidth = canvas.width - padding;
+  const paddleHScale = 0.2
+	const paddleWScale = 0.015
 
-  // Ball
-  var ballRadius = 10;
-  var ballXaxis = canvas.width / 2;
-  var ballYaxis = canvas.height / 2;
-  var ballSpeedXaxis = 5;
-  var ballSpeedYaxis = 5;
+  const canvasW = canvas.getBoundingClientRect().width;
+	const canvasH = canvas.getBoundingClientRect().height;
+	canvas.width = canvasW;
+	canvas.height = canvasH;
+	console.log("canvas w and h = ", canvasW, canvasH)
 
   // Paddles
-  var paddleHeight = 80;
-  var paddleWidth = 10;
-  var leftPaddleYaxis = canvas.height / 2 - paddleHeight / 2;
-  var rightPaddleYaxis = canvas.height / 2 - paddleHeight / 2;
-  var paddleSpeed = 5;
+  var paddleHeight = Math.floor(canvasH * paddleHScale);
+	var paddleWidth = Math.floor(canvasW * paddleWScale);
+	var leftPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
+	var rightPaddleYaxis = Math.floor(canvasH / 2 - paddleHeight / 2);
+	var paddleSpeed = canvasH * 0.01;
+
+  // Ball
+	var ballXaxis = Math.floor(canvasW / 2);
+	var ballYaxis = Math.floor(canvasH / 2);
+	var ballRadius = paddleWidth;
+	var ballSpeed = canvasW * 0.006;
+	var ballSpeedXaxis = ballSpeed;
+	var ballSpeedYaxis = ballSpeed;
+
 
   // Score
   var leftPlayerScore = 0;
   var rightPlayerScore = 0;
-  var maxScore = 10;
+  var maxScore = 3;
 
   // Keyboard events
   document.addEventListener("keydown", keyDownHandler);
@@ -76,118 +82,124 @@ offlineGame = () => {
 
   // Update game state
   function update() {
-    // Paddle movement
-    if (upPressed && rightPaddleYaxis > 0) rightPaddleYaxis -= paddleSpeed;
-    else if (downPressed && rightPaddleYaxis + paddleHeight < canvas.height)
-      rightPaddleYaxis += paddleSpeed;
-
-    // Move right paddle based on "w" and "s" keys
-    if (wPressed && leftPaddleYaxis > 0) leftPaddleYaxis -= paddleSpeed;
-    else if (sPressed && leftPaddleYaxis + paddleHeight < canvas.height)
+    // Left Paddle movement
+    if (wPressed && leftPaddleYaxis > 0) {
+      leftPaddleYaxis -= paddleSpeed;
+    }
+    else if (sPressed && leftPaddleYaxis + paddleHeight < canvasH) {
       leftPaddleYaxis += paddleSpeed;
-
-    // Move right paddle automatically based on ball position
-    // if (ballYaxis > rightPaddleYaxis + paddleHeight / 2)
-    //   rightPaddleYaxis += paddleSpeed;
-    // else if (ballYaxis < rightPaddleYaxis + paddleHeight / 2)
-    //   rightPaddleYaxis -= paddleSpeed;
+    }
+  
+    // Right Paddle movement
+    if (upPressed && rightPaddleYaxis > 0) {
+      rightPaddleYaxis -= paddleSpeed;
+    }
+    else if (downPressed && rightPaddleYaxis + paddleHeight < canvasH) {
+      rightPaddleYaxis += paddleSpeed;
+    }
 
     // Move ball
     ballXaxis += ballSpeedXaxis;
     ballYaxis += ballSpeedYaxis;
 
     // Top & bottom collision
-    if (ballYaxis - ballRadius < 0 || ballYaxis + ballRadius > canvas.height)
-      ballSpeedYaxis = -ballSpeedYaxis;
+    if (ballYaxis - ballRadius <= 0 || 
+        ballYaxis + ballRadius >= canvasH) {
+          ballSpeedYaxis = -ballSpeedYaxis;
+    }
 
     // Left paddle collision
-    if (
-      ballXaxis - ballRadius < paddleWidth &&
-      ballYaxis > leftPaddleYaxis &&
-      ballYaxis < leftPaddleYaxis + paddleHeight
-    )
-      ballSpeedXaxis = -ballSpeedXaxis;
+    if (ballXaxis - ballRadius <= paddleWidth &&
+        ballYaxis >= leftPaddleYaxis &&
+        ballYaxis <= leftPaddleYaxis + paddleHeight) {
+          ballSpeedXaxis = -ballSpeedXaxis;
+    }
 
     // Right paddle collision
-    if (
-      ballXaxis + ballRadius > canvas.width - paddleWidth &&
-      ballYaxis > rightPaddleYaxis &&
-      ballYaxis < rightPaddleYaxis + paddleHeight
-    )
-      ballSpeedXaxis = -ballSpeedXaxis;
+    if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
+        ballYaxis >= rightPaddleYaxis &&
+        ballYaxis <= rightPaddleYaxis + paddleHeight) {
+          ballSpeedXaxis = -ballSpeedXaxis;
+    }
 
     // Check if ball goes out of bounds on left or right side of canvas
-    if (ballXaxis < 0) {
+    if (ballXaxis - ballRadius <= 0) {
       rightPlayerScore++;
       reset();
-    } else if (ballXaxis > canvas.width) {
+    } else if (ballXaxis + ballRadius >= canvasW) {
       leftPlayerScore++;
       reset();
     }
 
     // Check if a player has won
     // This will be modified to know if you are player one or two and then decide to output win / lose accordingly
-    if (leftPlayerScore === maxScore) playerWin("Left player");
-    else if (rightPlayerScore === maxScore) playerWin("Right player");
+    if (leftPlayerScore === maxScore || rightPlayerScore === maxScore) gameRunning = false;
   }
 
   // Reset ball
   function reset() {
-    ballXaxis = canvas.width / 2;
-    ballYaxis = canvas.height / 2;
+    ballXaxis = canvasW / 2;
+    ballYaxis = canvasH / 2;
     ballSpeedXaxis = -ballSpeedXaxis;
-    // ballSpeedYaxis = Math.random();
-
     ballSpeedYaxis = -ballSpeedYaxis;
   }
 
   // Draw objects on canvas
   function draw() {
     // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.clearRect(0, 0, canvasW, canvasH);
 
-    //Paddle colors
-    ctx.fillStyle = "#0abdc6";
-    ctx.font = "15px Arial";
+		//Draw middle line
+		const color2 = "#57f2e5"
+		const color1 = "#FFB3CB"
 
-    //Draw middle line
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, 0);
-    ctx.lineTo(canvas.width / 2, canvas.height);
+		ctx.strokeStyle = color1;
+		ctx.beginPath();
+		ctx.moveTo(canvasW / 2, 0);
+		ctx.lineTo(canvasW / 2, canvasH);
+		
+		// ctx.strokeStyle = "#FFB3CB";
+		ctx.stroke();
+		ctx.closePath();
+		
+		//Draw ball
+		ctx.fillStyle = color2;
+		ctx.beginPath();
+		ctx.arc(ballXaxis, ballYaxis, ballRadius, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.closePath();
+		
+		//Draw left paddle
+		ctx.fillStyle = color1;
+		ctx.fillRect(0, leftPaddleYaxis, paddleWidth, paddleHeight);
 
-    //Set middle line color
-    ctx.strokeStyle = "#0abdc6";
-    ctx.stroke();
-    ctx.closePath();
-
-    //Draw ball
-    ctx.beginPath();
-    ctx.arc(ballXaxis, ballYaxis, ballRadius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.closePath();
-
-    //Draw left paddle
-    ctx.fillRect(0, leftPaddleYaxis, paddleWidth, paddleHeight);
-
-    //Draw right paddle
-    ctx.fillRect(
-      canvas.width - paddleWidth,
-      rightPaddleYaxis,
-      paddleWidth,
-      paddleHeight
-    );
-
+		//Draw right paddle
+		ctx.fillRect(canvasW - paddleWidth, rightPaddleYaxis, paddleWidth, paddleHeight);
     //Draw scores
     ctx.fillText("Score: " + leftPlayerScore, 10, 20);
-    ctx.fillText("Score: " + rightPlayerScore, canvas.width - 70, 20);
+    ctx.fillText("Score: " + rightPlayerScore, canvasW - 70, 20);
   }
 
+  function endGame() {
+    cancelAnimationFrame(animationId);
+    if (leftPlayerScore === maxScore)
+      alert("Left wins!");
+    else
+      alert("Right wins!");
+    engine('/cards');
+
+  }
   //Main loop
   function loop() {
-    update();
-    draw();
-    //Set animation for all frames to appear and be visible
-    animationId = requestAnimationFrame(loop);
+    if (gameRunning) {
+      update();
+      draw();
+      //Set animation for all frames to appear and be visible
+        animationId = requestAnimationFrame(loop);
+    }
+    else {
+      endGame();
+    }
   }
   draw();
 
