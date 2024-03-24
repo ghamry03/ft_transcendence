@@ -152,6 +152,19 @@ onlineGame = () => {
 	// Checks if a socket is open and ready to send/receive info
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
+	// Reset ball position to the center of the canvas and set the new ball direction 
+	async function reset (newBallSpeed) {
+		await lock.acquire()
+		try {
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+			ballSpeedXaxis = newBallSpeed;
+			ballSpeedYaxis = newBallSpeed;
+		} finally {
+			lock.release()
+		}
+	}
+	
 	// Handler for all websocket messages that come from the server
 	const handleWebSocketMessage = (event) => {
 		const messageData = JSON.parse(event.data);
@@ -173,6 +186,8 @@ onlineGame = () => {
 			console.log("score reset received, ", messageData.ballDir);
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
+			// reset(ballSpeed * messageData.ballDir);
+			// gameRunning = true;
 			reset(ballSpeed * messageData.ballDir).then(() => {
 				gameRunning = true;
 			});
@@ -180,8 +195,10 @@ onlineGame = () => {
 		else if (messageData.type === "matchEnded") {
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
+			// reset(ballSpeed);
+			// draw();
+			// requestAnimationFrame(endMatch);
 			reset(ballSpeed).then(() => {
-				// gameRunning = true;
 				draw();
 				requestAnimationFrame(endMatch);
 			});
@@ -190,7 +207,7 @@ onlineGame = () => {
 			// console.log("you're queued or have another ongoing match on another tab or computer", playerId);
 			ws.close(3001, "Player already in-game");
 			alert("You have a game running on another session!");
-			// show error pop up and redirect them back to home page 
+			engine('/cards');
 		}
 		else if (messageData.type === "matchFound") {
 			leftPlayerId = messageData.left;
@@ -216,8 +233,12 @@ onlineGame = () => {
 			reset(ballSpeed).then(() => {
 				alert("Opponent disconnected from the game");
 				cancelAnimationFrame(animationId);
+				engine('/cards');
 			});
-			// show error pop up and redirect them back to home page 
+			// reset(ballSpeed);
+			// alert("Opponent disconnected from the game");
+			// cancelAnimationFrame(animationId);
+			// engine('/cards');
 		}
 	};
 
@@ -231,6 +252,7 @@ onlineGame = () => {
 			setTimeout(function() {
 				alert("You win!");
 				cancelAnimationFrame(animationId);
+				engine('/cards');
 			  }, 0)
 		}
 		else {
@@ -238,6 +260,7 @@ onlineGame = () => {
 			setTimeout(function() {
 				alert("You lose.");
 				cancelAnimationFrame(animationId);
+				engine('/cards');
 			  }, 0)
 		}
 		// Marks the game as not running
@@ -313,7 +336,18 @@ onlineGame = () => {
 			sendScoredEvent();
 		}
 		else {
-			ballSpeedXaxis = -ballSpeedXaxis;
+			if (sideTemp == "right") {
+				if (ballSpeedXaxis < 0) 
+					console.log("case 1 detected!!!!!!!!!!!!!!!!!!!!!!!");
+				ballSpeedXaxis = -ballSpeed;
+			}
+			else {
+				if (ballSpeedXaxis > 0) {
+					console.log("case 2 detected!!!!!!!!!!!!!!!!!!!!!!!");
+				}
+
+				ballSpeedXaxis = ballSpeed;
+			}
 			console.log("opponent scored on ", sideTemp, ballSpeedXaxis)
 		}
 	}
@@ -324,8 +358,9 @@ onlineGame = () => {
 	{
 		await lock.acquire()
 		try {
+		
 			if (gameRunning == false) {
-				console.log("stuck here");
+				// console.log("stuck here");
 				return ;
 			}
 			// Left paddle movement
@@ -394,20 +429,13 @@ onlineGame = () => {
 			// Start the animation loop
 			animationId = requestAnimationFrame(animateGame);
 		});
+		// update();
+		// // Draw the updated frame on the canvas
+		// draw();
+		// // Start the animation loop
+		// animationId = requestAnimationFrame(animateGame);
 	};
 
-	// Reset ball position to the center of the canvas and set the new ball direction 
-	async function reset (newBallSpeed) {
-		await lock.acquire()
-		try {
-			ballXaxis = canvasW / 2;
-			ballYaxis = canvasH / 2;
-			ballSpeedXaxis = newBallSpeed;
-			ballSpeedYaxis = newBallSpeed;
-		} finally {
-			lock.release()
-		}
-	}
 
 	// Draws all updated paddle positions, ball position the canvas. Also updates the score elements
 	const draw = () => {
