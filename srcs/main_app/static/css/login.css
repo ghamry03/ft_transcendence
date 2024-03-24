@@ -1,0 +1,92 @@
+:root {
+    --login-text: #FFFCC7;
+    --loginbtn-bg: #E09F9F;
+    --loginbtn-hl: #EEEDED;
+    --loginbtn-shadow: #B86666;
+    --loginbtn-border: #000000;
+}
+
+#bg-image {
+    background-size: contain;
+    background-position: bottom center;
+    background-repeat: no-repeat;
+}
+
+.loginButtonPos {
+    font-size: 5%;
+    position: absolute;
+    width: 30%;
+    height: 8%;
+    max-width:100%;
+    max-height: 100%;
+    bottom: 39%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.loginPage h1 {
+    font-family: 'ntbricksans';
+    color: var(--login-text);
+    text-align: center;
+    font-size: 1vw + 1vh;
+    text-shadow: 0px 0.06em 0px #59322B;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.loginPage h2 {
+    position: relative;
+}
+
+.loginHeader {
+    position: relative;
+    min-width: 100vw;
+}
+
+.img-container {
+    flex: 1;
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 0;
+}
+
+.img-wrapper {
+    display: inline-block;
+    position: relative;
+    max-height: 100%;
+}
+
+.centered-img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: 100%;
+    object-fit: contain;
+}
+
+.loginPageContent {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.loginButton {
+    background-color: var(--loginbtn-bg);
+    color: #854D4D;
+    font-size: 1vw;
+    border-radius: 20px;
+    font-family: 'ps2p';
+    box-shadow: 0px 15px 0 #B86666;
+    transition: all ease-out 0.5s;
+}
+
+.loginButton:hover, .loginButton:focus {
+    transform: translateY(10px);
+    box-shadow: 0px 5px 0 #B86666;
+}
