@@ -1,10 +1,17 @@
 {% load static %}
-<!-- <div class="loginPage"> -->
-<div class="row g-5 m-0 loginPage">
-    <p>PONGPING</p>
-    <a href="{{authUrl}}">LOGIN</a>
-    <img src="{% static 'imgs/arcade.png' %}">
-    <div class="col-4">
-        {% include "loginButton.html" with title="Login" onClick="location.href='authUrl'" %}
+<div class="loginPageContent">
+    <div class="loginHeader">
+        <div class="loginPage">
+            <h1>PONGPING</h1>
+        </div>
     </div>
-</div
+
+    <div class="img-container">
+        <div class="img-wrapper">
+            <img src="/static/imgs/arcade.png" alt="Arcade" class="centered-img">
+            <div class="loginButtonPos">
+                <button type="button" class="btn loginButton w-100 h-100" onclick="location.href='{{authUrl}}'">PLAY</button>
+            </div>
+        </div>
+    </div>
+</div>
