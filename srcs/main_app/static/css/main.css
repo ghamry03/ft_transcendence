@@ -65,6 +65,10 @@ body {
   max-height: 100vh;
 }
 
+#main_error {
+  z-index: 999;
+}
+
 #homeContentArea{
   height: 80vh;
   max-height: 80vh;

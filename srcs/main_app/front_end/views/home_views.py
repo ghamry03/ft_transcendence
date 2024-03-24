@@ -11,14 +11,21 @@ def index(request):
     return render(request, 'base.html')
 
 def getTournamentHistory(uid):
-    response = requests.get(TOURNAMENT_HISOTRY_URL + f'api/tourhistory/{uid}')
+    try:
+        response = requests.get(TOURNAMENT_HISOTRY_URL + f'api/tourhistory/{uid}')
+    except:
+        return None
 
     if response.status_code == 200:
         return response.json()['data']
     return None
 
 def getMatchHistory(uid):
-    response = requests.get(MATCH_HISOTRY_URL + f'game/matchhistory/{uid}')
+    try:
+        response = requests.get(MATCH_HISOTRY_URL + f'game/matchhistory/{uid}')
+    except:
+        return None
+
     if response.status_code == 200:
         return response.json()
     return None
