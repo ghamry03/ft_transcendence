@@ -168,7 +168,6 @@ onlineGame = () => {
 		const messageData = JSON.parse(event.data);
 		if (messageData.type === "keyUpdate") {
 			if (messageData.isLeft) {
-				console.log("left ", messageData.key);
 				if (messageData.key == "w") {
 					leftWPressed = messageData.keyDown;
 				}
@@ -177,7 +176,6 @@ onlineGame = () => {
 				}
 			}
 			else {
-				console.log("right ", messageData.key);
 				if (messageData.key == "w") {
 					rightWPressed = messageData.keyDown;
 				}
