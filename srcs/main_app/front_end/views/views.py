@@ -33,13 +33,16 @@ def getOpponentInfo(request):
         'X-UID': ownerUid,
         'X-TOKEN': access_token
     }
-    response = requests.get(USER_API_URL + 'api/user/' + targetUid, headers=headers)
-    opponentInfo = response.json()
+    try:
+        response = requests.get(USER_API_URL + 'api/user/' + targetUid, headers=headers)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+
+    try:
+        opponentInfo = response.json()
+    except requests.exceptions.JSONDecodeError as e:
+        return JsonResponse({'error': 'Failed to get user status', 'details': str(e)}, status=400)
+
     opponentInfo['image'] = opponentInfo['image']
     return JsonResponse(opponentInfo)
-
-def getUnknownUserImg(request):
-    response = requests.head(USER_API_URL + '/media/unknownuser.png')
-    if response.status_code == 200:
-        return HttpResponse(MEDIA_SERVICE_URL + '/media/unknownuser.png')
-    return HttpResponseNotFound("The requested resource was not found.")

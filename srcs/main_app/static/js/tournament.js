@@ -202,16 +202,10 @@ tournament = () => {
 		await lock.acquire()
 		try {
 			var disconnectedPlayer = document.querySelector('[data-uid="' + playerId + '"]');
-			const response = await fetch('unknownUserImg/');
-			if (!response.ok) {
-				disconnectedPlayer.src = "https://i.imgur.com/BPukfZQ.png";
-			}
-			else {
-				const imgUrl = await response.text();
-				console.log('Unknown user image url: ', imgUrl);
-				disconnectedPlayer.src = imgUrl;
-			}
+				loginUrl = location.protocol === "https:" ? "https://localhost:8005/" : "http://localhost:8001/";
+				disconnectedPlayer.src = loginUrl + "media/unknownuser.png";
 		} catch(error) {
+			console.log(error);
 			console.log("Unknown user image not found");
 		} finally {
 			lock.release()
