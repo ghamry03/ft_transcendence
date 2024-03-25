@@ -18,6 +18,10 @@ services:
                 condition: service_started
             postgres:
                 condition: service_healthy
+            tourapp:
+                condition: service_started
+            friendsapp:
+                condition: service_started
         env_file:
             - ./.env
 

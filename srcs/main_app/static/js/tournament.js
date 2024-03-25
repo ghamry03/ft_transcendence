@@ -164,10 +164,11 @@ tournament = () => {
 		var nameElement = document.getElementById("name" + imgId);
 		if (playerImg) {
 			playerImg.src = imgUrl;
-			playerImg.setAttribute("data-uid", playerId);
+			playerImg.setAttribute("data-imguid", playerId);
 		}
 		if (nameElement) {
 			nameElement.innerText = username;
+			nameElement.setAttribute("data-nameuid", playerId);
 		}
 	}
 
@@ -184,12 +185,13 @@ tournament = () => {
 				if (imgElement) {
 					const imgUrl = await getImage(playerId);
 					imgElement.setAttribute("src", imgUrl);
-					imgElement.setAttribute("data-uid", playerId);
+					imgElement.setAttribute("data-imguid", playerId);
 				}
 				var nameElement = document.getElementById("name" + i);
 				if (nameElement) {
 					const userName = await getUserName(playerId);
 					nameElement.innerText = userName;
+					nameElement.setAttribute("data-nameuid", playerId);
 				}
 				i++;
 			}
@@ -203,11 +205,12 @@ tournament = () => {
 	async function removePlayer(playerId) {
 		await lock.acquire()
 		try {
-			var disconnectedPlayer = document.querySelector('[data-uid="' + playerId + '"]');
-				loginUrl = location.protocol === "https:" ? "https://localhost:8005/" : "http://localhost:8001/";
-				disconnectedPlayer.src = loginUrl + "media/unknownuser.png";
+			var disconnectedPlayerImg = document.querySelector('[data-imguid="' + playerId + '"]');
+			var disconnectedPlayerName = document.querySelector('[data-nameuid="' + playerId + '"]');
+			mediaUrl = location.protocol === "https:" ? "https://localhost:8005/" : "http://localhost:8001/";
+			disconnectedPlayerImg.src = mediaUrl + "media/unknownuser.png";
+			disconnectedPlayerName.innerText = "Player"
 		} catch(error) {
-			console.log(error);
 			console.log("Unknown user image not found");
 		} finally {
 			lock.release()
