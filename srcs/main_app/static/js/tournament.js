@@ -49,6 +49,8 @@ tournament = () => {
 	var canvas;
 	var leftScore;
 	var rightScore;
+	var upButton;
+    var downButton;
 	const paddleHScale = 0.2
 	const paddleWScale = 0.015
 
@@ -66,8 +68,8 @@ tournament = () => {
 	var leftPlayerScore = 0;
 	var rightPlayerScore = 0;
 
-	var wPressed = false;
-	var sPressed = false;
+	var upPressed = false;
+	var downPressed = false;
 
 	var leftWPressed = false;
 	var leftSPressed = false;
@@ -162,10 +164,11 @@ tournament = () => {
 		var nameElement = document.getElementById("name" + imgId);
 		if (playerImg) {
 			playerImg.src = imgUrl;
-			playerImg.setAttribute("data-uid", playerId);
+			playerImg.setAttribute("data-imguid", playerId);
 		}
 		if (nameElement) {
 			nameElement.innerText = username;
+			nameElement.setAttribute("data-nameuid", playerId);
 		}
 	}
 
@@ -182,12 +185,13 @@ tournament = () => {
 				if (imgElement) {
 					const imgUrl = await getImage(playerId);
 					imgElement.setAttribute("src", imgUrl);
-					imgElement.setAttribute("data-uid", playerId);
+					imgElement.setAttribute("data-imguid", playerId);
 				}
 				var nameElement = document.getElementById("name" + i);
 				if (nameElement) {
 					const userName = await getUserName(playerId);
 					nameElement.innerText = userName;
+					nameElement.setAttribute("data-nameuid", playerId);
 				}
 				i++;
 			}
@@ -201,16 +205,11 @@ tournament = () => {
 	async function removePlayer(playerId) {
 		await lock.acquire()
 		try {
-			var disconnectedPlayer = document.querySelector('[data-uid="' + playerId + '"]');
-			const response = await fetch('unknownUserImg/');
-			if (!response.ok) {
-				disconnectedPlayer.src = "https://i.imgur.com/BPukfZQ.png";
-			}
-			else {
-				const imgUrl = await response.text();
-				console.log('Unknown user image url: ', imgUrl);
-				disconnectedPlayer.src = imgUrl;
-			}
+			var disconnectedPlayerImg = document.querySelector('[data-imguid="' + playerId + '"]');
+			var disconnectedPlayerName = document.querySelector('[data-nameuid="' + playerId + '"]');
+			mediaUrl = location.protocol === "https:" ? "https://localhost:8005/" : "http://localhost:8001/";
+			disconnectedPlayerImg.src = mediaUrl + "media/unknownuser.png";
+			disconnectedPlayerName.innerText = "Player"
 		} catch(error) {
 			console.log("Unknown user image not found");
 		} finally {
@@ -274,6 +273,14 @@ tournament = () => {
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);
 		
+		// Set button press handlers for mobile game
+		upButton = document.getElementById("upButton");
+		downButton = document.getElementById("downButton");
+		upButton.addEventListener("touchstart", upButtonDownHandler);
+        upButton.addEventListener("touchend", upButtonUpHandler);
+		downButton.addEventListener("touchstart", downButtonDownHandler);
+        downButton.addEventListener("touchend", downButtonUpHandler);
+
 		// Display both players images 
 		var leftImage = document.getElementById("leftImage");
 		var rightImage = document.getElementById("rightImage");
@@ -297,7 +304,6 @@ tournament = () => {
 		canvasH = canvas.getBoundingClientRect().height;
 		canvas.width = canvasW;
 		canvas.height = canvasH;
-
 
 		// Paddle
 		paddleHeight = Math.floor(canvasH * paddleHScale);
@@ -323,8 +329,6 @@ tournament = () => {
 		// Scores
 		leftPlayerScore = 0;
 		rightPlayerScore = 0;
-		// pendingScoreUpdate = false;
-		// scoreChanged = false;
 
 		// Draw the initial screen for the game with start positions of paddles and ball
 		draw();
@@ -535,14 +539,14 @@ tournament = () => {
 	// Key down handler
 	function keyDownHandler(e)
 	{
-		if (e.key === "w" && !wPressed)
+		if (e.key === "w" && !upPressed)
 		{
-			wPressed = true;
+			upPressed = true;
 			sendKeyUpdate(e.key, true);
 		}
-		else if (e.key === "s" && !sPressed)
+		else if (e.key === "s" && !downPressed)
 		{
-			sPressed = true;
+			downPressed = true;
 			sendKeyUpdate(e.key, true);
 		}
 	}
@@ -550,15 +554,55 @@ tournament = () => {
 	// Key up handler
 	function keyUpHandler(e)
 	{
-		if (e.key === "w" && wPressed)
+		if (e.key === "w" && upPressed)
 		{
-			wPressed = false;
+			upPressed = false;
 			sendKeyUpdate(e.key, false);
 		}
-		else if (e.key === "s" && sPressed)
+		else if (e.key === "s" && downPressed)
 		{
-			sPressed = false;
+			downPressed = false;
 			sendKeyUpdate(e.key, false);
+		}
+	}
+
+	// Up Button down handler
+	function upButtonDownHandler(e)
+	{
+		if (!upPressed)
+		{
+			upPressed = true;
+			sendKeyUpdate("w", true);
+		}
+	}
+	
+	// Up Button up handler
+	function upButtonUpHandler(e)
+	{
+		if (upPressed)
+		{
+			upPressed = false;
+			sendKeyUpdate("w", false);
+		}
+	}
+	
+	// down Button down handler
+	function downButtonDownHandler(e)
+	{
+		if (!downPressed)
+		{
+			downPressed = true;
+			sendKeyUpdate("s", true);
+		}
+	}
+	
+	// down Button up handler
+	function downButtonUpHandler(e)
+	{
+		if (downPressed)
+		{
+			downPressed = false;
+			sendKeyUpdate("s", false);
 		}
 	}
 
@@ -733,6 +777,10 @@ tournament = () => {
 	tournament.destroy = () => {
 		document.removeEventListener("keydown", keyDownHandler);
 		document.removeEventListener("keyup", keyUpHandler);
+		upButton.removeEventListener("touchstart", upButtonDownHandler);
+        upButton.removeEventListener("touchend", upButtonUpHandler);
+		downButton.removeEventListener("touchstart", downButtonDownHandler);
+        downButton.removeEventListener("touchend", downButtonUpHandler);
 		if (ws) {
 			ws.close();
 			console.log("Tour: Closing connection with server");

@@ -29,7 +29,7 @@ function resetFormValidation(form) {
 
 function cancelFormButton() {
     console.log('inside');
-    form = document.getElementById("editProfileForm");
+    form = document.getElementById("edit_profile_form");
     resetFormValidation(form);
     form.reset();
     element = document.getElementById("edit_profile");
@@ -38,7 +38,7 @@ function cancelFormButton() {
 }
 
 function submitForm() {
-    form = document.getElementById("editProfileForm");
+    form = document.getElementById("edit_profile_form");
 
     resetFormValidation(form);
 

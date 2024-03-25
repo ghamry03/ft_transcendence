@@ -45,6 +45,8 @@ services:
                 condition: service_started
             tourapp:
                 condition: service_started
+            friendsapp:
+                condition: service_started
         env_file:
             - ./.env
         networks:

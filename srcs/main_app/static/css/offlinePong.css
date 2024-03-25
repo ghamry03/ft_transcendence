@@ -33,6 +33,18 @@ body {
   background-color:none;
 }
 
+.mobButtons .btn {
+  background-color: #1B102E;
+	border: none;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	font-size: 16px;
+	cursor: pointer;
+	border-radius: 8px;
+	color: var(--beach-bunny-blue);
+}
+
 canvas {
   background: #1B102E;
   /* border-radius: 5%; */

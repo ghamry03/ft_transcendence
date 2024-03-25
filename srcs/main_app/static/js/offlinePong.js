@@ -1,11 +1,14 @@
 offlineGame = () => {
   // Initialize canvas
-  var canvas = document.getElementById("canvas");
-  var ctx = canvas.getContext("2d");
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
 
-  var startBtn = document.getElementById("start-btn");
-  var pauseBtn = document.getElementById("pause-btn");
-  var restartBtn = document.getElementById("restart-btn");
+  const startBtn = document.getElementById("start-btn");
+  const pauseBtn = document.getElementById("pause-btn");
+  const leftUpButton = document.getElementById("leftUpButton");
+  const leftDownButton = document.getElementById("leftDownButton");
+  const rightUpButton = document.getElementById("rightUpButton");
+  const rightDownButton = document.getElementById("rightDownButton");
   var animationId;
   var gameRunning = false;
 
@@ -21,10 +24,6 @@ offlineGame = () => {
     cancelAnimationFrame(animationId);
   });
 
-  restartBtn.addEventListener("click", function () {
-    document.location.reload();
-  });
-
   const paddleHScale = 0.2
 	const paddleWScale = 0.015
 
@@ -32,7 +31,6 @@ offlineGame = () => {
 	const canvasH = canvas.getBoundingClientRect().height;
 	canvas.width = canvasW;
 	canvas.height = canvasH;
-	console.log("canvas w and h = ", canvasW, canvasH)
 
   // Paddles
   var paddleHeight = Math.floor(canvasH * paddleHScale);
@@ -60,41 +58,95 @@ offlineGame = () => {
   document.addEventListener("keyup", keyUpHandler);
 
   // Key press
-  var upPressed = false;
-  var downPressed = false;
-  var wPressed = false;
-  var sPressed = false;
+  var rightUpPressed = false;
+  var rightDownPressed = false;
+  var leftUpPressed = false;
+  var leftDownPressed = false;
+
+  // Handler function for left up button touch start
+  function handleLeftUpTouchStart() {
+    leftUpPressed = true;
+  }
+
+  // Handler function for left up button touch end
+  function handleLeftUpTouchEnd() {
+    leftUpPressed = false;
+  }
+
+  // Handler function for left down button touch start
+  function handleLeftDownTouchStart() {
+    leftDownPressed = true;
+  }
+
+  // Handler function for left down button touch end
+  function handleLeftDownTouchEnd() {
+    leftDownPressed = false;
+  }
+
+  // Handler function for right up button touch start
+  function handleRightUpTouchStart() {
+    rightUpPressed = true;
+  }
+
+  // Handler function for right up button touch end
+  function handleRightUpTouchEnd() {
+    rightUpPressed = false;
+  }
+
+  // Handler function for right down button touch start
+  function handleRightDownTouchStart() {
+    rightDownPressed = true;
+  }
+
+  // Handler function for right down button touch end
+  function handleRightDownTouchEnd() {
+    rightDownPressed = false;
+  }
+
+  // Adding event listeners with the handler functions
+  leftUpButton.addEventListener("touchstart", handleLeftUpTouchStart);
+  leftUpButton.addEventListener("touchend", handleLeftUpTouchEnd);
+
+  leftDownButton.addEventListener("touchstart", handleLeftDownTouchStart);
+  leftDownButton.addEventListener("touchend", handleLeftDownTouchEnd);
+
+  rightUpButton.addEventListener("touchstart", handleRightUpTouchStart);
+  rightUpButton.addEventListener("touchend", handleRightUpTouchEnd);
+
+  rightDownButton.addEventListener("touchstart", handleRightDownTouchStart);
+  rightDownButton.addEventListener("touchend", handleRightDownTouchEnd);
+
 
   function keyDownHandler(e) {
-    if (e.key === "ArrowUp") upPressed = true;
-    else if (e.key === "ArrowDown") downPressed = true;
-    else if (e.key === "w") wPressed = true;
-    else if (e.key === "s") sPressed = true;
+    if (e.key === "ArrowUp") rightUpPressed = true;
+    else if (e.key === "ArrowDown") rightDownPressed = true;
+    else if (e.key === "w") leftUpPressed = true;
+    else if (e.key === "s") leftDownPressed = true;
   }
 
   // Key release
   function keyUpHandler(e) {
-    if (e.key === "ArrowUp") upPressed = false;
-    else if (e.key === "ArrowDown") downPressed = false;
-    else if (e.key === "w") wPressed = false;
-    else if (e.key === "s") sPressed = false;
+    if (e.key === "ArrowUp") rightUpPressed = false;
+    else if (e.key === "ArrowDown") rightDownPressed = false;
+    else if (e.key === "w") leftUpPressed = false;
+    else if (e.key === "s") leftDownPressed = false;
   }
 
   // Update game state
   function update() {
     // Left Paddle movement
-    if (wPressed && leftPaddleYaxis > 0) {
+    if (leftUpPressed && leftPaddleYaxis > 0) {
       leftPaddleYaxis -= paddleSpeed;
     }
-    else if (sPressed && leftPaddleYaxis + paddleHeight < canvasH) {
+    else if (leftDownPressed && leftPaddleYaxis + paddleHeight < canvasH) {
       leftPaddleYaxis += paddleSpeed;
     }
   
     // Right Paddle movement
-    if (upPressed && rightPaddleYaxis > 0) {
+    if (rightUpPressed && rightPaddleYaxis > 0) {
       rightPaddleYaxis -= paddleSpeed;
     }
-    else if (downPressed && rightPaddleYaxis + paddleHeight < canvasH) {
+    else if (rightDownPressed && rightPaddleYaxis + paddleHeight < canvasH) {
       rightPaddleYaxis += paddleSpeed;
     }
 
@@ -206,6 +258,15 @@ offlineGame = () => {
   offlineGame.destroy = () => {
     document.removeEventListener("keydown", keyDownHandler);
     document.removeEventListener("keyup", keyUpHandler);
+    leftUpButton.removeEventListener("touchstart", handleLeftUpTouchStart);
+    leftUpButton.removeEventListener("touchend", handleLeftUpTouchEnd);
+    leftDownButton.removeEventListener("touchstart", handleLeftDownTouchStart);
+    leftDownButton.removeEventListener("touchend", handleLeftDownTouchEnd);
+    rightUpButton.removeEventListener("touchstart", handleRightUpTouchStart);
+    rightUpButton.removeEventListener("touchend", handleRightUpTouchEnd);
+    rightDownButton.removeEventListener("touchstart", handleRightDownTouchStart);
+    rightDownButton.removeEventListener("touchend", handleRightDownTouchEnd);
+
     cancelAnimationFrame(animationId);
   };
 };
