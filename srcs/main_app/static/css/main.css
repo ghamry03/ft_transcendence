@@ -569,11 +569,28 @@ body {
 }
 
 @media only screen and (max-width: 768px) {
+
   body{
     max-height: none;
+    height: 100vh;
+    overflow: auto;
   }
 
   .mainContainer{
     max-height: none;
+    height: 100%;
+  }
+  #homeContentArea{
+    max-height: none;
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  #mainContentArea{
+    height: 100%;
+  }
+
+  #matchHistoryDash, #tournamentHistoryDash{
+    margin: 2em auto;
   }
 }
