@@ -1,4 +1,3 @@
-import json
 import requests
 
 from main_app.constants import USER_API_URL, FRIEND_API_URL
@@ -23,7 +22,8 @@ def updateStatus(request, status):
     }
     data = {'status': status}
     try:
-        requests.post(f"{USER_API_URL}api/user/{uid}/", headers=headers, data=data)
+        response = requests.post(f"{USER_API_URL}api/user/{uid}/", headers=headers, data=data)
+        response.raise_for_status()
     except requests.RequestException as e:
         return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
 
@@ -39,7 +39,12 @@ def profile(request, uid):
         'X-UID': str(user_data['uid']),
         'X-TOKEN': access_token
     }
-    response = requests.get(f"{USER_API_URL}api/user/{uid}", headers=headers)
+    try:
+        response = requests.get(f"{USER_API_URL}api/user/{uid}", headers=headers)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+
     profile_data = response.json()
 
     profile_type = get_profile_type(uid, user_data['uid'], access_token)
@@ -63,12 +68,17 @@ def get_profile_type(uid, session_uid, access_token):
             'uid': uid,
             'access_token': access_token
         }
-        friends_response = requests.get(f"{FRIEND_API_URL}api/friends/", json=data)
+        try:
+            friends_response = requests.get(f"{FRIEND_API_URL}api/friends/", json=data)
+        except requests.RequestException as e:
+            return -1
+
         if friends_response.ok:
             friends_data = friends_response.json()
             relationship = friends_data.get('relationship', -1)
             return determine_relationship_type(relationship, friends_data)
         return -1
+
     return 0
 
 def determine_relationship_type(relationship, friends_data):
@@ -105,7 +115,7 @@ def edit_profile(request):
             f"{USER_API_URL}api/user/{user_data['uid']}/",
             headers=headers, data=data, files=files
         )
-        response.raise_for_status()  # Raise an error for bad responses
+        response.raise_for_status()
         request.session['userData'] = response.json()
         return JsonResponse({'message': 'Profile updated successfully'})
     except requests.RequestException as e:

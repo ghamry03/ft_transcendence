@@ -32,15 +32,18 @@ def getMatchHistory(uid):
 
 def getFriendsList(uid, accessToken):
     headers = { 'Content-Type': 'application/json' }
-    response = requests.get(
-        'http://friendsapp:8002/' + "api/friends/",
-        headers=headers,
-        json={
-            "uid": f"{uid}",
-            "ownerUID": f"{uid}",
-            "access_token": accessToken
-            },
-    )
+    try:
+        response = requests.get(
+            'http://friendsapp:8002/' + "api/friends/",
+            headers=headers,
+            json={
+                "uid": f"{uid}",
+                "ownerUID": f"{uid}",
+                "access_token": accessToken
+                },
+        )
+    except requests.RequestException as e:
+        return JsonResponse({})
 
     if response.status_code == 200:
         return response.json()

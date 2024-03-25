@@ -1,12 +1,18 @@
+import requests
+from main_app.constants import MATCH_HISOTRY_URL, TOURNAMENT_HISOTRY_URL
+
 from django.shortcuts import render
 from django.http import JsonResponse
 
 # Create your views here
 def onlineGame(request):
-    context = {
-    }
-    # return JsonResponse(data={}, status=500)
-    return render(request, 'game.html', context)
+    try:
+        response = requests.get(f"{MATCH_HISOTRY_URL}game/health")
+        response.raise_for_status()
+    except requests.RequestException as e:
+        return JsonResponse({'error': 'Failed to update profile', 'details': str(e)}, status=500)
+
+    return render(request, 'game.html')
 
 def offlineGame(request):
     context = {
@@ -14,6 +20,10 @@ def offlineGame(request):
     return render(request, 'offline.html', context)
 
 def tournament(request):
-    context = {
-    }
-    return render(request, 'tournament.html', context)
+    try:
+        response = requests.get(f"{TOURNAMENT_HISOTRY_URL}api/health")
+        response.raise_for_status()
+    except requests.RequestException as e:
+        return JsonResponse({'error': 'Failed to update profile', 'details': str(e)}, status=500)
+
+    return render(request, 'tournament.html')
