@@ -59,6 +59,7 @@ body {
   /* flex-direction: column-reverse; */
 }
 
+
 .mainContainer {
   width: 100vw;
   background-color: var(--dark-purple-bg);
@@ -566,4 +567,31 @@ body {
 #matchHistoryInjection, #tournamentHistoryInjection {
   overflow-y: auto;
   max-height: 95%;
+}
+
+@media only screen and (max-width: 768px) {
+
+  body{
+    max-height: none;
+    height: 100vh;
+    overflow: auto;
+  }
+
+  .mainContainer{
+    max-height: none;
+    height: 100%;
+  }
+  #homeContentArea{
+    max-height: none;
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  #mainContentArea{
+    height: 100%;
+  }
+
+  #matchHistoryDash, #tournamentHistoryDash{
+    margin: 2em auto;
+  }
 }

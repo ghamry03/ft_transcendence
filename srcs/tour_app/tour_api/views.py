@@ -1,7 +1,6 @@
-from django.http import Http404, JsonResponse, HttpResponse
-from django.utils.timezone import now
+from datetime  import datetime
+from django.http import JsonResponse
 from django.utils import timezone
-
 import requests
 
 from rest_framework.response import Response
@@ -10,33 +9,29 @@ from rest_framework import status
 import logging
 
 from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch, TournamentRank
-from tour_api.serializer import TournamentSerializer, GameSerializer, UserSerializer
-from django.http import HttpResponseBadRequest
+from tour_api.serializer import GameSerializer, UserSerializer
 
 logger = logging.getLogger(__name__)
 
-def calculate_time_passed(self, game_endtime):
-		current_time = now()
-		time_difference = current_time - game_endtime
+def calculate_time_passed(game_endtime):
+    def format_time_difference(time_difference):
+        if time_difference.days >= 1:
+            unit = "day"
+            quantity = time_difference.days
+        elif time_difference.seconds >= 3600:
+            unit = "hour"
+            quantity = time_difference.seconds // 3600
+        elif time_difference.seconds >= 60:
+            unit = "minute"
+            quantity = time_difference.seconds // 60
+        else:
+            unit = "second"
+            quantity = time_difference.seconds
+        return f"{quantity} {unit}{'s' if quantity > 1 else ''}"
 
-		if time_difference.days >= 1:
-			if time_difference.days == 1:
-				return "1 day"
-			return f"{time_difference.days} days"
-		elif time_difference.seconds >= 3600:
-			hours_passed = time_difference.seconds // 3600
-			if hours_passed == 1:
-				return "1 hour"
-			return f"{hours_passed} hours"
-		elif time_difference.seconds >= 60:
-			minutes_passed = time_difference.seconds // 60
-			if minutes_passed == 1:
-				return "1 minute"
-			return f"{minutes_passed} minutes"
-		else:
-			if time_difference.seconds == 1:
-				return "1 second"
-			return f"{time_difference.seconds} seconds"
+    current_time = datetime.now(timezone.utc)
+    time_difference = current_time - game_endtime
+    return format_time_difference(time_difference)
 
 def get_rank(user_id, tournament_id):
     try:
@@ -52,27 +47,20 @@ def get_rank(user_id, tournament_id):
 
 class TournamentHistoryApiView(APIView):
 	def get(self, request, user_id):
-		#Exclude was adding because it was crashing when the queryset included a match that didnt belong to a tournament needs testing
-		games = OnlinePlayermatch.objects.filter(player=user_id).exclude(game__tournament_id__isnull=True)
-		logger.info(f'OnlinePlayerMatch: {games}')
+		tournaments = OnlinePlayermatch.objects.filter(player=user_id).exclude(game__tournament_id__isnull=True).values_list("game__tournament_id", flat=True).distinct()
+		logger.info(f'OnlinePlayerMatch: {tournaments}')
 		tournament_details = []
-		for game in games:
-			logger.info(f'this is the tour game: {game.game.tournament}')
-			tid = game.game.tournament.id
-			time_passed = calculate_time_passed(self, game.game.endtime)
+
+		for tid in tournaments:
+			game = OnlinePlayermatch.objects.filter(player=user_id, game__tournament_id = tid).order_by('-game__endtime').first()
+			time_passed = calculate_time_passed(game.game.endtime)
 			rank = get_rank(user_id, tid)
-			if rank is not None:
-				tournament_details.append({
+			tournament_details.append({
 					"tournament_id": tid,
 					"tournament_time_passed": time_passed,
-					"rank": rank
+					"rank": rank if rank is not None else "Rank not found."
 				})
-			else:
-				tournament_details.append({
-					"tournament_id": tid,
-					"tournament_time_passed": time_passed,
-					"rank": "Rank not found."
-				})
+			logger.info(f'this is the found game: {time_passed} {rank}')
 		return Response({"data":tournament_details}, status=status.HTTP_200_OK)
 
 def get_player_image(self, target_uid, owner_uid, token):
