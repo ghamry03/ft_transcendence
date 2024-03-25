@@ -100,7 +100,7 @@ def rejectFriend(request, friendUID):
                     "access_token": access_token,
                     },
                 )
-        response.raise_for_status
+        response.raise_for_status()
     except requests.RequestException as e:
         return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
 
