@@ -1,7 +1,14 @@
 function fetchMainContent(pageUrl, container=null) {
     return new Promise((resolve) => {
         fetch(pageUrl)
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok){
+                    return response.json().then(body => {
+                        throw new Error(body.error || 'Network response was not ok');
+                    });
+                }
+                return response.text();
+            })
             .then(data => {
                 if (container != null) {
                     var parser = new DOMParser();
@@ -9,7 +16,12 @@ function fetchMainContent(pageUrl, container=null) {
                     document.getElementById(container).innerHTML = doc;
                     resolve();
                 }
-            });
+            })
+            .catch((error) => {
+                showError(`Failed to load content. [${error.message}]`, 'Retry', () => {
+                    fetchMainContent(pageUrl, container)
+                });
+            })
     });
 }
 
@@ -180,6 +192,7 @@ const injections = [
 
 function engine(pageUrl, addToHistory=true) {
     var promise;
+    console.log('LEMEEEE IN');
     for (let route of injections) {
         if (route.pattern.test(pageUrl)) {
             promise = route.handler(pageUrl);
@@ -216,12 +229,18 @@ function showError(errorMessage, buttonText, buttonOnClickFunction) {
     var myCollapse = new bootstrap.Collapse(errorDiv);
 
 
-    if (!errorDiv.classList.contains('show')) {
-        myCollapse.toggle();
-    }
+    myCollapse.show();
 
     errorButton.onclick = () => {
         buttonOnClickFunction();
-        myCollapse.toggle();
+        hideErrorMessage();
+    }
+}
+
+function hideErrorMessage() {
+    var errorDiv = document.getElementById('main_error');
+    if (errorDiv.classList.contains('show')) {
+        var myCollapse = new bootstrap.Collapse(errorDiv);
+        myCollapse.hide();
     }
 }

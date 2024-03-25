@@ -10,7 +10,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
     players = {}
     update_lock = asyncio.Lock()
     logger = logging.getLogger(__name__)
-    WIN_SCORE = 6
+    WIN_SCORE = 11
 
 	# Called when the websocket is handshaking as part of the connection process
     async def connect(self):
