@@ -18,17 +18,19 @@
 }
 
 .onlineGame .btn {
-	background-color: rgb(27, 16, 46);
+	background-color: #1B102E;
 	border: none;
-	color: #0abdc6;
 	padding: 10px 20px;
 	text-align: center;
 	text-decoration: none;
-	display: inline-block;
+	/* display: inline-block; */
 	font-size: 16px;
-	margin: 10px;
 	cursor: pointer;
-	border-radius: 5px;
+	border-radius: 8px;
+	color: var(--beach-bunny-blue);
+	/* margin-left: auto; */
+	/* margin-right: auto; */
+	float: right;
 }
   
 .onlineGame .btn:hover {
@@ -71,9 +73,16 @@
     animation: count 0.1s cubic-bezier(0.1,0.1,1,1) 1;
 }
 
-.column {
+.statusBar .column {
 	float: left;
 	width: 47%;
+	padding: 10px;
+	display: flex;
+}
+
+.mobButtons .column {
+	float: left;
+	width: 50%;
 	padding: 10px;
 	display: flex;
 }
@@ -90,25 +99,6 @@
 	text-align: center;
 }
 
-/* .image-cropper {
-	width: 70px;
-	height: 70px;
-	position: relative;
-	overflow: hidden;
-	border-radius: 50%;
-	margin-left: auto;
-	margin-right: auto;
-	float: left;
-}
-
-.playerpfp {
-	display: inline;
-	margin: 0 auto;
-	margin-left: -15%;
-	height: 100%;
-	width: auto;
-} */
-
 .img-circle {
     border-radius: 50%;
     position: relative;
@@ -118,7 +108,6 @@
 	margin-left: auto;
 	margin-right: auto;
     float: left;
-    /* margin-right: 10px; */
 }
 
 .img-circle.hor img {
@@ -143,6 +132,4 @@ p.score {
 	float: right;
 	color: #acacac;
 	line-height: 70px;
-	/* display: table-cell;
-  	vertical-align: middle; */
 }

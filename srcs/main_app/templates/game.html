@@ -4,7 +4,7 @@
     <canvas id="gameCanvas" class="w-100"></canvas>
   </div>
   <div id="readyGo"></div>
-  <div class="container-fluid col-12">
+  <div class="statusBar container-fluid col-12">
     <div class="column">
       <div class="img-circle hor">
         <img id="leftImage" src="{% static 'imgs/unknownuser.png' %}" alt="Player1" />
@@ -17,6 +17,15 @@
       <div class="img-circle hor">
         <img id="rightImage" src="{% static 'imgs/unknownuser.png' %}" alt="Player2" />
       </div>
+    </div>
+  </div>
+  <!-- Buttons will be shown only on devices with touch support -->
+  <div class="mobButtons container-fluid col-12 d-md-none d-sm-block">
+    <div class="column">
+      <button id="upButton" class="btn btn-primary" style="margin-left: auto">&#x25B2;</button>
+    </div>
+    <div class="column">
+      <button id="downButton" class="btn btn-primary" style="margin-right: auto">&#x25BC;</button>
     </div>
   </div>
 </div>
