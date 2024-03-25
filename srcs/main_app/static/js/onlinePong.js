@@ -168,16 +168,22 @@ onlineGame = () => {
 		const messageData = JSON.parse(event.data);
 		if (messageData.type === "keyUpdate") {
 			if (messageData.isLeft) {
-				if (messageData.key == "w")
+				console.log("left ", messageData.key);
+				if (messageData.key == "w") {
 					leftWPressed = messageData.keyDown;
-				else
+				}
+				else {
 					leftSPressed = messageData.keyDown;
+				}
 			}
 			else {
-				if (messageData.key == "w")
+				console.log("right ", messageData.key);
+				if (messageData.key == "w") {
 					rightWPressed = messageData.keyDown;
-				else
+				}
+				else {
 					rightSPressed = messageData.keyDown;
+				}
 			}
 		}
 		if (messageData.type === "scoreUpdate") {
@@ -507,11 +513,8 @@ onlineGame = () => {
 		// Set key handlers for the game 
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);
-		// upButton.addEventListener("mousedown", upButtonDownHandler);
-        // upButton.addEventListener("mouseup", upButtonUpHandler);
-		// downButton.addEventListener("mousedown", downButtonDownHandler);
-        // downButton.addEventListener("mouseup", downButtonUpHandler);
 		
+		// Set button press handlers for mobile game
 		upButton.addEventListener("touchstart", upButtonDownHandler);
         upButton.addEventListener("touchend", upButtonUpHandler);
 		downButton.addEventListener("touchstart", downButtonDownHandler);
@@ -524,6 +527,10 @@ onlineGame = () => {
 	onlineGame.destroy = () => {
 		document.removeEventListener("keydown", keyDownHandler);
 		document.removeEventListener("keyup", keyUpHandler);
+		upButton.removeEventListener("touchstart", upButtonDownHandler);
+        upButton.removeEventListener("touchend", upButtonUpHandler);
+		downButton.removeEventListener("touchstart", downButtonDownHandler);
+        downButton.removeEventListener("touchend", downButtonUpHandler);
 		if (ws) {
 			ws.close();
 			console.log("Closing connection with server");
