@@ -58,6 +58,7 @@ body {
   /* flex-direction: column-reverse; */
 }
 
+
 .mainContainer {
   width: 100vw;
   background-color: var(--dark-purple-bg);
@@ -565,4 +566,14 @@ body {
 #matchHistoryInjection, #tournamentHistoryInjection {
   overflow-y: auto;
   max-height: 95%;
+}
+
+@media only screen and (max-width: 768px) {
+  body{
+    max-height: none;
+  }
+
+  .mainContainer{
+    max-height: none;
+  }
 }
