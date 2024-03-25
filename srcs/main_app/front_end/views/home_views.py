@@ -1,6 +1,6 @@
 import requests, logging
 
-from main_app.constants import TOURNAMENT_HISOTRY_URL, MATCH_HISOTRY_URL
+from main_app.constants import TOURNAMENT_HISOTRY_URL, MATCH_HISOTRY_URL, FRIEND_API_URL
 
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -34,7 +34,7 @@ def getFriendsList(uid, accessToken):
     headers = { 'Content-Type': 'application/json' }
     try:
         response = requests.get(
-            'http://friendsapp:8002/' + "api/friends/",
+            FRIEND_API_URL + "api/friends/",
             headers=headers,
             json={
                 "uid": f"{uid}",
