@@ -72,13 +72,13 @@
 }
 
 .editProfile {
-	width: 40vw;
-	height: 50vh;
+	width: 60vw;
+	height: 60vh;
 }
 
 .editProfile label,input,button {
 	font-family: 'bpdots';
-	font-size: 0.5vw;
+	font-size: 1rem;
 	color: black;
 }
 
@@ -94,4 +94,8 @@
 	background: var(--Beach-bunny-Card, #FCF9F4); 
 	color: black;
 	border: 2px solid black;
+}
+
+#editProfileForm {
+	padding: 20px;
 }
