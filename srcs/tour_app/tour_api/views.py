@@ -40,14 +40,13 @@ def calculate_time_passed(self, game_endtime):
 
 def get_rank(user_id, tournament_id):
     try:
-        tournament = TournamentRank.objects.get(tournament=tournament_id)
+        tournament = TournamentRank.objects.get(tournament=tournament_id , player=user_id)
 
-        if int(user_id) == int(tournament.playerID):
+        if tournament and int(user_id) == int(tournament.player.pk):
             rank = tournament.rank
             return rank
         else:
             return None
-
     except Tournament.DoesNotExist:
         return None
 
