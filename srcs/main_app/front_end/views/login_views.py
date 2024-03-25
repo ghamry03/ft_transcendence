@@ -1,5 +1,4 @@
 import os
-import environ
 import requests
 from time import time
 
@@ -24,7 +23,11 @@ def authenticate(request):
         'code': (None, request.GET.get('code')),
         'redirect_uri': (None, REDIRECT_URI),
     }
-    response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
+    try:
+        response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
+    except requests.RequestException as e:
+        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+
     if response.status_code == 200:
         json_response = response.json()
         access_token = json_response.get('access_token', None)
@@ -38,7 +41,12 @@ def authenticate(request):
                 'Authorization': 'Bearer ' + access_token,
             }
 
-            me_response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
+            try:
+                me_response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
+                me_response.raise_for_status()
+            except requests.RequestException as e:
+                return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+
             UID = str(me_response.json()['id'])
             headers = {
                 'X-UID': UID,
@@ -72,7 +80,12 @@ def renew_token(request):
         'client_id': (None, os.environ['INTRA_UID']),
         'client_secret': (None, os.environ['INTRA_SECRET'])
     }
-    response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
+
+    try:
+        response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
+    except requests.RequestException as e:
+        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+
 
     if response.status_code == 200:
         json_response = response.json()
