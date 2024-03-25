@@ -38,6 +38,10 @@ onlineGame = () => {
 	const canvas = document.getElementById("gameCanvas");
 	const leftScore = document.getElementById("leftScore");
 	const rightScore = document.getElementById("rightScore");
+	var upButton = document.getElementById("upButton");
+    var downButton = document.getElementById("downButton");
+
+	
 	const ctx = canvas.getContext("2d");
 	const playerId = getCookie("uid");
 	const lock = new AsyncLock();
@@ -78,8 +82,8 @@ onlineGame = () => {
 	var leftSPressed = false;
 	var rightWPressed = false;
 	var rightSPressed = false;
-	var wPressed = false;
-	var sPressed = false;
+	var upPressed = false;
+	var downPressed = false;
 	var gameRunning = false;
 	var leftPlayerId;
 	var rightPlayerId;
@@ -276,17 +280,57 @@ onlineGame = () => {
 		}
 	}
 
+	// Up Button down handler
+	function upButtonDownHandler(e)
+	{
+		if (!upPressed)
+		{
+			upPressed = true;
+			sendKeyUpdate("w", true);
+		}
+	}
+	
+	// Up Button up handler
+	function upButtonUpHandler(e)
+	{
+		if (upPressed)
+		{
+			upPressed = false;
+			sendKeyUpdate("w", false);
+		}
+	}
+	
+	// down Button down handler
+	function downButtonDownHandler(e)
+	{
+		if (!downPressed)
+		{
+			downPressed = true;
+			sendKeyUpdate("s", true);
+		}
+	}
+	
+	// down Button up handler
+	function downButtonUpHandler(e)
+	{
+		if (downPressed)
+		{
+			downPressed = false;
+			sendKeyUpdate("s", false);
+		}
+	}
+
 	// Key down handler
 	function keyDownHandler(e)
 	{
-		if (e.key === "w" && !wPressed)
+		if (e.key === "w" && !upPressed)
 		{
-			wPressed = true;
+			upPressed = true;
 			sendKeyUpdate(e.key, true);
 		}
-		else if (e.key === "s" && !sPressed)
+		else if (e.key === "s" && !downPressed)
 		{
-			sPressed = true;
+			downPressed = true;
 			sendKeyUpdate(e.key, true);
 		}
 	}
@@ -294,14 +338,14 @@ onlineGame = () => {
 	// Key up handler
 	function keyUpHandler(e)
 	{
-		if (e.key === "w" && wPressed)
+		if (e.key === "w" && upPressed)
 		{
-			wPressed = false;
+			upPressed = false;
 			sendKeyUpdate(e.key, false);
 		}
-		else if (e.key === "s" && sPressed)
+		else if (e.key === "s" && downPressed)
 		{
-			sPressed = false;
+			downPressed = false;
 			sendKeyUpdate(e.key, false);
 		}
 	}
@@ -463,6 +507,15 @@ onlineGame = () => {
 		// Set key handlers for the game 
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);
+		// upButton.addEventListener("mousedown", upButtonDownHandler);
+        // upButton.addEventListener("mouseup", upButtonUpHandler);
+		// downButton.addEventListener("mousedown", downButtonDownHandler);
+        // downButton.addEventListener("mouseup", downButtonUpHandler);
+		
+		upButton.addEventListener("touchstart", upButtonDownHandler);
+        upButton.addEventListener("touchend", upButtonUpHandler);
+		downButton.addEventListener("touchstart", downButtonDownHandler);
+        downButton.addEventListener("touchend", downButtonUpHandler);
 	};
 
 	draw();
