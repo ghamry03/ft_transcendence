@@ -1,4 +1,38 @@
 onlineGame = () => {
+	// Class for managing asynchronous locks
+	class AsyncLock {
+		constructor() {
+			// Indicates whether the lock is currently acquired
+			this.locked = false;
+			// Queue to hold pending requests for the lock
+			this.queue = [];
+		}
+
+		// Method to acquire the lock asynchronously
+		async acquire() {
+			return new Promise((resolve, reject) => {
+				if (!this.locked) {
+					this.locked = true;
+					resolve();
+				} else {
+					// If locked, add resolver function to the queue
+					this.queue.push(resolve);
+				}
+			});
+		}
+
+		// Method to release the lock
+		release() {
+			if (this.queue.length > 0) {
+				// If queue is not empty, release to the next waiting task
+				const resolve = this.queue.shift();
+				resolve();
+			} else {
+				// If no pending tasks, release the lock
+				this.locked = false;
+			}
+		}
+	}
 
 	// Initialize all game variables
 	const canvas = document.getElementById("gameCanvas");
@@ -6,6 +40,7 @@ onlineGame = () => {
 	const rightScore = document.getElementById("rightScore");
 	const ctx = canvas.getContext("2d");
 	const playerId = getCookie("uid");
+	const lock = new AsyncLock();
 	
 	const paddleHScale = 0.2
 	const paddleWScale = 0.015
@@ -16,6 +51,7 @@ onlineGame = () => {
 	const canvasH = canvas.getBoundingClientRect().height;
 	canvas.width = canvasW;
 	canvas.height = canvasH;
+	console.log("canvas w and h = ", canvas.width, canvas.height)
 	
 	// Paddles
 	var paddleHeight = Math.floor(canvasH * paddleHScale);
@@ -35,7 +71,7 @@ onlineGame = () => {
 	// Score
 	var leftPlayerScore = 0;
 	var rightPlayerScore = 0;
-	const WIN_SCORE = 6;
+	const WIN_SCORE = 11;
 
 	// Keys
 	var leftWPressed = false;
@@ -110,6 +146,19 @@ onlineGame = () => {
 	// Checks if a socket is open and ready to send/receive info
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
+	// Reset ball position to the center of the canvas and set the new ball direction 
+	async function reset (newBallSpeed) {
+		await lock.acquire()
+		try {
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+			ballSpeedXaxis = newBallSpeed;
+			ballSpeedYaxis = newBallSpeed;
+		} finally {
+			lock.release()
+		}
+	}
+	
 	// Handler for all websocket messages that come from the server
 	const handleWebSocketMessage = (event) => {
 		const messageData = JSON.parse(event.data);
@@ -130,21 +179,22 @@ onlineGame = () => {
 		if (messageData.type === "scoreUpdate") {
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
-			reset(ballSpeed * messageData.ballDir);
-			gameRunning = true;
+			reset(ballSpeed * messageData.ballDir).then(() => {
+				gameRunning = true;
+			});
 		}
 		else if (messageData.type === "matchEnded") {
 			leftPlayerScore = messageData.leftScore;
 			rightPlayerScore = messageData.rightScore;
-			reset(ballSpeed);
-			draw();
-			requestAnimationFrame(endMatch);
+			reset(ballSpeed).then(() => {
+				draw();
+				requestAnimationFrame(endMatch);
+			});
 		}
 		else if (messageData.type === "inGame") {
-			// console.log("you're queued or have another ongoing match on another tab or computer", playerId);
 			ws.close(3001, "Player already in-game");
 			alert("You have a game running on another session!");
-			// show error pop up and redirect them back to home page 
+			engine('/cards');
 		}
 		else if (messageData.type === "matchFound") {
 			leftPlayerId = messageData.left;
@@ -157,20 +207,19 @@ onlineGame = () => {
 			var rightImage = document.getElementById("rightImage");
 			getImage(playerId, leftPlayerId)
 				.then(imgUrl => {
-					console.log("left image found: ", imgUrl);
 					leftImage.src = imgUrl;
 				});
 			getImage(playerId, rightPlayerId)
 				.then(imgUrl => {
-					console.log("right image found: ", imgUrl);
 					rightImage.src = imgUrl;
 				});
 		}
 		else if (messageData.type === "disconnected") {
-			reset();
-			alert("Opponent disconnected from the game");
-			cancelAnimationFrame(animationId);
-			// show error pop up and redirect them back to home page 
+			reset(ballSpeed).then(() => {
+				alert("Opponent disconnected from the game");
+				cancelAnimationFrame(animationId);
+				engine('/cards');
+			});
 		}
 	};
 
@@ -182,15 +231,17 @@ onlineGame = () => {
 			|| rightPlayerScore == WIN_SCORE && rightPlayerId == playerId) {
 			// Display victory message and prepare for next round
 			setTimeout(function() {
-				alert("You win!");
+				alert("You win! Returning to home screen...");
 				cancelAnimationFrame(animationId);
+				engine('/cards');
 			  }, 0)
 		}
 		else {
 			// Display defeat message and prepare for result display
 			setTimeout(function() {
-				alert("You lose.");
+				alert("You lose. Returning to home screen...");
 				cancelAnimationFrame(animationId);
+				engine('/cards');
 			  }, 0)
 		}
 		// Marks the game as not running
@@ -255,84 +306,101 @@ onlineGame = () => {
 		}
 	}
 
+	// sidePlayerId - pass in either the rightPlayerId or leftPlayerId
+	function checkScoreSide(sidePlayerId, ballHitRight) {
+		if (playerId == sidePlayerId) {
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+			gameRunning = false;
+			sendScoredEvent();
+		}
+		else {
+			if (ballHitRight == true) {
+				ballSpeedXaxis = -ballSpeed;
+			}
+			else {
+				ballSpeedXaxis = ballSpeed;
+			}
+		}
+	}
+
 	// This function is called in the animation loop for every frame update
 	// The paddle positions and ball positions are updated here
-	function update()
+	async function update()
 	{
-		if (gameRunning == false) {
-			console.log("stuck here");
-			return ;
-		}
-		// Left paddle movement
-		if (leftWPressed && leftPaddleYaxis > 0)
-			leftPaddleYaxis -= paddleSpeed;
-		else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvasH)
-			leftPaddleYaxis += paddleSpeed;
-		
-		// Right paddle movement
-		if (rightWPressed && rightPaddleYaxis > 0)
-			rightPaddleYaxis -= paddleSpeed;
-		else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvasH)
-			rightPaddleYaxis += paddleSpeed;
-
-		// Move ball
-		ballXaxis += ballSpeedXaxis;
-		ballYaxis += ballSpeedYaxis;
-
-		// Top & bottom collision
-		if (ballYaxis - ballRadius <= 0 ||
-			ballYaxis + ballRadius >= canvasH)
-			ballSpeedYaxis = -ballSpeedYaxis;
-
-		// Left paddle collision
-		if (ballXaxis - ballRadius <= paddleWidth &&
-			ballYaxis >= leftPaddleYaxis &&
-			ballYaxis <= leftPaddleYaxis + paddleHeight)
-			if (ballSpeedXaxis < 0)
-				ballSpeedXaxis = -ballSpeedXaxis;
-
-		// Right paddle collision
-		if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
-			ballYaxis >= rightPaddleYaxis &&
-			ballYaxis <= rightPaddleYaxis + paddleHeight)
-			if (ballSpeedXaxis > 0)
-				ballSpeedXaxis = -ballSpeedXaxis;
-
-		// Check if ball goes out of bounds on left or right side of canvas
-		if (ballXaxis - ballRadius <= 0) {
-			ballXaxis = canvasW / 2;
-			ballYaxis = canvasH / 2;
-			if (playerId == rightPlayerId) {
-				gameRunning = false;
-				sendScoredEvent();
+		await lock.acquire()
+		try {
+			if (gameRunning == false) {
+				return ;
 			}
-		}
-		else if (ballXaxis + ballRadius >= canvasW) {
-			ballXaxis = canvasW / 2;
-			ballYaxis = canvasH / 2;
-
-			if (playerId == leftPlayerId) {
-				gameRunning = false;
-				sendScoredEvent();
+			// Left paddle movement
+			if (leftWPressed && leftPaddleYaxis > 0) {
+				leftPaddleYaxis -= paddleSpeed;
 			}
+			else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvasH) {
+				leftPaddleYaxis += paddleSpeed;
+			}
+			
+			// Right paddle movement
+			if (rightWPressed && rightPaddleYaxis > 0) {
+				rightPaddleYaxis -= paddleSpeed;
+			}
+			else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvasH) {
+				rightPaddleYaxis += paddleSpeed;
+			}
+	
+			// Move ball
+			ballXaxis += ballSpeedXaxis;
+			ballYaxis += ballSpeedYaxis;
+	
+			// Top & bottom collision
+			if (ballYaxis - ballRadius <= 0 ||
+				ballYaxis + ballRadius >= canvasH) {
+				ballSpeedYaxis = -ballSpeedYaxis;
+			}
+	
+			// Left paddle collision
+			if (ballXaxis - ballRadius <= paddleWidth &&
+				ballYaxis >= leftPaddleYaxis &&
+				ballYaxis <= leftPaddleYaxis + paddleHeight) {
+				if (ballSpeedXaxis < 0) {
+					ballSpeedXaxis = -ballSpeedXaxis;
+				}
+			}
+	
+			// Right paddle collision
+			if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
+				ballYaxis >= rightPaddleYaxis &&
+				ballYaxis <= rightPaddleYaxis + paddleHeight) {
+				if (ballSpeedXaxis > 0) {
+					ballSpeedXaxis = -ballSpeedXaxis;
+				}
+			}
+	
+			// Check if ball goes out of bounds on left or right side of canvas
+			if (ballXaxis - ballRadius <= 0) {
+				// Check if this player is the right player and forward score info to server accordingly
+				checkScoreSide(rightPlayerId, false);
+			}
+			else if (ballXaxis + ballRadius >= canvasW) {
+				// Check if this player is the left player and forward score info to server accordingly
+				checkScoreSide(leftPlayerId, true);
+			}
+		} finally {
+			lock.release()
 		}
 	}
 
 	// Animation loop that keeps the game animation running
 	const animateGame = (time) => {
-		update();
-		draw();
-		// Start the animation loop
-		animationId = requestAnimationFrame(animateGame);
+		update().then(() => {
+			// Draw the updated frame on the canvas
+			draw();
+			// Start the animation loop
+			animationId = requestAnimationFrame(animateGame);
+		});
 	};
 
-	// Reset ball position to the center of the canvas and set the new ball direction 
-	const reset = (newBallSpeed) => {
-		ballXaxis = canvasW / 2;
-		ballYaxis = canvasH / 2;
-		ballSpeedXaxis = newBallSpeed;
-		ballSpeedYaxis = newBallSpeed;
-	}
 
 	// Draws all updated paddle positions, ball position the canvas. Also updates the score elements
 	const draw = () => {

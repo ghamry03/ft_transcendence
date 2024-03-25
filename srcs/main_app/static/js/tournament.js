@@ -36,7 +36,7 @@ tournament = () => {
 	}
 
 
-	const WIN_SCORE = 8;
+	const WIN_SCORE = 11;
 
 	const playerId = getCookie("uid");
 	const lock = new AsyncLock();
@@ -106,7 +106,6 @@ tournament = () => {
 				bracketContainer.style.display = "none";
 				statusBox.style.display = "none";
 				await engine('/tourGame');
-				console.log("fetched tour game template");
 			}
 		} finally {
 			lock.release()
@@ -280,12 +279,10 @@ tournament = () => {
 		var rightImage = document.getElementById("rightImage");
 		getImage(leftPlayerId)
 			.then(imgUrl => {
-				console.log("Image URL:", imgUrl);
 				leftImage.src = imgUrl;
 			});
 		getImage(rightPlayerId)
 			.then(imgUrl => {
-				console.log("Image URL:", imgUrl);
 				rightImage.src = imgUrl;
 			});
 			
@@ -378,19 +375,18 @@ tournament = () => {
 			case "scoreUpdate":
 				leftPlayerScore = messageData.leftScore;
 				rightPlayerScore = messageData.rightScore;
-				newspeed = ballSpeed * messageData.ballDir;
-				reset(ballSpeed * messageData.ballDir);
-				gameRunning = true;
-				// scoreChanged = true;
+				reset(ballSpeed * messageData.ballDir).then(() => {
+					gameRunning = true;
+				});
 				break;
 			case "matchEnded":
 				leftPlayerScore = messageData.leftScore;
 				rightPlayerScore = messageData.rightScore;
-				reset(ballSpeed);
-				gameRunning = true;
-				// scoreChanged = true;
-				draw();
-				requestAnimationFrame(endMatch);
+				reset(ballSpeed).then(() => {
+					// gameRunning = true;
+					draw();
+					requestAnimationFrame(endMatch);
+				});
 				break;
 			case "roundStarting":
 				console.log("Round starting... Left = ", messageData.leftPlayer, " Right = ", messageData.rightPlayer);
@@ -417,9 +413,9 @@ tournament = () => {
 				addImage(newPlayerId, messageData.imgId);
 				break;
 			case "inGame":
-				console.log("You're queued or have another ongoing tournament on another tab or computer", playerId);
 				ws.close(3001, "Player already in-game");
-				// show error pop up and redirect them back to home page 
+				alert("You have a tournament running on another session!");
+				engine('/cards');
 				break;
 			case "playerLeftQueue":
 				console.log("Player ", messageData.playerId, " has left the queue");
@@ -435,9 +431,10 @@ tournament = () => {
 					else {
 						rightPlayerScore = WIN_SCORE;
 					}
-					reset(ballSpeed);
-					draw();
-					requestAnimationFrame(endMatch);
+					reset(ballSpeed).then(() => {
+						draw();
+						requestAnimationFrame(endMatch);
+					});
 				}
 				else {
 					updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
@@ -567,91 +564,111 @@ tournament = () => {
 
 	// Reset ball position to the center of the canvas and set the new ball direction 
 	async function reset (newBallSpeed) {
-		ballXaxis = canvasW / 2;
-		ballYaxis = canvasH / 2;
-		ballSpeedXaxis = newBallSpeed;
-		ballSpeedYaxis = newBallSpeed;
+		await lock.acquire()
+		try {
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+			ballSpeedXaxis = newBallSpeed;
+			ballSpeedYaxis = newBallSpeed;
+		} finally {
+			lock.release()
+		}
 	}
 
+	// sidePlayerId - pass in either the rightPlayerId or leftPlayerId
+	function checkScoreSide(sidePlayerId, ballHitRight) {
+		if (playerId == sidePlayerId) {
+			ballXaxis = canvasW / 2;
+			ballYaxis = canvasH / 2;
+			gameRunning = false;
+			sendScoredEvent();
+		}
+		else {
+			if (ballHitRight == true) {
+				ballSpeedXaxis = -ballSpeed;
+			}
+			else {
+				ballSpeedXaxis = ballSpeed;
+			}
+		}
+	}
 	
 	// This function is called in the animation loop for every frame update
 	// The paddle positions and ball positions are updated here
-	function update()
+	async function update()
 	{
-		// if (pendingScoreUpdate) {
-		// 	console.log("scoreChanged = ", scoreChanged);
-		// 	return ;
-		// }
-		if (gameRunning == false) {
-			console.log("stuck here");
-			return ;
-		}
-		// Left paddle movement
-		if (leftWPressed && leftPaddleYaxis > 0)
-			leftPaddleYaxis -= paddleSpeed;
-		else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvasH)
-			leftPaddleYaxis += paddleSpeed;
-		
-		// Right paddle movement
-		if (rightWPressed && rightPaddleYaxis > 0)
-			rightPaddleYaxis -= paddleSpeed;
-		else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvasH)
-			rightPaddleYaxis += paddleSpeed;
-
-		// Move ball
-		ballXaxis += ballSpeedXaxis;
-		ballYaxis += ballSpeedYaxis;
-
-		// Top & bottom collision
-		if (ballYaxis - ballRadius <= 0 ||
-			ballYaxis + ballRadius >= canvasH)
-			ballSpeedYaxis = -ballSpeedYaxis;
-
-		// Left paddle collision
-		if (ballXaxis - ballRadius <= paddleWidth &&
-			ballYaxis >= leftPaddleYaxis &&
-			ballYaxis <= leftPaddleYaxis + paddleHeight)
-			if (ballSpeedXaxis < 0)
-				ballSpeedXaxis = -ballSpeedXaxis;
-
-		// Right paddle collision
-		if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
-			ballYaxis >= rightPaddleYaxis &&
-			ballYaxis <= rightPaddleYaxis + paddleHeight)
-			if (ballSpeedXaxis > 0)
-				ballSpeedXaxis = -ballSpeedXaxis;
-
-		// Check if ball goes out of bounds on left or right side of canvas
-		if (ballXaxis - ballRadius <= 0) {
-			// gameRunning = false;
-			// reset(ballSpeed);
-			// pendingScoreUpdate = true;
-			ballXaxis = canvasW / 2;
-			ballYaxis = canvasH / 2;
-			if (playerId == rightPlayerId) {
-				gameRunning = false;
-				sendScoredEvent();
+		await lock.acquire()
+		try {
+			if (gameRunning == false) {
+				// console.log("stuck here");
+				return ;
 			}
-		}
-		else if (ballXaxis + ballRadius >= canvasW) {
-			// gameRunning = false;
-			// reset(ballSpeed);
-			// pendingScoreUpdate = true;
-			ballXaxis = canvasW / 2;
-			ballYaxis = canvasH / 2;
-
-			if (playerId == leftPlayerId) {
-				gameRunning = false;
-				sendScoredEvent();
+			// Left paddle movement
+			if (leftWPressed && leftPaddleYaxis > 0) {
+				leftPaddleYaxis -= paddleSpeed;
 			}
+			else if (leftSPressed && leftPaddleYaxis + paddleHeight < canvasH) {
+				leftPaddleYaxis += paddleSpeed;
+			}
+			
+			// Right paddle movement
+			if (rightWPressed && rightPaddleYaxis > 0) {
+				rightPaddleYaxis -= paddleSpeed;
+			}
+			else if (rightSPressed && rightPaddleYaxis + paddleHeight < canvasH) {
+				rightPaddleYaxis += paddleSpeed;
+			}
+	
+			// Move ball
+			ballXaxis += ballSpeedXaxis;
+			ballYaxis += ballSpeedYaxis;
+	
+			// Top & bottom collision
+			if (ballYaxis - ballRadius <= 0 ||
+				ballYaxis + ballRadius >= canvasH) {
+				ballSpeedYaxis = -ballSpeedYaxis;
+			}
+	
+			// Left paddle collision
+			if (ballXaxis - ballRadius <= paddleWidth &&
+				ballYaxis >= leftPaddleYaxis &&
+				ballYaxis <= leftPaddleYaxis + paddleHeight) {
+				if (ballSpeedXaxis < 0) {
+					ballSpeedXaxis = -ballSpeedXaxis;
+				}
+			}
+	
+			// Right paddle collision
+			if (ballXaxis + ballRadius >= canvasW - paddleWidth &&
+				ballYaxis >= rightPaddleYaxis &&
+				ballYaxis <= rightPaddleYaxis + paddleHeight) {
+				if (ballSpeedXaxis > 0) {
+					ballSpeedXaxis = -ballSpeedXaxis;
+				}
+			}
+	
+			// Check if ball goes out of bounds on left or right side of canvas
+			if (ballXaxis - ballRadius <= 0) {
+				// Check if this player is the right player and forward score info to server accordingly
+				checkScoreSide(rightPlayerId, false);
+			}
+			else if (ballXaxis + ballRadius >= canvasW) {
+				// Check if this player is the left player and forward score info to server accordingly
+				checkScoreSide(leftPlayerId, true);
+			}
+		} finally {
+			lock.release()
 		}
 	}
 
 	// Animation loop that keeps the game animation running
 	const animateGame = (time) => {
-		update();
-		draw();
-		animationId = requestAnimationFrame(animateGame);
+		update().then(() => {
+			// Draw the updated frame on the canvas
+			draw();
+			// Start the animation loop
+			animationId = requestAnimationFrame(animateGame);
+		});
 	};
 
 	// Draws all updated paddle positions, ball position the canvas. Also updates the score elements
@@ -699,10 +716,6 @@ tournament = () => {
 			leftScore.style.color = "#C5FFC0";
 			rightScore.style.color = "#C5FFC0";
 		}
-		// if (pendingScoreUpdate && scoreChanged) {
-		// 	pendingScoreUpdate = false;
-		// 	scoreChanged = false;
-		// }
 	}
 	
 	const joinQueue = () => {
