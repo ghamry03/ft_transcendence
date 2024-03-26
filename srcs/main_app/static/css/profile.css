@@ -2,8 +2,8 @@
 	width: 80vw;
 	height: 60vh;
 	overflow: scroll;
-	background: #D4BBFE;
-	padding: 20px 0;
+	background: var(--beach-bunny-lavendar);
+	padding: 20px;
 	overflow: scroll;
 }
 
@@ -43,7 +43,7 @@
 }
 
 .profile .d-flex {
-	column-gap: 0.5rem;
+	column-gap: 1rem;
 }
 
 .profile .d-flex p {
