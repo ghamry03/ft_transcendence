@@ -139,6 +139,7 @@ body {
 .pongping:hover{
   cursor: pointer;
 }
+
 .containerBorder {
   border-radius: 12px;
     width: 100%;
@@ -167,6 +168,10 @@ body {
   -webkit-text-stroke-color: var(--Chat-Chat-text, #000);
 }
 
+.containerBorder {
+  padding: 4%;
+}
+
 .containerBorder h3 {
   text-align: center;
   font-family: 'ps2p';
@@ -183,14 +188,18 @@ body {
 }
 
 .containerBorder .description p{
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  font-family: 'bpdots';
+  font-weight: 700;
+  padding-left: 5%;
+  padding-right: 5%;
 }
 
 #matchHistoryDash .content, #tournamentHistoryDash .content{
   background-color: whitesmoke;
   border-radius: 12px;
-  border: solid 2px black;
-  box-shadow: 8px 7px 0px 0px var(--beach-bunny-lavendar-dark);
+  border: solid 5px var(--beach-bunny-lavendar-dark);
+  /* box-shadow: 8px 7px 0px 0px var(--beach-bunny-lavendar-dark); */
   height: 100%;
 }
 
@@ -204,6 +213,7 @@ body {
   line-height: normal;
   text-transform: uppercase;
   padding-bottom: 4px;
+  padding: 10px;
   box-shadow:
   -8px 0px 0px 0px whitesmoke,
   8px 0px 0px 0px whitesmoke,
@@ -357,6 +367,7 @@ body {
   font-weight: 700;
   line-height: normal;
   font-variant: all-small-caps;
+  color: var(--chat-text);
   z-index: 9;
   text-wrap: nowrap;
 }
@@ -470,10 +481,13 @@ body {
   background-color: var(--green-darker);
   text-align: center;
   font-family: bpdots;
-  font-size: 24px;
+  font-size: 18px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 5px;
   box-shadow: 
   -4px -4px 0px var(--green-darker),
   -4px 4px 0px var(--green-darker),
