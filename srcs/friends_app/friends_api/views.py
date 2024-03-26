@@ -93,7 +93,10 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
             )
 
         if uid == ownerUID:
-            queryset = Friend.objects.filter(Q(first_id=ownerUID) | Q(second_id=ownerUID))
+            try:
+                queryset = Friend.objects.filter(Q(first_id=ownerUID) | Q(second_id=ownerUID))
+            except:
+                return Response(data = {}, status=status.HTTP_200_OK)
             friendsList = []
             friendRequests = 0;
             for friend in queryset:
@@ -119,10 +122,13 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
                 curl -X GET -H "Content-Type: application/json" -d '{
                     "uid": "123", "ownerUID":"123" ,  "access_token": "xxxxxxxxxxx"}' /api/friends/ 
             '''
-            obj = Friend.objects.filter(
-                Q(first_id=uid, second_id=ownerUID) |
-                Q(first_id=ownerUID, second_id=uid)
-            ).first()
+            try:
+                obj = Friend.objects.filter(
+                    Q(first_id=uid, second_id=ownerUID) |
+                    Q(first_id=ownerUID, second_id=uid)
+                ).first()
+            except:
+                return Response(data = {}, status=status.HTTP_200_OK)
             if not obj:
                 return Response(data = {}, status=status.HTTP_200_OK)
             data = {
