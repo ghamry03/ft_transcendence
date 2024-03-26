@@ -47,10 +47,9 @@
 }
 
 .profile .d-flex p {
-	color: var(--Beach-bunny-Text, #59322B);
+	color: var(--chat-text, #80629D);
 	font-family: 'bpdots';
-	font-size: 15px;
-	font-size: 1.5em;
+	font-size: 1.3em;
 	font-style: normal;
 	font-weight: 700;
 	line-height: normal;
@@ -60,9 +59,9 @@
 }
 
 .profile .d-flex a {
-	color: var(--Beach-bunny-Text, #59322B);
+	color: var(--chat-text, #80629D);
 	font-family: 'bpdots';
-	font-size: 1.5em;
+	font-size: 1.3em;
 	font-style: normal;
 	font-weight: 700;
 	line-height: normal;
