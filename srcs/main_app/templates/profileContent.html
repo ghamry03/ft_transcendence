@@ -79,108 +79,12 @@
                     </div>
 
                     <!-- content -->
-                    <div>
-                        <h3>Match 0</h3>
-                        <h3>Match 1</h3>
-                        <h3>Match 2</h3>
-                        <h3>Match 3</h3>
-                        <h3>Match 4</h3>
-                        <h3>Match 5</h3>
-                        <h3>Match 6</h3>
-                        <h3>Match 7</h3>
-                        <h3>Match 8</h3>
-                        <h3>Match 9</h3>
-                        <h3>Match 10</h3>
-                        <h3>Match 11</h3>
-                        <h3>Match 12</h3>
-                        <h3>Match 13</h3>
-                        <h3>Match 14</h3>
-                        <h3>Match 15</h3>
-                        <h3>Match 16</h3>
-                        <h3>Match 17</h3>
-                        <h3>Match 18</h3>
-                        <h3>Match 19</h3>
-                        <h3>Match 20</h3>
-                        <h3>Match 21</h3>
-                        <h3>Match 22</h3>
-                        <h3>Match 23</h3>
-                        <h3>Match 24</h3>
-                        <h3>Match 25</h3>
-                        <h3>Match 26</h3>
-                        <h3>Match 27</h3>
-                        <h3>Match 28</h3>
-                        <h3>Match 29</h3>
-                        <h3>Match 30</h3>
-                        <h3>Match 31</h3>
-                        <h3>Match 32</h3>
-                        <h3>Match 33</h3>
-                        <h3>Match 34</h3>
-                        <h3>Match 35</h3>
-                        <h3>Match 36</h3>
-                        <h3>Match 37</h3>
-                        <h3>Match 38</h3>
-                        <h3>Match 39</h3>
-                        <h3>Match 40</h3>
-                        <h3>Match 41</h3>
-                        <h3>Match 42</h3>
-                        <h3>Match 43</h3>
-                        <h3>Match 44</h3>
-                        <h3>Match 45</h3>
-                        <h3>Match 46</h3>
-                        <h3>Match 47</h3>
-                        <h3>Match 48</h3>
-                        <h3>Match 49</h3>
-                        <h3>Match 50</h3>
-                        <h3>Match 51</h3>
-                        <h3>Match 52</h3>
-                        <h3>Match 53</h3>
-                        <h3>Match 54</h3>
-                        <h3>Match 55</h3>
-                        <h3>Match 56</h3>
-                        <h3>Match 57</h3>
-                        <h3>Match 58</h3>
-                        <h3>Match 59</h3>
-                        <h3>Match 60</h3>
-                        <h3>Match 61</h3>
-                        <h3>Match 62</h3>
-                        <h3>Match 63</h3>
-                        <h3>Match 64</h3>
-                        <h3>Match 65</h3>
-                        <h3>Match 66</h3>
-                        <h3>Match 67</h3>
-                        <h3>Match 68</h3>
-                        <h3>Match 69</h3>
-                        <h3>Match 70</h3>
-                        <h3>Match 71</h3>
-                        <h3>Match 72</h3>
-                        <h3>Match 73</h3>
-                        <h3>Match 74</h3>
-                        <h3>Match 75</h3>
-                        <h3>Match 76</h3>
-                        <h3>Match 77</h3>
-                        <h3>Match 78</h3>
-                        <h3>Match 79</h3>
-                        <h3>Match 80</h3>
-                        <h3>Match 81</h3>
-                        <h3>Match 82</h3>
-                        <h3>Match 83</h3>
-                        <h3>Match 84</h3>
-                        <h3>Match 85</h3>
-                        <h3>Match 86</h3>
-                        <h3>Match 87</h3>
-                        <h3>Match 88</h3>
-                        <h3>Match 89</h3>
-                        <h3>Match 90</h3>
-                        <h3>Match 91</h3>
-                        <h3>Match 92</h3>
-                        <h3>Match 93</h3>
-                        <h3>Match 94</h3>
-                        <h3>Match 95</h3>
-                        <h3>Match 96</h3>
-                        <h3>Match 97</h3>
-                        <h3>Match 98</h3>
-                        <h3>Match 99</h3>
-                        <h3>Match 100</h3>
+                    <div id="matchHistoryInjection">
+                        {% if matchHistory %}
+                            {% for match in matchHistory %}
+                                {% include 'matchHistoryEntry.html' with img=image myScore=match.my_score theirScore=match.opponent.score theirImg=match.opponent.image theirUsername=match.opponent.username time=match.timePassed %}
+                            {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -195,108 +99,12 @@
                     </div>
 
                     <!-- content -->
-                    <div>
-                        <h3>Tournaments 0</h3>
-                        <h3>Tournaments 1</h3>
-                        <h3>Tournaments 2</h3>
-                        <h3>Tournaments 3</h3>
-                        <h3>Tournaments 4</h3>
-                        <h3>Tournaments 5</h3>
-                        <h3>Tournaments 6</h3>
-                        <h3>Tournaments 7</h3>
-                        <h3>Tournaments 8</h3>
-                        <h3>Tournaments 9</h3>
-                        <h3>Tournaments 10</h3>
-                        <h3>Tournaments 11</h3>
-                        <h3>Tournaments 12</h3>
-                        <h3>Tournaments 13</h3>
-                        <h3>Tournaments 14</h3>
-                        <h3>Tournaments 15</h3>
-                        <h3>Tournaments 16</h3>
-                        <h3>Tournaments 17</h3>
-                        <h3>Tournaments 18</h3>
-                        <h3>Tournaments 19</h3>
-                        <h3>Tournaments 20</h3>
-                        <h3>Tournaments 21</h3>
-                        <h3>Tournaments 22</h3>
-                        <h3>Tournaments 23</h3>
-                        <h3>Tournaments 24</h3>
-                        <h3>Tournaments 25</h3>
-                        <h3>Tournaments 26</h3>
-                        <h3>Tournaments 27</h3>
-                        <h3>Tournaments 28</h3>
-                        <h3>Tournaments 29</h3>
-                        <h3>Tournaments 30</h3>
-                        <h3>Tournaments 31</h3>
-                        <h3>Tournaments 32</h3>
-                        <h3>Tournaments 33</h3>
-                        <h3>Tournaments 34</h3>
-                        <h3>Tournaments 35</h3>
-                        <h3>Tournaments 36</h3>
-                        <h3>Tournaments 37</h3>
-                        <h3>Tournaments 38</h3>
-                        <h3>Tournaments 39</h3>
-                        <h3>Tournaments 40</h3>
-                        <h3>Tournaments 41</h3>
-                        <h3>Tournaments 42</h3>
-                        <h3>Tournaments 43</h3>
-                        <h3>Tournaments 44</h3>
-                        <h3>Tournaments 45</h3>
-                        <h3>Tournaments 46</h3>
-                        <h3>Tournaments 47</h3>
-                        <h3>Tournaments 48</h3>
-                        <h3>Tournaments 49</h3>
-                        <h3>Tournaments 50</h3>
-                        <h3>Tournaments 51</h3>
-                        <h3>Tournaments 52</h3>
-                        <h3>Tournaments 53</h3>
-                        <h3>Tournaments 54</h3>
-                        <h3>Tournaments 55</h3>
-                        <h3>Tournaments 56</h3>
-                        <h3>Tournaments 57</h3>
-                        <h3>Tournaments 58</h3>
-                        <h3>Tournaments 59</h3>
-                        <h3>Tournaments 60</h3>
-                        <h3>Tournaments 61</h3>
-                        <h3>Tournaments 62</h3>
-                        <h3>Tournaments 63</h3>
-                        <h3>Tournaments 64</h3>
-                        <h3>Tournaments 65</h3>
-                        <h3>Tournaments 66</h3>
-                        <h3>Tournaments 67</h3>
-                        <h3>Tournaments 68</h3>
-                        <h3>Tournaments 69</h3>
-                        <h3>Tournaments 70</h3>
-                        <h3>Tournaments 71</h3>
-                        <h3>Tournaments 72</h3>
-                        <h3>Tournaments 73</h3>
-                        <h3>Tournaments 74</h3>
-                        <h3>Tournaments 75</h3>
-                        <h3>Tournaments 76</h3>
-                        <h3>Tournaments 77</h3>
-                        <h3>Tournaments 78</h3>
-                        <h3>Tournaments 79</h3>
-                        <h3>Tournaments 80</h3>
-                        <h3>Tournaments 81</h3>
-                        <h3>Tournaments 82</h3>
-                        <h3>Tournaments 83</h3>
-                        <h3>Tournaments 84</h3>
-                        <h3>Tournaments 85</h3>
-                        <h3>Tournaments 86</h3>
-                        <h3>Tournaments 87</h3>
-                        <h3>Tournaments 88</h3>
-                        <h3>Tournaments 89</h3>
-                        <h3>Tournaments 90</h3>
-                        <h3>Tournaments 91</h3>
-                        <h3>Tournaments 92</h3>
-                        <h3>Tournaments 93</h3>
-                        <h3>Tournaments 94</h3>
-                        <h3>Tournaments 95</h3>
-                        <h3>Tournaments 96</h3>
-                        <h3>Tournaments 97</h3>
-                        <h3>Tournaments 98</h3>
-                        <h3>Tournaments 99</h3>
-                        <h3>Tournaments 100</h3>
+                    <div id="tournamentHistoryInjection">
+                        {% if tournamentHistory %}
+                            {% for match in tournamentHistory %}
+                                {% include 'tournamentHistoryEntry.html' with img=image rank=match.rank date=match.tournament_time_passed%}
+                            {% endfor %}
+                        {% endif %}
                     </div>
 
                 </div>
