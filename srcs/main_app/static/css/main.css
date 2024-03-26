@@ -583,6 +583,32 @@ body {
   max-height: 95%;
 }
 
+.mobileNavBar{
+  position: fixed;
+  bottom: 0;
+  height: 7.5vh;
+  width: 100vw;
+  background-color: var(--beach-bunny-lavendar);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+.mainFriendMobileContainer{
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.mobileFriend{
+  display: inline-block;
+}
+.mobileAddFriend{
+  right: 0;
+}
+
+.mobileFriendInjection{
+  overflow: auto;
+}
 @media only screen and (max-width: 768px) {
 
   body{
@@ -607,5 +633,12 @@ body {
 
   #matchHistoryDash, #tournamentHistoryDash{
     margin: 2em auto;
+  }
+
+  .formBase{
+    width: 75%;
+  }
+  .historySection{
+    margin-bottom: 7.5vh!important;
   }
 }

@@ -16,7 +16,7 @@ def getMaxPos(playerMax):
 
 class TournamentConsumer(AsyncWebsocketConsumer):
 
-    PLAYER_MAX = 8
+    PLAYER_MAX = 2
     WIN_SCORE = 11
     update_lock = asyncio.Lock()
     logger = logging.getLogger(__name__)
