@@ -1,6 +1,7 @@
 import requests
 
 from main_app.constants import USER_API_URL, FRIEND_API_URL
+from .home_views import getTournamentHistory, getMatchHistory
 
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -49,6 +50,9 @@ def profile(request, uid):
 
     profile_type = get_profile_type(uid, user_data['uid'], access_token)
 
+    tournamentHistory = getTournamentHistory(uid)
+    matchHistory = getMatchHistory(uid)
+
     context = {
         'uid': uid,
         'image': profile_data['image'],
@@ -58,6 +62,8 @@ def profile(request, uid):
         'intra_url': profile_data['intra_url'],
         'status': profile_data['status'],
         'type': profile_type,
+        'tournamentHistory': tournamentHistory,
+        'matchHistory': matchHistory
     }
     return render(request, 'profileContent.html', context)
 

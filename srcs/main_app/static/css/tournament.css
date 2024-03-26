@@ -198,7 +198,7 @@ tbody{
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    color: var(--chat-text);
+    color: var(--beach-bunny-brown);
  }
 
  #tournamentStatus {
@@ -250,6 +250,8 @@ tbody{
  .tournamentEntry{
    padding: 12px;
    border-bottom: 2px solid #dddbdb;
+   font-family: 'bpdots';
+   font-weight: 700;
  }
 
 
@@ -270,7 +272,7 @@ tbody{
    font-family: bpdots;
    font-size: 37px;
    font-style: normal;
-   font-weight: 700;
+   font-weight: 800;
    line-height: normal;
    text-transform: lowercase;
    text-align: left;

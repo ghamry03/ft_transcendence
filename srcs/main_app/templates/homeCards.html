@@ -30,7 +30,7 @@
 
             <div id="matchHistoryInjection">
 
-                {%if matchHistory %}
+                {% if matchHistory %}
                     {% for match in matchHistory %}
                         {% include 'matchHistoryEntry.html' with img=userData.image myScore=match.my_score theirScore=match.opponent.score theirImg=match.opponent.image theirUsername=match.opponent.username time=match.timePassed %}
                     {% endfor %}
@@ -49,7 +49,7 @@
             </div>
             <div id="tournamentHistoryInjection">
 
-                {%if tournamentHistory %}
+                {% if tournamentHistory %}
                     {% for match in tournamentHistory %}
                         {% include 'tournamentHistoryEntry.html' with img=userData.image rank=match.rank date=match.tournament_time_passed%}
                     {% endfor %}
