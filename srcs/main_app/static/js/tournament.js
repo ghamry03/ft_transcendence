@@ -777,10 +777,14 @@ tournament = () => {
 	tournament.destroy = () => {
 		document.removeEventListener("keydown", keyDownHandler);
 		document.removeEventListener("keyup", keyUpHandler);
-		upButton.removeEventListener("touchstart", upButtonDownHandler);
-        upButton.removeEventListener("touchend", upButtonUpHandler);
-		downButton.removeEventListener("touchstart", downButtonDownHandler);
-        downButton.removeEventListener("touchend", downButtonUpHandler);
+		if (upButton) {
+			upButton.removeEventListener("touchstart", upButtonDownHandler);
+			upButton.removeEventListener("touchend", upButtonUpHandler);
+		}
+		if (downButton) {
+			downButton.removeEventListener("touchstart", downButtonDownHandler);
+			downButton.removeEventListener("touchend", downButtonUpHandler);
+		}
 		if (ws) {
 			ws.close();
 			console.log("Tour: Closing connection with server");
