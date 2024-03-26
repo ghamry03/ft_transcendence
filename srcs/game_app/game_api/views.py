@@ -84,7 +84,7 @@ class   MatchHistoryApiView(APIView):
 
 
 		# Retrieve all matches for the user
-		user_matches = PlayerMatch.objects.filter(player=user_id)
+		user_matches = PlayerMatch.objects.filter(player=user_id).order_by('-game__endtime')
 
 		games_details = []
 		for match in user_matches:

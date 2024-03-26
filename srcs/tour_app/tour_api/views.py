@@ -61,7 +61,8 @@ class TournamentHistoryApiView(APIView):
 					"rank": rank if rank is not None else "Rank not found."
 				})
 			logger.info(f'this is the found game: {time_passed} {rank}')
-		return Response({"data":tournament_details}, status=status.HTTP_200_OK)
+		sorted_tournament_details = sorted(tournament_details, key=lambda x: x['tournament_time_passed'], reverse=True)
+		return Response({"data": sorted_tournament_details}, status=status.HTTP_200_OK)
 
 def get_player_image(self, target_uid, owner_uid, token):
 		headers = {
