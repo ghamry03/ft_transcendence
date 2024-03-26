@@ -325,6 +325,19 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     },
                 )
 
+        elif msg_type == "gameReady":
+            player["ready"] = True
+            # Check if their opponent is also ready
+            if opponent["ready"] == True:
+                player["ready"] = False
+                opponent["ready"] = False
+                await self.channel_layer.group_send(
+                    player["groupName"],
+                    {
+                        "type": "gameReady",
+                    },
+                )
+
     # Call this to start a new round of a tournament, giving it the tournament ID
     # This function would also end the tournament if it finds there aren't enough people to continue
     async def startRound(self, tourName):
@@ -503,6 +516,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             text_data=json.dumps(
                 {
                     "type": "tournamentStarted",
+                }
+            )
+        )
+    
+    async def gameReady(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "gameReady",
                 }
             )
         )

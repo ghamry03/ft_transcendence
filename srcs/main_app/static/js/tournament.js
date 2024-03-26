@@ -250,7 +250,7 @@ tournament = () => {
 			}
 			if (texts.length === 0) {
 				clearInterval(interval);
-				callback();
+				gameRunning = true;
 				return;
 			}
 			// Trim array
@@ -334,8 +334,14 @@ tournament = () => {
 		draw();
 
 		// Start the match countdown and animation
-		gameRunning = true;
-		countdown(document.getElementById("readyGo"), animateGame);
+
+		// gameRunning = false;
+		// animateGame();
+		// countdown(document.getElementById("readyGo"));
+		sendGameReadyEvent();
+
+		// gameRunning = true;
+		// countdown(document.getElementById("readyGo"), animateGame);
 	}
 
 	// Handler for checkbox if a user is ready to start their assigned match
@@ -397,6 +403,11 @@ tournament = () => {
 				leftPlayerId = messageData.leftPlayer;
 				rightPlayerId = messageData.rightPlayer;
 				startMatch(messageData.leftPlayer, messageData.rightPlayer);
+				break;
+			case "gameReady":
+				gameRunning = false;
+				animateGame();
+				countdown(document.getElementById("readyGo"));
 				break;
 			case "tournamentStarted":
 				console.log("Tournament starting...");
@@ -497,6 +508,22 @@ tournament = () => {
 			ws.send(
 				JSON.stringify({
 					type: "playerReady",
+					playerId: playerId
+				})
+			);
+		}
+		else {
+			alert("Lost connection with server");
+		}
+	}
+
+	// Sends a player ready event to the server
+	function sendGameReadyEvent()
+	{
+		if (isOpen(ws)) {
+			ws.send(
+				JSON.stringify({
+					type: "gameReady",
 					playerId: playerId
 				})
 			);
