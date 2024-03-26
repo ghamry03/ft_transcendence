@@ -789,15 +789,28 @@ tournament = () => {
 		}
 	}
 	
-	const joinQueue = () => {
-		// Set up WebSocket connection
-		console.log("uid = ", playerId);
-		// prod version
+	async function establishSocket() {
+		try {
+			const response = await fetch("tourUrl/");
+			if (!response.ok) {
+				alert("Cannot connect to the server. Returning home...");
+				engine('/cards');
+			}
+			else {
+				const tourUrl = await response.text();
+				ws = new WebSocket(tourUrl +  "ws/tour/?uid=" + playerId);
+				console.log("Socket established, ws = ", ws);
+				ws.onmessage = handleWebSocketMessage;
+			}
+		} catch(error) {
+			console.log("Error establishing socket");
+		}
 
-		var wsScheme = location.protocol === "https:" ? "wss://" : "ws://";
-		ws = new WebSocket(wsScheme + "localhost:8004/ws/tour/?uid=" + playerId);
-		console.log(wsScheme, " connected: ", ws);
-		ws.onmessage = handleWebSocketMessage;
+	}
+
+	const joinQueue = () => {
+		console.log("uid = ", playerId);
+		establishSocket();
 	};
 	joinQueue();
 

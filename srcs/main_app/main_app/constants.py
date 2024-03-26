@@ -9,6 +9,8 @@ if DEBUG == True:
     FRIEND_API_URL = environ.get('FRIENDS_API_URL', 'http://friendsapp:8002/')
     MATCH_HISOTRY_URL = environ.get('GAME_API_URL', 'http://gameapp:8003/')
     TOURNAMENT_HISOTRY_URL = environ.get('TOUR_API_URL', 'http://tourapp:8004/')
+    GAME_URL = environ.get('GAME_URL', 'ws://localhost:8003/')
+    TOUR_URL = environ.get('TOUR_URL', 'ws://localhost:8004/')
 else:
     AUTH_URL = environ.get('AUTH_URL', 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-9c64ddc1254a330959e05ab254676bd2839aaf33ceba357b53462f7f6bb8c345&redirect_uri=https%3A%2F%2Flocalhost%2Fauthenticate%2F&response_type=code')
     REDIRECT_URI = environ.get('REDIRECT_URI', 'https://localhost/authenticate/')
@@ -17,3 +19,5 @@ else:
     MATCH_HISOTRY_URL = environ.get('GAME_API_URL', 'http://gameapp:8003/')
     TOURNAMENT_HISOTRY_URL = environ.get('TOUR_API_URL', 'http://tourapp:8004/')
     MEDIA_SERVICE_URL = environ.get('MEDIA_URL', 'https://localhost:8005/')
+    GAME_URL = environ.get('GAME_URL', 'wss://localhost:8003/')
+    TOUR_URL = environ.get('TOUR_URL', 'wss://localhost:8004/')
