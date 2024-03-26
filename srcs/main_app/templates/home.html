@@ -28,7 +28,7 @@
             <div class="friendInjection">
                 {% for friend in friendsList %}
                     {% if friend.relationship == 0 %}
-                        {% include 'friend.html' with name=friend.username uid=friend.uid imgURL=friend.image %}
+                        {% include 'friend.html' with name=friend.username uid=friend.uid imgURL=friend.image status=friend.status %}
                     {% endif %}
                 {% endfor %}
             </div>
