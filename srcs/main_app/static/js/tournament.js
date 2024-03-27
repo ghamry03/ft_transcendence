@@ -474,7 +474,7 @@ tournament = () => {
 			);
 		}
 		else {
-			console.log("1Lost connection with server");
+			console.log("Lost connection with server");
 			cancelAnimationFrame(animationId);
 		}
 	}
@@ -491,7 +491,7 @@ tournament = () => {
 			);
 		}
 		else {
-			console.log("2Lost connection with server");
+			console.log("Lost connection with server");
 			cancelAnimationFrame(animationId);
 		}
 	}
