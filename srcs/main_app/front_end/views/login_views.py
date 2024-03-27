@@ -53,9 +53,13 @@ def authenticate(request):
                 'X-TOKEN': access_token
             }
 
-            user_api_response = requests.get(USER_API_URL + 'api/user/' + UID, headers=headers)
-            request.session['userData'] = user_api_response.json()
-            request.session['logged_in'] = True
+            try:
+                user_api_response = requests.get(USER_API_URL + 'api/user/' + UID, headers=headers)
+                user_api_response.raise_for_status()
+                request.session['userData'] = user_api_response.json()
+                request.session['logged_in'] = True
+            except requests.RequestException as e:
+                return JsonResponse({'error': 'user api connection error', 'details': str(e)}, status=500)
             return redirect('/')
     try:
         request.session.flush()
