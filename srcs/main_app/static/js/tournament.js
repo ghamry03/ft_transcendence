@@ -320,16 +320,6 @@ tournament = () => {
 		ballSpeedXaxis = ballSpeed;
 		ballSpeedYaxis = ballSpeed;
 
-		// Keys
-		leftWPressed = false;
-		leftSPressed = false;
-		rightWPressed = false;
-		rightSPressed = false;
-
-		// Scores
-		leftPlayerScore = 0;
-		rightPlayerScore = 0;
-
 		// Draw the initial screen for the game with start positions of paddles and ball
 		draw();
 
@@ -405,9 +395,11 @@ tournament = () => {
 				startMatch(messageData.leftPlayer, messageData.rightPlayer);
 				break;
 			case "gameReady":
+				console.log("both are ready!");
 				gameRunning = false;
 				animateGame();
 				countdown(document.getElementById("readyGo"));
+				console.log("game has started");
 				break;
 			case "tournamentStarted":
 				console.log("Tournament starting...");
@@ -439,7 +431,8 @@ tournament = () => {
 			case "disconnected":
 				console.log("Opponent has disconnected");
 				// add an modal saying the opponent disconnected and they win by default
-				if (gameRunning) {
+				if (gameRunning || document.getElementById("gameCanvas")) {
+					console.log("game was running when op disconnected");
 					if (leftPlayerId == playerId) {
 						leftPlayerScore = WIN_SCORE;
 					}
@@ -452,6 +445,7 @@ tournament = () => {
 					});
 				}
 				else {
+					console.log("game was not running when op disconnected");
 					updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
 					checkForm.style.display = "none";
 				}
@@ -479,7 +473,7 @@ tournament = () => {
 			);
 		}
 		else {
-			alert("Lost connection with server");
+			console.log("1Lost connection with server");
 			cancelAnimationFrame(animationId);
 		}
 	}
@@ -496,7 +490,7 @@ tournament = () => {
 			);
 		}
 		else {
-			alert("Lost connection with server");
+			console.log("2Lost connection with server");
 			cancelAnimationFrame(animationId);
 		}
 	}
@@ -513,7 +507,7 @@ tournament = () => {
 			);
 		}
 		else {
-			alert("Lost connection with server");
+			console.log("3Lost connection with server");
 		}
 	}
 
@@ -529,7 +523,7 @@ tournament = () => {
 			);
 		}
 		else {
-			alert("Lost connection with server");
+			console.log("4Lost connection with server");
 		}
 	}
 
@@ -542,6 +536,7 @@ tournament = () => {
 	// Ends the match and updates UI accordingly
 	function endMatch() {
 		// Checks if the left player or right player wins the match
+		console.log("leftplayerscore = ", leftPlayerScore, "rightplayerscore = ", rightPlayerScore);
 		if ((leftPlayerScore == WIN_SCORE && leftPlayerId == playerId) || 
 			(rightPlayerScore == WIN_SCORE && rightPlayerId == playerId)) {
 			// Display victory message and prepare for next round
@@ -561,6 +556,14 @@ tournament = () => {
 		}
 		// Marks the game as not running
 		gameRunning = false;
+
+		// Reset game params to default
+		leftWPressed = false;
+		leftSPressed = false;
+		rightWPressed = false;
+		rightSPressed = false;
+		leftPlayerScore = 0;
+		rightPlayerScore = 0;
 	}
 
 	// Key down handler
