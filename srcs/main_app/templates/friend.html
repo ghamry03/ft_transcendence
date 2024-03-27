@@ -1,6 +1,6 @@
 <div class="friend row g-0 m-0">
     <div class="col-3 friendImg">
-        <div class="position-relative d-inline-block ">
+        <div class="position-relative d-inline-block {%if status == 0%}friendOffline{%elif status == 1%}friendOnline{%else%}friendInGame{% endif %}">
             <img src="{{imgURL}}">
         </div>
     </div>
