@@ -55,7 +55,7 @@ class HealthCheckMiddleware:
 
     def __call__(self, request):
         if request.path != '/login/api/health':
-            logger.debug('checking database health')
+            logger.debug(f'checking database health [{request.path}]')
 
             response = self.handle_health_check(request)
             if response:
@@ -70,7 +70,7 @@ class HealthCheckMiddleware:
         try:
             db_conn.cursor()
         except OperationalError:
-            logger.debug("can't connect to db")
-            return JsonResponse({'error': 'can\'t connect to the db'}, status=503)
+            logger.debug(f"can't connect to db [{request.path}]")
+            return JsonResponse({'error': f'can\'t connect to the db [{request.path}]'}, status=503)
         else:
-            logger.debug('db connection is alive')
+            logger.debug(f'db connection is alive [{request.path}]')

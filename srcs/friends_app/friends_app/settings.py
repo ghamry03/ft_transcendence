@@ -107,6 +107,7 @@ DATABASES = {
         "PASSWORD": env("POSTGRES_PASSWORD"),
         "HOST": env("DB_HOST"),
         "PORT": env("DB_PORT"),
+        "OPTIONS": {},
         },
         "users": {
             "ENGINE": 'django.db.backends.postgresql',
@@ -117,6 +118,8 @@ DATABASES = {
             "PORT": env("DB_PORT"),
         }
 }
+if DEBUG:
+    DATABASES['default']['OPTIONS']['connect_timeout'] = 2
 
 
 

@@ -46,7 +46,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'tour_app.middleware.HealthCheckMiddleware',
+    'tour_app.APIMiddleware.HealthCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -88,8 +88,11 @@ DATABASES = {
         "PASSWORD": getenv("POSTGRES_PASSWORD"),
         "HOST": getenv("DB_HOST"),
         "PORT": getenv("DB_PORT"),
+        "OPTIONS": {},
     }
 }
+if DEBUG:
+    DATABASES['default']['OPTIONS']['connect_timeout'] = 2
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

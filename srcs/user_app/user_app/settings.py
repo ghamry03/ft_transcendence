@@ -49,7 +49,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'user_app.middleware.HealthCheckMiddleware',
+    'user_app.APIMiddleware.HealthCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -91,8 +91,11 @@ DATABASES = {
         "PASSWORD": getenv("POSTGRES_PASSWORD"),
         "HOST": getenv("DB_HOST"),
         "PORT": getenv("DB_PORT"),
+        "OPTIONS": {},
     }
 }
+if DEBUG:
+    DATABASES['default']['OPTIONS']['connect_timeout'] = 2
 
 LOGGING = {
     'version': 1,
