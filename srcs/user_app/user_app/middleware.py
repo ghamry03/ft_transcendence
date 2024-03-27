@@ -1,4 +1,7 @@
 from django.http import JsonResponse
+import logging
+
+logger = logging.getLogger(__name__)
 
 class HealthCheckMiddleware:
     def __init__(self, get_response):
@@ -12,7 +15,9 @@ class HealthCheckMiddleware:
     def handle_health_check(self, request):
         from django.db import connections
         from django.db.utils import OperationalError
+        logger.debug("we are here")
         db_conn = connections['default']
+        logger.debug("we are here")
         try:
             db_conn.cursor()
         except OperationalError:
