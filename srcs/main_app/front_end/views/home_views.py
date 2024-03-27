@@ -80,7 +80,10 @@ def topBar(request):
 
 def homeCards(request):
     userData = request.session.get('userData', None)
-    uid = userData.get('uid', None)
+    if userData:
+        uid = userData.get('uid', None)
+    else:
+        uid = None
     tournamentHistory = getTournamentHistory(uid)
     matchHistory = getMatchHistory(uid)
 

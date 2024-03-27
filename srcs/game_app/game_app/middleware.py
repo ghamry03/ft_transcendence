@@ -10,7 +10,7 @@ class HealthCheckMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path != '/login/api/health':
+        if request.path != '/game/health':
             logger.debug('checking database health')
 
             response = self.handle_health_check(request)

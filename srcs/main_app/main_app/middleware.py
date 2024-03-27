@@ -10,8 +10,9 @@ class HealthCheckMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path != '/login/api/health':
-            logger.debug('checking database health')
+        logger.debug(f'the path  {request.path}')
+        if request.path != '/' and request.path != '/favicon.ico' and request.path != '/cards/' and request.path != '/cards' and request.path != '/online/':
+            logger.debug(f'checking database health {request.path}')
 
             response = self.handle_health_check(request)
             if response:
@@ -30,3 +31,4 @@ class HealthCheckMiddleware:
             return JsonResponse({'error': 'can\'t connect to the db'}, status=503)
         else:
             logger.debug('db connection is alive')
+
