@@ -431,7 +431,7 @@ tournament = () => {
 			case "disconnected":
 				console.log("Opponent has disconnected");
 				// add an modal saying the opponent disconnected and they win by default
-				if (gameRunning || document.getElementById("gameCanvas")) {
+				if (gameRunning || bracketContainer.style.display === "none") {
 					console.log("game was running when op disconnected");
 					if (leftPlayerId == playerId) {
 						leftPlayerScore = WIN_SCORE;
@@ -453,6 +453,7 @@ tournament = () => {
 			case "tournamentCanceled":
 				alert("Tournament was canceled, not enough players to continue");
 				ws.close();
+				engine('/cards');
 				break;
 			default:
 				break;
@@ -506,9 +507,6 @@ tournament = () => {
 				})
 			);
 		}
-		else {
-			console.log("3Lost connection with server");
-		}
 	}
 
 	// Sends a player ready event to the server
@@ -521,9 +519,6 @@ tournament = () => {
 					playerId: playerId
 				})
 			);
-		}
-		else {
-			console.log("4Lost connection with server");
 		}
 	}
 
