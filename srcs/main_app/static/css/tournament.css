@@ -173,13 +173,14 @@ table:not(:first-child){
     border-radius: 100%;
     height: 100%;
     width: 100%;
+    min-width: 42px;
     max-width: 42px;
     max-height: 42px;
     width: 100%;
     margin: 12px 0px;
  }
 tbody{
-    display: table;
+    display: block;
     width: 100%;
 }
  tr:first-child{
@@ -199,6 +200,9 @@ tbody{
     font-weight: 400;
     line-height: normal;
     color: var(--beach-bunny-brown);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
  }
 
  #tournamentStatus {
@@ -241,6 +245,7 @@ tbody{
 
  td{
     vertical-align: middle;
+    max-width: calc(100% - 42px);
  }
 
  #tournamentHistoryInjection{
@@ -286,4 +291,8 @@ tbody{
    font-style: normal;
    font-weight: 700;
    line-height: normal;
+}
+
+#statusBox label{
+   text-align: left;
 }

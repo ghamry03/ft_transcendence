@@ -3,14 +3,14 @@
 <div class="row m-0" id="statusBox">
 	<p class="mx-auto" id="tournamentStatus">Waiting for players...</p>
 	<div class="mx-auto form-check" id="readyButton" style="display: none;">
-		<input class="mx-auto form-check-input" type="checkbox" value="">
-		<label class="mx-auto form-check-label" for="readyToStart" style="color: white;">Ready</label>
+			<input class="mx-auto form-check-input float-none" type="checkbox" value="">
+			<label class="mx-auto form-check-label" for="readyToStart" style="color: white;">Ready</label>
 	</div>
 </div>
 <div class="row m-0" id="bracketContainer">
 	<div class="col-8">
 		<div class="row">
-			<div class="col quarterFinal">
+			<div class="col-6 quarterFinal">
 				<table class="w-75">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player0"></td>
@@ -35,7 +35,7 @@
 					</tr>
 				</table>
 			</div>
-			<div class="col d-flex align-items-center semiFinal">
+			<div class="col-6 d-flex align-items-center semiFinal">
 				<table class="w-75 matchOne">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player8"></td>
@@ -52,7 +52,7 @@
 		
 		<!-- BOTTOM HALF OF THE BRACKET -->
 		<div class="row mt-5">
-			<div class="col quarterFinal">
+			<div class="col-6 quarterFinal">
 				<table class="w-75">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player4"></td>
@@ -77,7 +77,7 @@
 					</tr>
 				</table>
 			</div>
-			<div class="col d-flex align-items-center semiFinal">
+			<div class="col-6 d-flex align-items-center semiFinal">
 				<table class="w-75 matchTwo">
 					<tr class="playerPill">
 						<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player10"></td>
@@ -95,7 +95,7 @@
 	</div>
 	
 	<!-- FINAL MATCH -->
-	<div class="col d-flex align-items-center final">
+	<div class="col-4 d-flex align-items-center final">
 		<table class="w-75">
 			<tr class="playerPill">
 				<td><img src="{% static 'imgs/unknownuser.png' %}" alt="Image 0" id="player12"></td>
