@@ -89,7 +89,7 @@ services:
             test: ["CMD", "curl", "--fail", "http://localhost:8001/api/health"]
             interval: 5s
             timeout: 5s
-            retries: 5
+            retries: 10
 
     postgres:
         build: ./postgres

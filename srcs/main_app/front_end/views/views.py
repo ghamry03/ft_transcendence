@@ -1,12 +1,12 @@
 import requests
 
 from front_end.hostnameAuthentication import hostname_whitelist
-from main_app.constants import USER_API_URL, MEDIA_SERVICE_URL
+from main_app.constants import USER_API_URL
 
 from django.conf import settings
 from django.views.generic import View
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse, JsonResponse, HttpResponseNotFound, HttpResponseBadRequest, HttpResponseNotFound
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponseBadRequest, HttpResponseNotFound
 from django.contrib.sessions.models import Session
 
 

@@ -40,5 +40,7 @@ urlpatterns = [
     # GAME
     path('online/', game_views.onlineGame, name="onlineGame"),
     path('offline/', game_views.offlineGame, name="offlineGame"),
-    path('tournament/', game_views.tournament, name="offlineGame"),
+    path('tournament/', game_views.tournament, name="tournament"),
+    path('gameUrl/', game_views.getGameUrl, name="gameUrl"),
+    path('tourUrl/', game_views.getTourUrl, name="tourUrl"),
 ]

@@ -1,8 +1,8 @@
 import requests
-from main_app.constants import MATCH_HISOTRY_URL, TOURNAMENT_HISOTRY_URL
+from main_app.constants import MATCH_HISOTRY_URL, TOURNAMENT_HISOTRY_URL, GAME_URL, TOUR_URL
 
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 
 # Create your views here
 def onlineGame(request):
@@ -27,3 +27,9 @@ def tournament(request):
         return JsonResponse({'error': 'Failed to update profile', 'details': str(e)}, status=500)
 
     return render(request, 'tournament.html')
+
+def getGameUrl(request):
+    return HttpResponse(GAME_URL)
+
+def getTourUrl(request):
+    return HttpResponse(TOUR_URL)
