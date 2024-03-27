@@ -3,6 +3,8 @@ services:
     mainapp:
         build: ./main_app
         image: mainapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: mainapp
         restart: on-failure
         ports:
@@ -28,6 +30,8 @@ services:
     gameapp:
         build: ./game_app
         image: gameapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: gameapp
         restart: on-failure
         ports:
@@ -49,6 +53,8 @@ services:
     tourapp:
         build: ./tour_app
         image: tourapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: tourapp
         restart: on-failure
         ports:
@@ -72,6 +78,8 @@ services:
     userapp:
         build: ./user_app
         image: userapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: userapp
         restart: on-failure
         ports:
@@ -94,6 +102,8 @@ services:
     postgres:
         build: ./postgres
         image: postgres
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: postgres
         restart: on-failure
         volumes:
@@ -112,6 +122,8 @@ services:
     friendsapp:
         build: ./friends_app
         image: friendsapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: friendsapp
         restart: always
         ports:
