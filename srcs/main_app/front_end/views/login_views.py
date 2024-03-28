@@ -29,10 +29,12 @@ def authenticate(request):
         'code': (None, request.GET.get('code')),
         'redirect_uri': (None, REDIRECT_URI),
     }
+
+    context = { 'logged_in': False }
     try:
         response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
     except requests.RequestException as e:
-        return render(request, 'base.html', status=500)
+        return render(request, 'base.html', context=context, status=500)
 
     if response.status_code == 200:
         json_response = response.json()
@@ -51,7 +53,7 @@ def authenticate(request):
                 me_response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
                 me_response.raise_for_status()
             except requests.RequestException as e:
-                return render(request, 'base.html', status=500)
+                return render(request, 'base.html', context=context, status=500)
 
             UID = str(me_response.json()['id'])
             headers = {
@@ -65,8 +67,8 @@ def authenticate(request):
                 setSessionKey(request, 'userData', user_api_response.json())
                 setSessionKey(request, 'logged_in', True)
             except requests.RequestException as e:
-                return render(request, 'base.html', status=500)
-            return render(request, 'base.html')
+                return render(request, 'base.html', context=context, status=500)
+            return redirect('/')
     try:
         request.session.flush()
     except:
