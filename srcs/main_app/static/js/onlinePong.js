@@ -497,17 +497,33 @@ onlineGame = () => {
 			rightScore.style.color = "#C5FFC0";
 		}
 	}
+
+	async function establishSocket() {
+		try {
+			const response = await fetch("gameUrl/");
+			if (!response.ok) {
+				alert("Cannot connect to the server. Returning home...");
+				engine('/cards');
+			}
+			else {
+				const gameUrl = await response.text();
+				ws = new WebSocket(gameUrl +  "ws/game/?uid=" + playerId);
+				console.log("Socket established, ws = ", ws);
+				ws.onmessage = handleWebSocketMessage;
+			}
+		} catch(error) {
+			console.log("Error establishing socket");
+		}
+
+	}
+
 	// Entrypoint
 	const joinQueue = () => {
 		// Set up WebSocket connection
 		console.log("uid = ", playerId);
+		
+		establishSocket();
 
-		wsScheme = location.protocol === "https:" ? "wss://" : "ws://";
-		ws = new WebSocket(wsScheme + "localhost:8003/ws/game/?uid=" + playerId);
-		
-		console.log("Socket established, ws = ", ws);
-		ws.onmessage = handleWebSocketMessage;
-		
 		// Set key handlers for the game 
 		document.addEventListener("keydown", keyDownHandler);
 		document.addEventListener("keyup", keyUpHandler);
