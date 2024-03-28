@@ -3,7 +3,6 @@ import requests
 from main_app.utils import getSessionKey
 from main_app.constants import USER_API_URL
 from front_end.hostnameAuthentication import hostname_whitelist
-from main_app.constants import USER_API_URL
 
 from django.conf import settings
 from django.views.generic import View
