@@ -1,5 +1,6 @@
 import requests, logging
 
+from main_app.utils import getSessionKey
 from main_app.constants import TOURNAMENT_HISOTRY_URL, MATCH_HISOTRY_URL, FRIEND_API_URL
 
 from django.http import HttpResponse, JsonResponse
@@ -50,9 +51,9 @@ def getFriendsList(uid, accessToken):
     return JsonResponse({})
 
 def homePage(request):
-    userData = request.session.get('userData', None)
-    uid = userData.get('uid', None)
-    accessToken = request.session.get('access_token', None)
+    userData = getSessionKey(request, 'userData')
+    uid = userData.get('uid', None) if userData else None
+    accessToken = getSessionKey(request, 'access_token')
 
     friendsList = getFriendsList(uid, accessToken)
 
@@ -68,22 +69,20 @@ def homePage(request):
     return httpResponse
 
 def topBar(request):
-    logged_in = request.session.get('logged_in', None)
-    if 'logged_in' not in request.session or logged_in == False:
+    logged_in = getSessionKey(request, 'logged_in')
+    if not logged_in or logged_in == False:
         return render(request, 'topBar.html')
 
-    userData = request.session.get('userData', None)
+    userData = getSessionKey(request, 'userData')
 
     return render(request, 'topBar.html', {
         'userData': userData,
     })
 
 def homeCards(request):
-    userData = request.session.get('userData', None)
-    if userData:
-        uid = userData.get('uid', None)
-    else:
-        uid = None
+    userData = getSessionKey(request, 'userData')
+    uid = userData.get('uid', None) if userData else None
+
     tournamentHistory = getTournamentHistory(uid)
     matchHistory = getMatchHistory(uid)
 

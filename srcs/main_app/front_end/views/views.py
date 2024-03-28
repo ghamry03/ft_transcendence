@@ -1,7 +1,8 @@
 import requests
 
+from main_app.utils import getSessionKey
+from main_app.constants import USER_API_URL
 from front_end.hostnameAuthentication import hostname_whitelist
-from main_app.constants import USER_API_URL, MEDIA_SERVICE_URL
 
 from django.conf import settings
 from django.views.generic import View
@@ -28,7 +29,7 @@ class SessionDataView(View):
 def getOpponentInfo(request):
     ownerUid = request.GET.get('ownerUid')
     targetUid = request.GET.get('targetUid')
-    access_token = request.session.get('access_token', None)
+    access_token = getSessionKey(request, 'access_token')
     headers = {
         'X-UID': ownerUid,
         'X-TOKEN': access_token

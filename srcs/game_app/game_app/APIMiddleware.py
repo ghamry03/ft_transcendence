@@ -1,6 +1,8 @@
 import logging
 
 from django.http import JsonResponse
+from django.db import connections
+from django.db.utils import OperationalError
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +23,6 @@ class HealthCheckMiddleware:
         return self.get_response(request)
 
     def handle_health_check(self, request):
-        from django.db import connections
-        from django.db.utils import OperationalError
         db_conn = connections['default']
         try:
             db_conn.cursor()
