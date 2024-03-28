@@ -14,7 +14,7 @@ def searchUsers(request, username):
     uid = userData.get('uid', None) if userData else None
     access_token = getSessionKey(request, 'access_token')
     headers = {
-        'X-UID': uid,
+        'X-UID': str(uid),
         'X-TOKEN': access_token
     }
 
@@ -22,6 +22,7 @@ def searchUsers(request, username):
 
     try:
         response = requests.get(base_url, headers=headers)
+        response.raise_for_status()
     except requests.RequestException as e:
         return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
 
