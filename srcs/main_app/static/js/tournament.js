@@ -87,6 +87,25 @@ tournament = () => {
 	var ballSpeedYaxis;
 	var lost = false;
 
+
+	// Checks if a socket is open and ready to send/receive info
+	function isOpen(ws) { return ws.readyState === ws.OPEN }
+
+	function disconnectInactivePlayer() {
+		if (document.visibilityState == "visible") {
+			console.log("tab is active")
+		  } else {
+			console.log("tab is inactive")
+			  if (isOpen(ws)) {
+				  ws.close();
+				  engine('/cards');
+			  }
+		  }
+	}
+
+	document.addEventListener("visibilitychange", disconnectInactivePlayer);
+
+	
 	// This function removes the bracket from view and inserts the game canvas, or vice versa
 	async function toggleBracket() {
 		await lock.acquire()
@@ -152,9 +171,6 @@ tournament = () => {
 			console.error("Error fetching image:", error);
 		}
 	}
-
-	// Checks if a socket is open and ready to send/receive info
-	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
 	// Adds the image of user to a given image placeholder
 	async function addImage(playerId, imgId) {
@@ -535,18 +551,18 @@ tournament = () => {
 		if ((leftPlayerScore == WIN_SCORE && leftPlayerId == playerId) || 
 			(rightPlayerScore == WIN_SCORE && rightPlayerId == playerId)) {
 			// Display victory message and prepare for next round
-			setTimeout(function() {
-				updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
+			updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
+			// setTimeout(function() {
 				alert("You win! Proceed to next round...");
 				toggleBracket();
-			}, 0);
+			// }, 0);
 		} else {
 			// Display defeat message and prepare for result display
-			setTimeout(function() {
-				updateTourStatus("You lost at round " + roundNo);
+			updateTourStatus("You lost at round " + roundNo);
+			// setTimeout(function() {
 				alert("You lose. Proceed to results...");
 				toggleBracket();
-			}, 0);
+			// }, 0);
 			lost = true;
 		}
 		// Marks the game as not running
@@ -815,6 +831,7 @@ tournament = () => {
 	tournament.destroy = () => {
 		document.removeEventListener("keydown", keyDownHandler);
 		document.removeEventListener("keyup", keyUpHandler);
+		document.removeEventListener("visibilitychange", disconnectInactivePlayer);
 		if (upButton) {
 			upButton.removeEventListener("touchstart", upButtonDownHandler);
 			upButton.removeEventListener("touchend", upButtonUpHandler);
@@ -823,7 +840,8 @@ tournament = () => {
 			downButton.removeEventListener("touchstart", downButtonDownHandler);
 			downButton.removeEventListener("touchend", downButtonUpHandler);
 		}
-		if (ws) {
+
+		if (isOpen(ws)) {
 			ws.close();
 			console.log("Tour: Closing connection with server");
 		}
