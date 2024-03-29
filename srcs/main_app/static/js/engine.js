@@ -139,6 +139,8 @@ const injections = [
     {
         pattern: /^\/logout$/,
         handler: () => {
+            // updateStatus(0);
+            // fetchMainContent("/logout", 'mainContainer');
             updateStatus(0)
                 .then(() => fetchMainContent("/logout", 'mainContainer'));
             removeScript('token');

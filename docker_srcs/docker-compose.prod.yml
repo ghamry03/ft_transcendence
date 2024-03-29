@@ -3,6 +3,8 @@ services:
     server:
         build: ./server
         image: nginx
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: nginx
         restart: on-failure
         volumes:
@@ -23,7 +25,8 @@ services:
             - gameapp
             - friendsapp
         networks:
-            - user_app_network
+            user_app_network:
+                ipv4_address: $NGINX_IP
         environment:
             - DEBUG=0
 
@@ -32,6 +35,8 @@ services:
           context: ../
           dockerfile: ./docker_srcs/main_app/Dockerfile.prod
         image: mainapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: mainapp
         restart: on-failure
         expose:
@@ -50,7 +55,8 @@ services:
         env_file:
             - ./.env
         networks:
-            - user_app_network
+            user_app_network:
+                ipv4_address: $MAIN_IP
         environment:
             - DEBUG=0
  
@@ -59,6 +65,8 @@ services:
           context: ../
           dockerfile: ./docker_srcs/game_app/Dockerfile.prod
         image: gameapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: gameapp
         restart: on-failure
         expose:
@@ -71,7 +79,8 @@ services:
         env_file:
             - ./.env
         networks:
-            - user_app_network
+            user_app_network:
+                ipv4_address: $GAME_IP
         environment:
             - DEBUG=0
 
@@ -80,6 +89,8 @@ services:
           context: ../
           dockerfile: ./docker_srcs/tour_app/Dockerfile.prod
         image: tourapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: tourapp
         restart: on-failure
         expose:
@@ -90,7 +101,8 @@ services:
         env_file:
             - ./.env
         networks:
-            - user_app_network
+            user_app_network:
+                ipv4_address: $TOUR_IP
         healthcheck:
             test: ["CMD", "curl", "--fail", "http://localhost:8004/tour/health"]
             interval: 5s
@@ -102,6 +114,8 @@ services:
           context: ../
           dockerfile: ./docker_srcs/user_app/Dockerfile.prod
         image: userapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: userapp
         restart: on-failure
         expose:
@@ -114,7 +128,8 @@ services:
         volumes:
             - ../srcs/user_app/media:/home/user_app/media
         networks:
-            - user_app_network
+            user_app_network:
+                ipv4_address: $USER_IP
         healthcheck:
             test: ["CMD", "curl", "--fail", "http://localhost:8001/api/health"]
             interval: 5s
@@ -126,6 +141,8 @@ services:
     postgres:
         build: ./postgres
         image: postgres
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: postgres
         restart: on-failure
         volumes:
@@ -138,7 +155,8 @@ services:
         env_file:
             - ./.env
         networks:
-            - user_app_network
+            user_app_network:
+                ipv4_address: $POSTGRES_IP
         environment:
             - DEBUG=0
 
@@ -147,6 +165,8 @@ services:
           context: ../
           dockerfile: ./docker_srcs/friends_app/Dockerfile.prod
         image: friendsapp
+        extra_hosts:
+            - "$DB_HOST:$POSTGRES_IP"
         container_name: friendsapp
         restart: always
         expose:
@@ -159,10 +179,14 @@ services:
         env_file:
             - ./.env
         networks:
-            - user_app_network
+            user_app_network:
+                ipv4_address: $FRIENDS_IP
         environment:
             - DEBUG=0
 
 networks:
     user_app_network:
         driver: bridge
+        ipam:
+            config:
+                - subnet: 192.168.1.0/28
