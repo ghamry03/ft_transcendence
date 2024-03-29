@@ -83,8 +83,9 @@ const injections = [
             fetchMainContent('/home', 'mainContentArea')
                 .then(() => fetchMainContent('/topbar', 'topBar'))
                 .then(() => fetchMainContent('/cards', 'homeContentArea'))
-                .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
+                .then(() => {fetchMainContent('/sideBar', 'sideBar')})
                 .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
+                .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
                 .then(() => updateStatus(1));
             window.addEventListener('unload', updateStatusUnload);
         }
@@ -96,6 +97,8 @@ const injections = [
             removeScript('offline');
             removeScript('tournament');
             fetchMainContent('/cards', 'homeContentArea')
+            .then(() => {fetchMainContent('/sideBar', 'sideBar')})
+            .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
                 .then(() => updateStatus(1));
         }
     },
@@ -103,6 +106,7 @@ const injections = [
         pattern: /^\/offline$/,
         handler: () => {
             fetchMainContent('/offline', 'homeContentArea')
+            .then(() => {fetchMainContent('/sideBar', 'sideBar')})
                 .then(() => injectScript('/static/js/offlinePong.js', 'homeContentArea', 'offline'))
                 .then(() => updateStatus(2));
         }
@@ -111,6 +115,7 @@ const injections = [
         pattern: /^\/online$/,
         handler: () => {
             fetchMainContent('/online', 'homeContentArea')
+            .then(() => {fetchMainContent('/sideBar', 'sideBar')})
                 .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'))
                 .then(() => updateStatus(2));
         }
@@ -119,6 +124,7 @@ const injections = [
         pattern: /^\/tournament$/,
         handler: () => {
             fetchMainContent('/tournament', 'homeContentArea')
+            .then(() => {fetchMainContent('/sideBar', 'sideBar')})
                 .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'))
                 .then(() => updateStatus(2));
         }

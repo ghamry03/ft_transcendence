@@ -92,3 +92,17 @@ def homeCards(request):
         "matchHistory": matchHistory,
     }
     return render(request, 'homeCards.html', context)
+
+def sideBar(request):
+    userData = request.session.get('userData', None)
+    uid = userData.get('uid', None)
+    accessToken = request.session.get('access_token', None)
+
+    friendsList = getFriendsList(uid, accessToken)
+
+    context = {
+        "userData": userData,
+        "friendsList": friendsList['friendsList'],
+        "friendRequests": friendsList['friendRequests'],
+        }
+    return render(request, 'sideBar.html', context)

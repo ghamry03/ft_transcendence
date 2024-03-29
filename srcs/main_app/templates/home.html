@@ -10,45 +10,8 @@
 </div>
 <div class="row g-0">
     <div class="d-none d-md-flex col-2 flex-grow-1">
-        <div class="navigationBar">
-            <div class="friendButton friendRequest row g-0 m-0" data-bs-toggle="collapse"
-            data-bs-target="#friendRequestsPop">
-                <div class="col-3 flex-grow-1">
-                    {% load static %}
-                    <div class="position-relative d-inline-block {% if friendRequests != 0 %} friendRequestButton {% endif %} ">
-                        <img src="{% static 'imgs/invites_button.svg'%}" />
-                    </div>
-                </div>
-                <div class="align-items-center friendName title col-9">
-                    <p class="m-0">friend requests</p>
-                </div>
-            </div>
-
-            <!--INJECT THE FRIENDS HERE -->
-            <div class="friendInjection">
-                {% for friend in friendsList %}
-                    {% if friend.relationship == 0 %}
-                        {% include 'friend.html' with name=friend.username uid=friend.uid imgURL=friend.image status=friend.status %}
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <!--END OF FRIENDS INJECTION-->
-
-            <!--ADD FRIEND HERE-->
-            <div
-                class="friendButton friendRequest friendAdd row g-0 m-0"
-                data-bs-toggle="collapse"
-                data-bs-target="#addFriendPop"
-            >
-                <div class="col-3">
-                    {% load static %}
-                    <img src="{% static 'imgs/add_friend.svg'%}" />
-                </div>
-                <div class="align-items-center friendName title col-9">
-                    <p class="m-0">add friends</p>
-                </div>
-            </div>
-            <!--END OF ADD FRIEND-->
+        <div id="sideBar" class="navigationBar">
+            
         </div>
     </div>
     <div id="homeContentArea" class="welcomeBar col-12 col-md-8  d-flex flex-column "></div>
