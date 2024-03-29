@@ -96,7 +96,7 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }   
 }
-LOGGING_CONFIG = None
+# LOGGING_CONFIG = None
 
 LOGGING = {
     'version': 1,

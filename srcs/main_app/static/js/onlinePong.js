@@ -260,6 +260,7 @@ onlineGame = () => {
 	function sendKeyUpdate(key, keyDown)
 	{
 		if (isOpen(ws)) {
+			console.log("Sending key press event");
 			ws.send(
 				JSON.stringify({
 					type: "keypress",
@@ -269,18 +270,25 @@ onlineGame = () => {
 				})
 			);
 		}
+		else {
+			console.log("Keypress fail - Lost connection with server");
+		}
 	}
 	
 	// Sends a player scored event to the server
 	function sendScoredEvent(key, keyDown)
 	{
 		if (isOpen(ws)) {
+			console.log("Sending scored event");
 			ws.send(
 				JSON.stringify({
 					type: "playerScored",
 					playerId: playerId
 				})
 			);
+		}
+		else {
+			console.log("Score fail - Lost connection with server");
 		}
 	}
 

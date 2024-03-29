@@ -82,7 +82,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 self.queue.pop(self.queue.index(self.player_id))
             # If player is in an active game
             elif self.player_id in self.players:
-                self.logger.info("Player %d disconnected during a match", self.player_id)
+                self.logger.info("Player %s disconnected during a match", self.player_id)
                 groupOwner = self.players[self.player_id]["groupOwner"]
                 opponentId = self.players[self.player_id]["opponentId"]
                 if opponentId == None:
