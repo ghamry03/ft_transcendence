@@ -88,6 +88,7 @@ def logout(request):
     except OperationalError:
         logger.debug(f"can't flush the session, redirecting to login page")
     else:
+        request.session.flush()
         logger.debug(f"session flushed, redirecting to login page")
     return render(request, 'login.html', context)
 
