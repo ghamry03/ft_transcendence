@@ -49,13 +49,14 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'friends_app.APIMiddleware.HealthCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware'
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 LOGGING = {
@@ -106,6 +107,7 @@ DATABASES = {
         "PASSWORD": env("POSTGRES_PASSWORD"),
         "HOST": env("DB_HOST"),
         "PORT": env("DB_PORT"),
+        "OPTIONS": {},
         },
         "users": {
             "ENGINE": 'django.db.backends.postgresql',
@@ -116,6 +118,8 @@ DATABASES = {
             "PORT": env("DB_PORT"),
         }
 }
+if DEBUG:
+    DATABASES['default']['OPTIONS']['connect_timeout'] = 2
 
 
 

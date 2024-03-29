@@ -1,5 +1,6 @@
 import requests
 
+from main_app.utils import getSessionKey
 from main_app.constants import USER_API_URL, FRIEND_API_URL
 from .home_views import getTournamentHistory, getMatchHistory
 
@@ -8,12 +9,13 @@ from django.shortcuts import render
 
 
 def updateStatus(request, status):
-    user_data = request.session.get('userData')
+    user_data = getSessionKey(request, 'userData')
     if not user_data:
         return JsonResponse({'error': 'User data not found'}, status=400)
 
-    uid = user_data.get('uid')
-    access_token = request.session.get('access_token')
+    uid = user_data.get('uid', None) if user_data else None
+
+    access_token = getSessionKey(request, 'access_token')
     if not all([uid, access_token]):
         return JsonResponse({'error': 'Missing UID or access token'}, status=400)
 
@@ -31,13 +33,15 @@ def updateStatus(request, status):
     return JsonResponse({'message': 'Status updated'})
 
 def profile(request, uid):
-    user_data = request.session.get('userData')
-    access_token = request.session.get('access_token')
+    user_data = getSessionKey(request, 'userData')
+    access_token = getSessionKey(request, 'access_token')
     if not all([user_data, access_token]):
         return JsonResponse({'error': 'Authentication required'}, status=401)
 
+    uid = user_data.get('uid', None) if user_data else None
+
     headers = {
-        'X-UID': str(user_data['uid']),
+        'X-UID': str(uid),
         'X-TOKEN': access_token
     }
     try:
@@ -103,8 +107,8 @@ def edit_profile(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Invalid request method'}, status=405)
 
-    user_data = request.session.get('userData')
-    access_token = request.session.get('access_token')
+    user_data = getSessionKey(request, 'userData')
+    access_token = getSessionKey(request, 'access_token')
     if not user_data or not access_token:
         return JsonResponse({'error': 'Authentication required'}, status=401)
 

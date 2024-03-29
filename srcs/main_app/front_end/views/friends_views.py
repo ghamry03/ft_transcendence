@@ -1,5 +1,6 @@
 import requests, logging
 
+from main_app.utils import getSessionKey
 from main_app.constants import FRIEND_API_URL, USER_API_URL
 
 from django.shortcuts import render
@@ -9,19 +10,22 @@ from django.http import HttpResponse, JsonResponse
 logger = logging.getLogger(__name__)
 
 def searchUsers(request, username):
-    userData = request.session.get('userData', None)
+    userData = getSessionKey(request, 'userData')
+    uid = userData.get('uid', None) if userData else None
+    access_token = getSessionKey(request, 'access_token')
     headers = {
-        'X-UID': f'{request.session['userData']['uid']}',
-        'X-TOKEN': request.session['access_token']
+        'X-UID': str(uid),
+        'X-TOKEN': access_token
     }
 
     base_url = USER_API_URL + 'api/search/' + username
-    
+
     try:
         response = requests.get(base_url, headers=headers)
+        response.raise_for_status()
     except requests.RequestException as e:
         return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
-    
+
     if response.status_code == 200:
         data = {
             'status': response.status_code,
@@ -36,10 +40,11 @@ def searchUsers(request, username):
 
 def addUser(request, friendUID):
     headers = { 'Content-Type': 'application/json' }
-    userData = request.session.get('userData', None)
-    access_token = request.session.get('access_token', None)
+    userData = getSessionKey(request, 'userData')
+    access_token = getSessionKey(request, 'access_token')
+    session_id = getSessionKey(request, 'session_key')
 
-    myuid = userData.get('uid', None)
+    myuid = userData.get('uid', None) if userData else None
 
     try:
         response = requests.post(
@@ -47,9 +52,9 @@ def addUser(request, friendUID):
             headers=headers,
             json={
                 "first_id": f'{myuid}',
-                "second_id": f'{friendUID}', 
-                "session_id": request.session.session_key, 
-                "access_token": access_token, 
+                "second_id": f'{friendUID}',
+                "session_id": session_id,
+                "access_token": access_token,
                 },
         )
         response.raise_for_status()
@@ -59,10 +64,11 @@ def addUser(request, friendUID):
 
 def acceptFriend(request, friendUID):
     headers = { 'Content-Type': 'application/json' }
-    userData = request.session.get('userData', None)
-    access_token = request.session.get('access_token', None)
+    userData = getSessionKey(request, 'userData')
+    access_token = getSessionKey(request, 'access_token')
+    session_id = getSessionKey(request, 'session_key')
 
-    myuid = userData.get('uid', None)
+    myuid = userData.get('uid', None) if userData else None
 
     try:
         response = requests.put(
@@ -70,9 +76,9 @@ def acceptFriend(request, friendUID):
             headers=headers,
             json={
                 "first_user": f'{myuid}',
-                "second_user": f'{friendUID}', 
+                "second_user": f'{friendUID}',
                 "relationship": 0, 
-                "session_id": request.session.session_key, 
+                "session_id": session_id, 
                 "access_token": access_token,
                 },
         )
@@ -84,10 +90,11 @@ def acceptFriend(request, friendUID):
 
 def rejectFriend(request, friendUID):
     headers = { 'Content-Type': 'application/json' }
-    userData = request.session.get('userData', None)
-    access_token = request.session.get('access_token', None)
+    userData = getSessionKey(request, 'userData')
+    access_token = getSessionKey(request, 'access_token')
+    session_id = getSessionKey(request, 'session_key')
 
-    myuid = userData.get('uid', None)
+    myuid = userData.get('uid', None) if userData else None
 
     try:
         response = requests.delete(
@@ -95,8 +102,8 @@ def rejectFriend(request, friendUID):
                 headers=headers,
                 json={
                     "first_user": f'{myuid}',
-                    "second_user": f'{friendUID}', 
-                    "session_id": request.session.session_key, 
+                    "second_user": f'{friendUID}',
+                    "session_id": session_id,
                     "access_token": access_token,
                     },
                 )
