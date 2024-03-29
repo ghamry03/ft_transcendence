@@ -481,6 +481,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         )
     
+    async def lostConnection(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "lostConnection",
+                }
+            )
+        )
+    
     async def disconnected(self, event):
         await self.send(
             text_data=json.dumps(

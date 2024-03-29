@@ -457,8 +457,13 @@ tournament = () => {
 				}
 				break;
 			case "tournamentCanceled":
-				alert("Tournament was canceled, not enough players to continue");
+				alert("Tournament was canceled, not enough players to continue. Returning home...");
 				ws.close();
+				break;
+			case "lostConnection":
+				alert("Tournament was canceled due to a server error. Returning home...");
+				ws.close();
+				engine('/cards');
 				break;
 			default:
 				break;
