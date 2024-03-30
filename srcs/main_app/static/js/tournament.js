@@ -91,19 +91,20 @@ tournament = () => {
 	// Checks if a socket is open and ready to send/receive info
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
-	function disconnectInactivePlayer() {
-		if (document.visibilityState == "visible") {
-			console.log("tab is active")
-		  } else {
-			console.log("tab is inactive")
-			  if (isOpen(ws)) {
-				  ws.close();
-				  engine('/cards');
-			  }
-		  }
-	}
+	// function disconnectInactivePlayer() {
+	// 	if (document.visibilityState == "visible") {
+	// 		console.log("tab is active")
+	// 	  } else {
+	// 		console.log("tab is inactive")
+	// 		alert("you left the tab");
+	// 		  if (isOpen(ws)) {
+	// 			  ws.close();
+	// 			  engine('/cards');
+	// 		  }
+	// 	  }
+	// }
 
-	document.addEventListener("visibilitychange", disconnectInactivePlayer);
+	// document.addEventListener("visibilitychange", disconnectInactivePlayer);
 
 	
 	// This function removes the bracket from view and inserts the game canvas, or vice versa
@@ -161,7 +162,6 @@ tournament = () => {
 				}
 				else {
 					return response.json().then(body => {
-						console.log("get image success");
 						return body.image;
 					})
 				}
@@ -183,7 +183,6 @@ tournament = () => {
 				}
 				else {
 					return response.json().then(body => {
-						console.log("get username success");
 						return body.username;
 					})
 				}
@@ -441,7 +440,6 @@ tournament = () => {
 				startMatch(messageData.leftPlayer, messageData.rightPlayer);
 				break;
 			case "gameReady":
-				console.log("both are ready!");
 				gameRunning = false;
 				animateGame();
 				countdown(document.getElementById("readyGo"));
@@ -497,13 +495,13 @@ tournament = () => {
 				}
 				break;
 			case "tournamentCanceled":
-				alert("Tournament was canceled, not enough players to continue. Returning home...");
 				ws.close();
+				alert("Tournament was canceled, not enough players to continue. Returning home...");
 				engine('/cards');
 				break;
 			case "lostConnection":
-				alert("Tournament was canceled due to a server error. Returning home...");
 				ws.close();
+				alert("Tournament was canceled due to a server error. Returning home...");
 				engine('/cards');
 				break;
 			default:
@@ -866,7 +864,7 @@ tournament = () => {
 	tournament.destroy = () => {
 		document.removeEventListener("keydown", keyDownHandler);
 		document.removeEventListener("keyup", keyUpHandler);
-		document.removeEventListener("visibilitychange", disconnectInactivePlayer);
+		// document.removeEventListener("visibilitychange", disconnectInactivePlayer);
 		if (upButton) {
 			upButton.removeEventListener("touchstart", upButtonDownHandler);
 			upButton.removeEventListener("touchend", upButtonUpHandler);
