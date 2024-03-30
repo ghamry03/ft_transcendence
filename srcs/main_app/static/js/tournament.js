@@ -87,6 +87,25 @@ tournament = () => {
 	var ballSpeedYaxis;
 	var lost = false;
 
+
+	// Checks if a socket is open and ready to send/receive info
+	function isOpen(ws) { return ws.readyState === ws.OPEN }
+
+	function disconnectInactivePlayer() {
+		if (document.visibilityState == "visible") {
+			console.log("tab is active")
+		  } else {
+			console.log("tab is inactive")
+			  if (isOpen(ws)) {
+				  ws.close();
+				  engine('/cards');
+			  }
+		  }
+	}
+
+	document.addEventListener("visibilitychange", disconnectInactivePlayer);
+
+	
 	// This function removes the bracket from view and inserts the game canvas, or vice versa
 	async function toggleBracket() {
 		await lock.acquire()
@@ -152,9 +171,6 @@ tournament = () => {
 			console.error("Error fetching image:", error);
 		}
 	}
-
-	// Checks if a socket is open and ready to send/receive info
-	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
 	// Adds the image of user to a given image placeholder
 	async function addImage(playerId, imgId) {
@@ -320,16 +336,6 @@ tournament = () => {
 		ballSpeedXaxis = ballSpeed;
 		ballSpeedYaxis = ballSpeed;
 
-		// Keys
-		leftWPressed = false;
-		leftSPressed = false;
-		rightWPressed = false;
-		rightSPressed = false;
-
-		// Scores
-		leftPlayerScore = 0;
-		rightPlayerScore = 0;
-
 		// Draw the initial screen for the game with start positions of paddles and ball
 		draw();
 
@@ -405,9 +411,11 @@ tournament = () => {
 				startMatch(messageData.leftPlayer, messageData.rightPlayer);
 				break;
 			case "gameReady":
+				console.log("both are ready!");
 				gameRunning = false;
 				animateGame();
 				countdown(document.getElementById("readyGo"));
+				console.log("game has started");
 				break;
 			case "tournamentStarted":
 				console.log("Tournament starting...");
@@ -439,7 +447,8 @@ tournament = () => {
 			case "disconnected":
 				console.log("Opponent has disconnected");
 				// add an modal saying the opponent disconnected and they win by default
-				if (gameRunning) {
+				if (gameRunning || bracketContainer.style.display === "none") {
+					console.log("game was running when op disconnected");
 					if (leftPlayerId == playerId) {
 						leftPlayerScore = WIN_SCORE;
 					}
@@ -452,6 +461,7 @@ tournament = () => {
 					});
 				}
 				else {
+					console.log("game was not running when op disconnected");
 					updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
 					checkForm.style.display = "none";
 				}
@@ -459,6 +469,7 @@ tournament = () => {
 			case "tournamentCanceled":
 				alert("Tournament was canceled, not enough players to continue");
 				ws.close();
+				engine('/cards');
 				break;
 			default:
 				break;
@@ -479,7 +490,7 @@ tournament = () => {
 			);
 		}
 		else {
-			alert("Lost connection with server");
+			console.log("Lost connection with server");
 			cancelAnimationFrame(animationId);
 		}
 	}
@@ -496,7 +507,7 @@ tournament = () => {
 			);
 		}
 		else {
-			alert("Lost connection with server");
+			console.log("Lost connection with server");
 			cancelAnimationFrame(animationId);
 		}
 	}
@@ -512,9 +523,6 @@ tournament = () => {
 				})
 			);
 		}
-		else {
-			alert("Lost connection with server");
-		}
 	}
 
 	// Sends a player ready event to the server
@@ -528,9 +536,6 @@ tournament = () => {
 				})
 			);
 		}
-		else {
-			alert("Lost connection with server");
-		}
 	}
 
 	function updateTourStatus(msg) {
@@ -542,25 +547,34 @@ tournament = () => {
 	// Ends the match and updates UI accordingly
 	function endMatch() {
 		// Checks if the left player or right player wins the match
+		console.log("leftplayerscore = ", leftPlayerScore, "rightplayerscore = ", rightPlayerScore);
 		if ((leftPlayerScore == WIN_SCORE && leftPlayerId == playerId) || 
 			(rightPlayerScore == WIN_SCORE && rightPlayerId == playerId)) {
 			// Display victory message and prepare for next round
-			setTimeout(function() {
-				updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
+			updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
+			// setTimeout(function() {
 				alert("You win! Proceed to next round...");
 				toggleBracket();
-			}, 0);
+			// }, 0);
 		} else {
 			// Display defeat message and prepare for result display
-			setTimeout(function() {
-				updateTourStatus("You lost at round " + roundNo);
+			updateTourStatus("You lost at round " + roundNo);
+			// setTimeout(function() {
 				alert("You lose. Proceed to results...");
 				toggleBracket();
-			}, 0);
+			// }, 0);
 			lost = true;
 		}
 		// Marks the game as not running
 		gameRunning = false;
+
+		// Reset game params to default
+		leftWPressed = false;
+		leftSPressed = false;
+		rightWPressed = false;
+		rightSPressed = false;
+		leftPlayerScore = 0;
+		rightPlayerScore = 0;
 	}
 
 	// Key down handler
@@ -817,6 +831,7 @@ tournament = () => {
 	tournament.destroy = () => {
 		document.removeEventListener("keydown", keyDownHandler);
 		document.removeEventListener("keyup", keyUpHandler);
+		document.removeEventListener("visibilitychange", disconnectInactivePlayer);
 		if (upButton) {
 			upButton.removeEventListener("touchstart", upButtonDownHandler);
 			upButton.removeEventListener("touchend", upButtonUpHandler);
@@ -825,7 +840,8 @@ tournament = () => {
 			downButton.removeEventListener("touchstart", downButtonDownHandler);
 			downButton.removeEventListener("touchend", downButtonUpHandler);
 		}
-		if (ws) {
+
+		if (isOpen(ws)) {
 			ws.close();
 			console.log("Tour: Closing connection with server");
 		}

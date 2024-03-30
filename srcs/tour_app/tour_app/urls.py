@@ -17,9 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from tour_game import urls as tour_urls
+from tour_api import urls as tour
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('api/', include('tour_api.urls')),
+	path('api/', include(tour)),
     path('tour/', include(tour_urls)),
 ]
