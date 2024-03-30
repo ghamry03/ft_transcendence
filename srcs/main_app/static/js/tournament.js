@@ -443,7 +443,7 @@ tournament = () => {
 				gameRunning = false;
 				animateGame();
 				countdown(document.getElementById("readyGo"));
-				console.log("game has started");
+				console.log("Game has started");
 				break;
 			case "tournamentStarted":
 				console.log("Tournament starting...");
@@ -460,7 +460,7 @@ tournament = () => {
 				break;
 			case "newPlayerJoined":
 				var newPlayerId = messageData.newPlayerId;
-				console.log("new player joined: ", newPlayerId);
+				console.log("New player joined: ", newPlayerId);
 				addImage(newPlayerId, messageData.imgId);
 				break;
 			case "inGame":
@@ -474,9 +474,8 @@ tournament = () => {
 				break;
 			case "disconnected":
 				console.log("Opponent has disconnected");
-				// add an modal saying the opponent disconnected and they win by default
 				if (gameRunning || bracketContainer.style.display === "none") {
-					console.log("game was running when op disconnected");
+					console.log("Game was running when op disconnected");
 					if (leftPlayerId == playerId) {
 						leftPlayerScore = WIN_SCORE;
 					}
@@ -489,7 +488,7 @@ tournament = () => {
 					});
 				}
 				else {
-					console.log("game was not running when op disconnected");
+					console.log("Game was not running when op disconnected");
 					updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
 					checkForm.style.display = "none";
 				}
@@ -580,7 +579,6 @@ tournament = () => {
 	// Ends the match and updates UI accordingly
 	function endMatch() {
 		// Checks if the left player or right player wins the match
-		console.log("leftplayerscore = ", leftPlayerScore, "rightplayerscore = ", rightPlayerScore);
 		if ((leftPlayerScore == WIN_SCORE && leftPlayerId == playerId) || 
 			(rightPlayerScore == WIN_SCORE && rightPlayerId == playerId)) {
 			// Display victory message and prepare for next round
@@ -718,7 +716,6 @@ tournament = () => {
 		await lock.acquire()
 		try {
 			if (gameRunning == false) {
-				// console.log("stuck here");
 				return ;
 			}
 			// Left paddle movement
