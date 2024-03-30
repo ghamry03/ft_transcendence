@@ -1,11 +1,11 @@
 {% load static %}
 <div class="container-fluid d-flex flex-grow-1 mh-100 pt-3 pb-3">
-    <div class="row flex-grow-1 g-3 g-lg-4 mw-100">
+    <div class="row flex-grow-1 g-2 g-lg-4 mw-100">
 
         <!-- Profile pic, name, login -->
         <div
-            class="col-12 col-lg-3 mh-100 d-flex flex-column flex-grow-1"
-            style="overflow: scroll"
+            class="col-12 col-lg-3 mh-100 d-flex flex-column flex-grow-1 profileInfo"
+            style="overflow: overlay"
         >
             <!-- img -->
             <div class="d-flex justify-content-center" style="margin-bottom: 25px;">
@@ -30,24 +30,24 @@
                     <button class="btn"
                     data-bs-toggle="collapse"
                     data-bs-target="#edit_profile"
+                    id="primary-btn"
                 >
                     Edit Profile
                 </button>
                 {% elif type == 1 %}
-                    <button class="btn" onclick="engine('/add/{{uid}}/'); engine('/profile/{{uid}}')">Add Friend</button>
+                    <button class="btn" id="primary-btn" onclick="engine('/add/{{uid}}/'); engine('/profile/{{uid}}')">Add Friend</button>
                 {% elif type == 2 %}
-                    <button class="btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Remove Friend</button>
+                    <button class="btn" id="primary-btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Remove Friend</button>
                 {% elif type == 3 %}
-                    <button class="btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Cancel Request</button>
+                    <button class="btn" id="primary-btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Cancel Request</button>
                 {% elif type == 4 %}
                     <div class="col-9">
-                        <button class="btn" onclick="engine('/accept/{{uid}}/'); engine('/profile/{{uid}}')">Accept Request</button>
+                        <button class="btn" id="primary-btn" onclick="engine('/accept/{{uid}}/'); engine('/profile/{{uid}}')">Accept Request</button>
                     </div>
                     <div class="col-3">
-                        <button class="btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Reject Request</button>
+                        <button class="btn" id="secondry-btn" onclick="engine('/reject/{{uid}}/'); engine('/profile/{{uid}}')">Reject Request</button>
                     </div>
                 {% else %}
-                    <button type="" class="btn">Unavilable</button>
                 {% endif %}
             </div>
 
@@ -71,45 +71,38 @@
         </div>
 
         <!-- match history -->
-        <div class="col-12 col-lg-6 d-flex mh-100">
-            <div id="matchHistoryDash" class="d-flex flex-grow-1 mh-100">
-                <div class="content flex-grow-1 p-2">
-                    <div class="titleSection">
-                        <h3 class="title">Match History</h3>
-                    </div>
+        <div id="matchHistoryDash" class="col-12 col-lg-6">
+            <div class="content p-2 profileCard">
+                <div class="titleSection">
+                    <h3 class="title">Match History</h3>
+                </div>
 
-                    <!-- content -->
-                    <div id="matchHistoryInjection">
-                        {% if matchHistory %}
-                            {% for match in matchHistory %}
-                                {% include 'matchHistoryEntry.html' with img=image myScore=match.my_score theirScore=match.opponent.score theirImg=match.opponent.image theirUsername=match.opponent.username time=match.timePassed %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
+                <div id="matchHistoryInjection">
+
+                    {% if matchHistory %}
+                        {% for match in matchHistory %}
+                            {% include 'matchHistoryEntry.html' with img=image myScore=match.my_score theirScore=match.opponent.score theirImg=match.opponent.image theirUsername=match.opponent.username time=match.timePassed %}
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- tour history -->
-        <div class="col-12 col-lg-3 d-flex mh-100">
-            <div id="tournamentHistoryDash" class="d-flex flex-grow-1 mh-100">
-                <div class="content flex-grow-1 p-2">
-                    <div class="titleSection">
-                        <h3 class="title">Your Tournaments</h3>
-                    </div>
+        <div id="tournamentHistoryDash" class="col-12 col-lg-3 d-flex flex-column flex-grow-1 pb-3 pb-lg-0">
+                <div class="content p-2 profileCard">
+                <div class="titleSection">
+                    <h3 class="title">Your Tournaments</h3>
+                </div>
+                <div id="tournamentHistoryInjection">
 
-                    <!-- content -->
-                    <div id="tournamentHistoryInjection">
-                        {% if tournamentHistory %}
-                            {% for match in tournamentHistory %}
-                                {% include 'tournamentHistoryEntry.html' with img=image rank=match.rank date=match.tournament_time_passed%}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-
+                    {% if tournamentHistory %}
+                        {% for match in tournamentHistory %}
+                            {% include 'tournamentHistoryEntry.html' with img=userData.image rank=match.rank date=match.tournament_time_passed%}
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>
-
     </div>
 </div>
