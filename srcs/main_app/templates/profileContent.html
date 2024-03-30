@@ -83,9 +83,6 @@
                         {% for match in matchHistory %}
                             {% include 'matchHistoryEntry.html' with img=image myScore=match.my_score theirScore=match.opponent.score theirImg=match.opponent.image theirUsername=match.opponent.username time=match.timePassed %}
                         {% endfor %}
-                    {% else %}
-                        <p>Participate in matches to check your history</p>
-                        {% include "gameButton.html" with onclick="engine('/online')" content="Join online game" %}
                     {% endif %}
                 </div>
             </div>
