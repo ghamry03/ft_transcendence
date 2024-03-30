@@ -27,19 +27,6 @@
 	min-width: 0;
 }
 
-/* .profile button { */
-/* 	width: 100%; */
-/* 	background: #FCF9F4; */
-/* 	color: #59322B; */
-/* 	text-align: center; */
-/* 	font-family: "ps2p"; */
-/* 	font-size: 12px; */
-/* 	font-style: normal; */
-/* 	font-weight: 400; */
-/* 	line-height: normal; */
-/* 	text-transform: uppercase; */
-/* } */
-
 .profile .d-flex {
 	column-gap: 1rem;
 }
