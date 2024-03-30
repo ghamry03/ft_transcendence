@@ -651,3 +651,8 @@ body {
     margin-bottom: 7.5vh!important;
   }
 }
+
+.profileTopBar .dropdown-menu {
+  background-color: var(--beach-bunny);
+  font-family: 'bpdots';
+}
