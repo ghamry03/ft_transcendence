@@ -4,20 +4,17 @@
             Welcome back {{ userData.first_name }}, it's PONGPING time!
         </p>
     </div>
-    <!-- <div class="col-2">
-{% include "gameButton.html" %}
-</div> -->
 </div>
 
 <div class="row gy-0 gx-5 g-md-5 m-0">
     <div class="col-6 col-md-4">
-        {% include "buttonCard.html" with img="imgs/game.svg" title="Online" description="Get matched with a random player online" onClick="engine('/online')" %}
+        {% include "buttonCard.html" with img="imgs/game.svg" title="Online" description="Get matched with a random player online" onClick="engine('/online');setAttribute('onclick','')" %}
     </div>
     <div class="d-none d-md-flex col-sm-12 col-md-4">
         {% include "buttonCard.html" with img="imgs/offline.svg" title="Offline" description="Play a local match with your friends" onClick="engine('/offline')" %}
     </div>
     <div class="col-6 col-md-4">
-        {% include "buttonCard.html" with img="imgs/cup.svg" title="Tournament" description="Compete in a tournament or start your own!" onClick="engine('/tournament')" %}
+        {% include "buttonCard.html" with img="imgs/cup.svg" title="Tournament" description="Compete in a tournament or start your own!" onClick="engine('/tournament');setAttribute('onclick','')" %}
     </div>
 </div>
 

@@ -38,8 +38,6 @@ def profile(request, uid):
     if not all([user_data, access_token]):
         return JsonResponse({'error': 'Authentication required'}, status=401)
 
-    uid = user_data.get('uid', None) if user_data else None
-
     headers = {
         'X-UID': str(uid),
         'X-TOKEN': access_token

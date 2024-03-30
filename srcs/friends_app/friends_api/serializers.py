@@ -1,7 +1,7 @@
 import requests
 from rest_framework import serializers
 from friends_api.models import Friend
-from django.db import connections
+from django.db.models import Q
 from django.core.exceptions import ValidationError
 from . import USER_API_URL
 
@@ -20,11 +20,14 @@ class FriendSerializer(serializers.ModelSerializer):
         first_id = data.get('first_id')
         second_id = data.get('second_id')
 
-        if Friend.objects.filter(first_id=first_id, second_id=second_id).exists():
-            raise serializers.ValidationError("the two users are already Friends", code='duplicate')
+        friend_check = Q(first_id=first_id, second_id=second_id) | Q(first_id=second_id, second_id=first_id)
 
-        if Friend.objects.filter(first_id=second_id, second_id=first_id).exists():
-            raise serializers.ValidationError("the two users are already Friends", code='duplicate')
+        if Friend.objects.filter(friend_check, relationship=0).exists():
+            raise serializers.ValidationError("You are already friends with this person", code='duplicate')
+
+        if Friend.objects.filter(friend_check, relationship=1).exists():
+            raise serializers.ValidationError("There is already a pending friend request", code='duplicate')
+
 
         return data
     

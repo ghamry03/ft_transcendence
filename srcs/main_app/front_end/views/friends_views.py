@@ -58,8 +58,10 @@ def addUser(request, friendUID):
                 },
         )
         response.raise_for_status()
+    except requests.HTTPError as e:
+        return JsonResponse({'error': f'{e.response.json().get('non_field_errors', ['Unknown error'])[0]}'}, status=e.response.status_code)
     except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+            return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
     return JsonResponse(data={})
 
 def acceptFriend(request, friendUID):
@@ -85,7 +87,7 @@ def acceptFriend(request, friendUID):
         response.raise_for_status()
     except requests.RequestException as e:
         return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
-    return JsonResponse(data={})
+    return JsonResponse(data={}, status=200)
 
 
 def rejectFriend(request, friendUID):
