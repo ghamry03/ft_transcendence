@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'game_app.APIMiddleware.HealthCheckMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -85,8 +86,11 @@ DATABASES = {
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": os.environ.get("DB_HOST"),
         "PORT": os.environ.get("DB_PORT"),
+        "OPTIONS": {},
     }
 }
+if DEBUG:
+    DATABASES['default']['OPTIONS']['connect_timeout'] = 2
 
 # import django
 # django.setup()
@@ -108,7 +112,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'INFO',  # Adjust the log level as needed
+        'level': 'DEBUG',  # Adjust the log level as needed
     },
 }
 

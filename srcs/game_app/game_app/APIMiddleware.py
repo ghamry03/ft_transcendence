@@ -1,9 +1,8 @@
 import logging
 
 from django.http import JsonResponse
-
-from rest_framework.exceptions import APIException
-from rest_framework import status
+from django.db import connections
+from django.db.utils import OperationalError
 
 logger = logging.getLogger(__name__)
 
@@ -13,24 +12,22 @@ class HealthCheckMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path != '/api/health':
+        if request.path != '/game/health':
+            logger.debug(f'checking database health [{request.path}]')
             logger.debug('checking database health')
+
             response = self.handle_health_check(request)
             if response:
                 return response
-            else:
-                return self.get_response(request)
-        else:
-            return self.get_response(request)
+
+        return self.get_response(request)
 
     def handle_health_check(self, request):
-        from django.db import connections
-        from django.db.utils import OperationalError
         db_conn = connections['default']
         try:
             db_conn.cursor()
         except OperationalError:
-            logger.debug("can't connect to db")
-            return JsonResponse({"okeh": "msh okeh"})
+            logger.debug(f"can't connect to db [{request.path}]")
+            return JsonResponse({'error': f'can\'t connect to the db [{request.path}]'}, status=503)
         else:
-            logger.debug('db connection is alive')
+            logger.debug(f'db connection is alive [{request.path}]')
