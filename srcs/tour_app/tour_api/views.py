@@ -49,11 +49,17 @@ class TournamentHistoryApiView(APIView):
 	def get(self, request, user_id):
 		tournaments = OnlinePlayermatch.objects.filter(player=user_id).exclude(game__tournament_id__isnull=True).values_list("game__tournament_id", flat=True).distinct()
 		logger.info(f'OnlinePlayerMatch: {tournaments}')
+		tournaments = sorted(tournaments, reverse=True)
 		tournament_details = []
-
+		gameList = []
 		for tid in tournaments:
 			game = OnlinePlayermatch.objects.filter(player=user_id, game__tournament_id = tid).order_by('-game__endtime').first()
-			time_passed = calculate_time_passed(game.game.endtime)
+			if game:
+				gameList.append(game)
+		logger.info(f'this is list: {gameList}')
+		for gameaz in gameList:
+			tid = gameaz.game.tournament.pk
+			time_passed = calculate_time_passed(gameaz.game.endtime)
 			rank = get_rank(user_id, tid)
 			tournament_details.append({
 					"tournament_id": tid,
@@ -61,8 +67,8 @@ class TournamentHistoryApiView(APIView):
 					"rank": rank if rank is not None else "Rank not found."
 				})
 			logger.info(f'this is the found game: {time_passed} {rank}')
-		sorted_tournament_details = sorted(tournament_details, key=lambda x: x['tournament_time_passed'], reverse=True)
-		return Response({"data": sorted_tournament_details}, status=status.HTTP_200_OK)
+		# sorted_tournament_details = sorted(tournament_details, key=lambda x: x['tournament_time_passed'], reverse=True)
+		return Response({"data": tournament_details}, status=status.HTTP_200_OK)
 
 def get_player_image(self, target_uid, owner_uid, token):
 		headers = {
