@@ -105,7 +105,6 @@ class TournamentMatchesApiView(APIView):
 				"player1_image_url": player1_image_url,
 				"player2_image_url": player2_image_url
 			})
-
 		return Response({"data":game_details}, status=status.HTTP_200_OK)
 
 def health_check(request):
