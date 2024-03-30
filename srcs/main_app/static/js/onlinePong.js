@@ -88,6 +88,23 @@ onlineGame = () => {
 	var leftPlayerId;
 	var rightPlayerId;
 	
+	// Checks if a socket is open and ready to send/receive info
+	function isOpen(ws) { return ws.readyState === ws.OPEN }
+
+	function disconnectInactivePlayer() {
+		if (document.visibilityState == "visible") {
+			console.log("tab is active")
+		  } else {
+			console.log("tab is inactive")
+			  if (isOpen(ws)) {
+				  ws.close();
+				  engine('/cards');
+			  }
+		  }
+	}
+
+	document.addEventListener("visibilitychange", disconnectInactivePlayer);
+
 	// This function retrieves the value of a cookie by its name from the browser's cookies
 	function getCookie(cname) {
 		let name = cname + "=";
@@ -146,9 +163,6 @@ onlineGame = () => {
 		// Initiate an interval, but store it in a variable so we can remove it later.
 		var interval = setInterval( count, 1000 );  
 	}
-
-	// Checks if a socket is open and ready to send/receive info
-	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
 	// Reset ball position to the center of the canvas and set the new ball direction 
 	async function reset (newBallSpeed) {
@@ -553,6 +567,7 @@ onlineGame = () => {
         upButton.removeEventListener("touchend", upButtonUpHandler);
 		downButton.removeEventListener("touchstart", downButtonDownHandler);
         downButton.removeEventListener("touchend", downButtonUpHandler);
+		document.removeEventListener("visibilitychange", disconnectInactivePlayer);
 		if (ws) {
 			ws.close();
 			console.log("Closing connection with server");

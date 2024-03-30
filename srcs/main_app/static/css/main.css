@@ -358,6 +358,7 @@ body {
   z-index: 9;
   text-wrap: nowrap;
   text-decoration: none;
+  color: var(--beach-bunny-brown);
 }
 
 .friendName.title p{
@@ -650,4 +651,9 @@ body {
   .historySection{
     margin-bottom: 7.5vh!important;
   }
+}
+
+.profileTopBar .dropdown-menu {
+  background-color: var(--beach-bunny);
+  font-family: 'bpdots';
 }
