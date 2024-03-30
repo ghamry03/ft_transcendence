@@ -27,18 +27,18 @@
 	min-width: 0;
 }
 
-.profile button {
-	width: 100%;
-	background: #FCF9F4;
-	color: #59322B;
-	text-align: center;
-	font-family: "ps2p";
-	font-size: 12px;
-	font-style: normal;
-	font-weight: 400;
-	line-height: normal;
-	text-transform: uppercase;
-}
+/* .profile button { */
+/* 	width: 100%; */
+/* 	background: #FCF9F4; */
+/* 	color: #59322B; */
+/* 	text-align: center; */
+/* 	font-family: "ps2p"; */
+/* 	font-size: 12px; */
+/* 	font-style: normal; */
+/* 	font-weight: 400; */
+/* 	line-height: normal; */
+/* 	text-transform: uppercase; */
+/* } */
 
 .profile .d-flex {
 	column-gap: 1rem;
@@ -79,14 +79,14 @@
 	color: black;
 }
 
-.editProfile #primary-btn {
+#primary-btn {
 	width: 100%;
 	background: var(--Beach-bunny-Accent, #F5BB76);
 	color: black;
 	border: 2px solid black;
 }
 
-.editProfile #secondry-btn {
+#secondry-btn {
 	width: 100%;
 	background: var(--Beach-bunny-Card, #FCF9F4); 
 	color: black;
