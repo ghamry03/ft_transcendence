@@ -20,6 +20,7 @@ urlpatterns = [
     path('topbar/', home_views.topBar, name='topBar'),
     path('cards/', home_views.homeCards, name='home_cards'),
     path('sideBar/', home_views.sideBar, name='sideBar'),
+    path('sideBarMobile/', home_views.sideBarMobile, name='sideBarMobile'),
 
     # LOGIN
     path('login/', login_views.loginPage, name='login'),

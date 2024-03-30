@@ -15,25 +15,7 @@
         </div>
     </div>
 
-    <div class="d-flex d-md-none mobileNavBar px-2">
-        {% load static %}
-        <div class="mainFriendMobileContainer d-flex flex-row justify-content-start align-items-center ">
-            <div data-bs-toggle="collapse"
-            data-bs-target="#friendRequestsPop" class="position-relative d-inline-block {% if friendRequests != 0 %} friendRequestButton {% endif %} ">
-                <img src="{% static 'imgs/invites_button.svg'%}" />
-            </div>
-            <div class="mobileFriendInjection d-flex flex-grow-1">
-                {% for friend in friendsList %}
-                    {% if friend.relationship == 0 %}
-                        {% include 'mobileFriend.html' with uid=friend.uid imgURL=friend.image %}
-                    {% endif %}
-                {% endfor %}
-            </div>
-            <div data-bs-toggle="collapse"
-            data-bs-target="#addFriendPop" class="mobileAddFriend position-relative d-inline-block">
-                <img src="{% static 'imgs/add_friend.svg'%}" />
-            </div>
-        </div>
+    <div id="sideBarMobile" class="d-flex d-md-none mobileNavBar px-2">
     </div>
 
 

@@ -1,5 +1,5 @@
 function fetchMainContent(pageUrl, container=null) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         fetch(pageUrl)
             .then(response => {
                 if (!response.ok){
@@ -14,13 +14,14 @@ function fetchMainContent(pageUrl, container=null) {
                     var parser = new DOMParser();
                     var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
                     document.getElementById(container).innerHTML = doc;
-                    resolve();
                 }
+                resolve();
             })
             .catch((error) => {
-                showError(`Failed to load content. [${error.message}]`, 'Retry', () => {
+                showError(`${error.message}`, 'Retry', () => {
                     fetchMainContent(pageUrl, container)
                 });
+                reject(error);
             })
     });
 }
@@ -84,6 +85,7 @@ const injections = [
                 .then(() => fetchMainContent('/topbar', 'topBar'))
                 .then(() => fetchMainContent('/cards', 'homeContentArea'))
                 .then(() => {fetchMainContent('/sideBar', 'sideBar')})
+                .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
                 .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
                 .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
                 .then(() => updateStatus(1));
@@ -98,6 +100,7 @@ const injections = [
             removeScript('tournament');
             fetchMainContent('/cards', 'homeContentArea')
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
+            .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
             .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
                 .then(() => updateStatus(1));
         }
@@ -107,6 +110,7 @@ const injections = [
         handler: () => {
             fetchMainContent('/offline', 'homeContentArea')
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
+            .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
                 .then(() => injectScript('/static/js/offlinePong.js', 'homeContentArea', 'offline'))
                 .then(() => updateStatus(2));
         }
@@ -116,6 +120,7 @@ const injections = [
         handler: () => {
             fetchMainContent('/online', 'homeContentArea')
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
+            .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
                 .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'))
                 .then(() => updateStatus(2));
         }
@@ -125,6 +130,7 @@ const injections = [
         handler: () => {
             fetchMainContent('/tournament', 'homeContentArea')
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
+            .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
                 .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'))
                 .then(() => updateStatus(2));
         }
@@ -178,19 +184,27 @@ const injections = [
     {
         pattern: /^\/add\/.*$/,
         handler: (url) => {
-            fetchMainContent(url);
+            fetchMainContent(url)
+            .then(() => {fetchMainContent('/sideBar', 'sideBar')})
+            .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')});
         }
     },
     {
         pattern: /^\/accept\/.*$/,
         handler: (url) => {
-            fetchMainContent(url);
+            fetchMainContent(url)
+            .then(() => {fetchMainContent('/sideBar', 'sideBar')})
+            .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
+            ;
         }
     },
     {
         pattern: /^\/reject\/.*$/,
         handler: (url) => {
-            fetchMainContent(url);
+            fetchMainContent(url)
+            .then(() => {fetchMainContent('/sideBar', 'sideBar')})
+            .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
+            ;
         }
     }
 ];

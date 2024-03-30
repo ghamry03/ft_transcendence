@@ -106,3 +106,17 @@ def sideBar(request):
         "friendRequests": friendsList['friendRequests'],
         }
     return render(request, 'sideBar.html', context)
+
+def sideBarMobile(request):
+    userData = request.session.get('userData', None)
+    uid = userData.get('uid', None)
+    accessToken = request.session.get('access_token', None)
+
+    friendsList = getFriendsList(uid, accessToken)
+
+    context = {
+        "userData": userData,
+        "friendsList": friendsList['friendsList'],
+        "friendRequests": friendsList['friendRequests'],
+        }
+    return render(request, 'sideBarMobile.html', context)
