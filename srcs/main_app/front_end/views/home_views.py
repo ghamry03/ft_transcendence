@@ -81,7 +81,6 @@ def topBar(request):
     })
 
 def homeCards(request):
-    print(request.session['access_token'])
     userData = getSessionKey(request, 'userData')
     uid = userData.get('uid', None) if userData else None
 
