@@ -74,6 +74,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     tourName = self.tournaments[-1]
                     playerUids, channelNames = self.queue.getCopy()
                     tid = await tour_db.createTournament()
+                    if not tid:
+                        await self.cancelTour(tourName)
+                        return
                     self.logger.info("created tournament with id = %d", tid)
                     self.activeTournaments[tourName] = {
                         "tourName": tourName,
@@ -94,7 +97,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if close_code == 3001: 
             return 
         async with self.update_lock:
-
             # If player is in queue
             if self.queue.contains(self.playerId):
                 self.logger.info("Player %d left queue", self.playerId)
@@ -118,7 +120,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             elif self.playerId in self.players:
                 self.logger.info("Player %d disconnected during a match", self.playerId)
                 player = self.players[self.playerId]
-                opponent = self.players[player["opponentId"]]
+                opponent = self.players.get(player["opponentId"], None)
                 tour = self.activeTournaments.get(player["tourName"], None)
 
                 # Clearing disconnected player's channel from all groups
@@ -139,8 +141,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 )
 
                 # End the round 
-                opponent["score"] = self.WIN_SCORE
-                await self.endRound(opponent, player)
+                if opponent:
+                    opponent["score"] = self.WIN_SCORE
+                    success = await self.endRound(opponent, player)
+                    if not success:
+                        return 
                 if tour:
                     if tour["countReady"] == tour["countPlayers"]:
                         asyncio.create_task(self.startRound(tour["tourName"]))
@@ -160,21 +165,40 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 )
                 del self.waitingPlayers[self.playerId]
 
+    async def cancelTour(self, tourName):
+        self.logger.info("Cancelling tournament %s due to db failure", tourName)
+        await self.channel_layer.group_send(
+            tourName,
+            {"type": "lostConnection"},
+        )
+        if tourName in self.activeTournaments:
+            del self.activeTournaments[tourName]
+
     # This function ends a round, closes the tournament if its the last round, does all final db writes 
     async def endRound(self, winner, loser):
         self.logger.info("Ending round")
         
-        # Save game results to db
-        requests.get('http://gameapp:8003/game/endGame/' 
-                    + str(winner['gid']) + '/' 
-                    + str(winner["id"]) + '/' 
-                    + str(loser["id"]) + '/'
-                    + str(winner["score"]) + '/'
-                    + str(loser["score"]) + '/')
-        
         # Update the rank of the loser in this match
-        tour = self.activeTournaments[winner["tourName"]]
-        await tour_db.updateRank(loser['tid'], loser['id'], tour['curRank'])
+        tour = self.activeTournaments.get(winner["tourName"], None)
+        # Save game results to db
+        try:
+            response = requests.get('http://gameapp:8003/game/endGame/' 
+                        + str(winner['gid']) + '/' 
+                        + str(winner["id"]) + '/' 
+                        + str(loser["id"]) + '/'
+                        + str(winner["score"]) + '/'
+                        + str(loser["score"]) + '/')
+            response.raise_for_status()
+        except requests.RequestException as e:
+            self.logger.info("Cannot end game due to db failure")
+            if tour:
+                await self.cancelTour(tour["tourName"])
+            return False
+
+        dbSuccess = await tour_db.updateRank(loser['tid'], loser['id'], tour['curRank'])
+        if not dbSuccess:
+            await self.cancelTour(tour["tourName"])
+            return False
         tour["curRank"] -= 1
 
         # End the tournament here and cleanup if this is the last round
@@ -188,9 +212,15 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }
             )
             # Update the rank of the winner in this match
-            await tour_db.updateRank(winner['tid'], winner['id'], tour['curRank'])
+            dbSuccess = await tour_db.updateRank(winner['tid'], winner['id'], tour['curRank'])
+            if not dbSuccess:
+                await self.cancelTour(tour["tourName"])
+                return False
             tour["curRank"] -= 1
-            await tour_db.endTournament(winner["tid"])
+            dbSuccess = await tour_db.endTournament(winner["tid"])
+            if not dbSuccess:
+                await self.cancelTour(tour["tourName"])
+                return False
             del self.activeTournaments[winner["tourName"]]
 
         # Find winner's new position on the bracket and broadcast to tournament for the next round
@@ -221,6 +251,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         # Remove both players from active player pool
         del self.players[winner["id"]]
         del self.players[loser["id"]]
+        return True
 
 	# Called when the server receives a message from the WebSocket
     async def receive(self, text_data):
@@ -286,7 +317,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 )
                 # End the round for these players
                 tour = self.activeTournaments[player["tourName"]]
-                await self.endRound(player, opponent)
+                success = await self.endRound(player, opponent)
+                if not success:
+                    return 
                 # Start the next round if this was the last match in the round
                 if tour["countReady"] == tour["countPlayers"]:
                     asyncio.create_task(self.startRound(tour["tourName"]))
@@ -374,7 +407,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     break
 
                 # Register the new game in the db and create new channel group for the match
-                gameIdResponse = requests.get('http://gameapp:8003/game/createGame/' + str(pid1) + '/' + str(pid2) + '/' + str(tid) + '/')
+                try:
+                    gameIdResponse = requests.get('http://gameapp:8003/game/createGame/' + str(pid1) + '/' + str(pid2) + '/' + str(tid) + '/')
+                    gameIdResponse.raise_for_status()
+                except requests.RequestException as e:
+                    self.logger.info("Cannot create game due to db failure")
+                    await self.cancelTour(tour["tourName"])
+                    return
+
                 gid = int(gameIdResponse.text)
                 groupName = str(pid1) + "_" + str(pid2)
                 
@@ -414,11 +454,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 # We automatically assign the one who stayed to be the winner
                 if not channel2:
                     self.players[pid1]["score"] = self.WIN_SCORE
-                    await self.endRound(self.players[pid1], self.players[pid2])
+                    success = await self.endRound(self.players[pid1], self.players[pid2])
+                    if not success:
+                        return 
                 elif not channel1:
                     self.players[pid2]["score"] = self.WIN_SCORE
-                    await self.endRound(self.players[pid2], self.players[pid1])
-
+                    success = await self.endRound(self.players[pid2], self.players[pid1])
+                    if not success:
+                        return 
                 # If both players are still online, we add them to the same channel group 
                 if channel1 and channel2:
                     self.logger.info("Creating group with name = %s", groupName)
@@ -436,11 +479,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         
         # Broadcast to remaining players that the tournament was cancelled 
         if canceled:
+            dbSuccess = await tour_db.deleteTournament(tid)
+            if not dbSuccess:
+                await self.cancelTour(tour["tourName"])
+                return
             await self.channel_layer.group_send(
                 tourName,
                 {"type": "tournamentCanceled"},
             )
-            await tour_db.deleteTournament(tid)
             del self.activeTournaments[tourName]
         # Broadcast to all players that the next round is starting
         else:

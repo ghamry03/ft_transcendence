@@ -133,24 +133,46 @@ tournament = () => {
 
 	// This function fetches a player image given their UID
 	async function getImage(targetUid) {
-		try {
-			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
-			const jsonResponse = await response.json();
-			return jsonResponse.image;
-		} catch (error) {
-			console.error("Error fetching image:", error);
-		}
+		const promise = fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid)
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(body => {
+						throw new Error(body.error || 'Fetch image failed');
+					});
+				}
+				else {
+					return response.json().then(body => {
+						console.log("get image success");
+						return body.image;
+					})
+				}
+			})
+			.catch((error) => {
+				return "";
+			});
+		return promise;
 	}
 
 	// This function fetches the username of a player given their UID
 	async function getUserName(targetUid) {
-		try {
-			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
-			const jsonResponse = await response.json();
-			return jsonResponse.username;
-		} catch (error) {
-			console.error("Error fetching image:", error);
-		}
+		const promise = fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid)
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(body => {
+						throw new Error(body.error || 'Fetch username failed');
+					});
+				}
+				else {
+					return response.json().then(body => {
+						console.log("get username success");
+						return body.username;
+					})
+				}
+			})
+			.catch((error) => {
+				return "Player";
+			});
+		return promise;
 	}
 
 	// Checks if a socket is open and ready to send/receive info
@@ -163,8 +185,10 @@ tournament = () => {
 		var playerImg = document.getElementById("player" + imgId);
 		var nameElement = document.getElementById("name" + imgId);
 		if (playerImg) {
-			playerImg.src = imgUrl;
-			playerImg.setAttribute("data-imguid", playerId);
+			if (imgUrl.length > 0) {
+				playerImg.src = imgUrl;
+				playerImg.setAttribute("data-imguid", playerId);
+			}
 		}
 		if (nameElement) {
 			nameElement.innerText = username;
@@ -184,8 +208,10 @@ tournament = () => {
 				var imgElement = document.getElementById("player" + i);
 				if (imgElement) {
 					const imgUrl = await getImage(playerId);
-					imgElement.setAttribute("src", imgUrl);
-					imgElement.setAttribute("data-imguid", playerId);
+					if (imgUrl.length > 0) {
+						imgElement.setAttribute("src", imgUrl);
+						imgElement.setAttribute("data-imguid", playerId);
+					}
 				}
 				var nameElement = document.getElementById("name" + i);
 				if (nameElement) {
@@ -226,9 +252,11 @@ tournament = () => {
 		updateTourStatus("Winner of the tournament - " + userName);
 		var divElement = document.createElement("div");
 		divElement.className = "img-cir round mx-auto";
-
+		
 		var imgElement = document.createElement("img");
-		imgElement.src = imgUrl;
+		if (imgUrl.length > 0) {
+			imgElement.src = imgUrl;
+		}
 		imgElement.alt = "Winner";
 		imgElement.id = "winnerImg";
 
@@ -286,11 +314,13 @@ tournament = () => {
 		var rightImage = document.getElementById("rightImage");
 		getImage(leftPlayerId)
 			.then(imgUrl => {
-				leftImage.src = imgUrl;
+				if (imgUrl.length > 0)
+					leftImage.src = imgUrl;
 			});
 		getImage(rightPlayerId)
 			.then(imgUrl => {
-				rightImage.src = imgUrl;
+				if (imgUrl.length > 0)
+					rightImage.src = imgUrl;
 			});
 			
 		// ----- Setting all game params to starting values -----
@@ -459,6 +489,7 @@ tournament = () => {
 			case "tournamentCanceled":
 				alert("Tournament was canceled, not enough players to continue. Returning home...");
 				ws.close();
+				engine('/cards');
 				break;
 			case "lostConnection":
 				alert("Tournament was canceled due to a server error. Returning home...");

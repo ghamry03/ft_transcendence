@@ -20,11 +20,11 @@ def offlineGame(request):
     return render(request, 'offline.html', context)
 
 def tournament(request):
-    try:
-        response = requests.get(f"{TOURNAMENT_HISOTRY_URL}api/health")
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update profile', 'details': str(e)}, status=500)
+    # try:
+    #     response = requests.get(f"{TOURNAMENT_HISOTRY_URL}api/health")
+    #     response.raise_for_status()
+    # except requests.RequestException as e:
+    #     return JsonResponse({'error': 'Failed to update profile', 'details': str(e)}, status=500)
 
     return render(request, 'tournament.html')
 
