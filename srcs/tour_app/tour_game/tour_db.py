@@ -23,28 +23,40 @@ def createTournament():
 	logger.info("tourdb: creating tour")
 	if not checkDbHealth():
 		return None
-	tour = Tournament.objects.create(
-		starttime=timezone.now()
-	)
-	return tour.id
+	try:
+		tour = Tournament.objects.create(
+			starttime=timezone.now()
+		)
+		return tour.id
+	except:
+		logger.info("createtour: db failed")
+		return None
 
 @sync_to_async
 def deleteTournament(tid):
 	logger.info("tourdb: deleting tour")
 	if not checkDbHealth():
 		return None
-	Tournament.objects.get(id=tid).delete()
-	return tid
+	try:
+		Tournament.objects.get(id=tid).delete()
+		return tid
+	except:
+		logger.info("deletetour: db failed")
+		return None 
 
 @sync_to_async
 def endTournament(tid):
 	logger.info("tourdb: ending tour")
 	if not checkDbHealth():
 		return None
-	tour = Tournament.objects.get(id=tid)
-	tour.endtime = timezone.now()
-	tour.save()
-	return tid
+	try:
+		tour = Tournament.objects.get(id=tid)
+		tour.endtime = timezone.now()
+		tour.save()
+		return tid
+	except:
+		logger.info("endtour: db failed")
+		return None 
 
 
 @sync_to_async
@@ -52,12 +64,16 @@ def updateRank(tid, uid, rank):
 	logger.info("tourdb: updating rank")
 	if not checkDbHealth():
 		return None
-	tour = Tournament.objects.get(id=tid)
-	player = UserApiUser.objects.get(uid=uid)
-	tourRank = TournamentRank.objects.create(
-		player=player,
-		rank=rank,
-		tournament=tour
-	)
-	tourRank.save()
-	return tid
+	try:
+		tour = Tournament.objects.get(id=tid)
+		player = UserApiUser.objects.get(uid=uid)
+		tourRank = TournamentRank.objects.create(
+			player=player,
+			rank=rank,
+			tournament=tour
+		)
+		tourRank.save()
+		return tid
+	except:
+		logger.info("updaterank: db failed")
+		return None 

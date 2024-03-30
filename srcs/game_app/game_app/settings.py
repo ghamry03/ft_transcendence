@@ -90,7 +90,7 @@ DATABASES = {
     }
 }
 if DEBUG:
-    DATABASES['default']['OPTIONS']['connect_timeout'] = 2
+    DATABASES['default']['OPTIONS']['connect_timeout'] = 20
 
 # import django
 # django.setup()

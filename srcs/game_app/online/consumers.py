@@ -32,8 +32,6 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 if len(self.queue) > 0:
                     queuedPlayerId = self.queue[0]
                     self.logger.info("Found a player %s with no opponent", queuedPlayerId)
-                    gid = await game_db.createGame(queuedPlayerId, self.player_id)
-
                     # Moving queued player from queue to player pool
                     self.queue.pop(0)
                     self.players[queuedPlayerId] = {
@@ -41,7 +39,7 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                         "opponentId": self.player_id,
                         "score": 0,
                         "groupOwner": queuedPlayerId,
-                        "gid": gid
+                        "gid": -1
                     }
                     
                     # Adding new player to the opponent's group
@@ -55,9 +53,17 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                         "opponentId": queuedPlayerId,
                         "score": 0,
                         "groupOwner": queuedPlayerId,
-                        "gid": gid
+                        "gid": -1
                     }
 
+                    gid = await game_db.createGame(queuedPlayerId, self.player_id)
+                    if not gid:
+                        self.logger.info("Cannot create game due to db failure")
+                        await self.cancelGame(queuedPlayerId)
+                        return
+                    
+                    self.players[queuedPlayerId]["gid"] = gid
+                    self.players[self.player_id]["gid"] = gid
                     # Broadcast to both players that match has been found
                     await self.channel_layer.group_send(
                         queuedPlayerId,
@@ -96,15 +102,16 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     gid = self.players[self.player_id]['gid']
 
                     del self.players[self.player_id]
+                    del self.players[opponentId]
                     await self.channel_layer.group_discard(
                         groupOwner, self.channel_name
                     )
-                    await self.channel_layer.group_send(
-                        groupOwner,
-                        {"type": "disconnected"}
-                    )
-                    del self.players[opponentId]
-                    await game_db.endGame(gid, self.player_id, opponentId, score1, self.WIN_SCORE)
+                    if gid != -1:
+                        await self.channel_layer.group_send(
+                            groupOwner,
+                            {"type": "disconnected"}
+                        )
+                        await game_db.endGame(gid, self.player_id, opponentId, score1, self.WIN_SCORE)
 
 	# Called when the server receives a message from the WebSocket
     async def receive(self, text_data):
@@ -182,6 +189,13 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                 )
                 self.logger.info("Sent score update back %d %d", player["score"], opponent["score"])
     
+    async def cancelGame(self, gameName):
+        self.logger.info("Cancelling game %s due to db failure", gameName)
+        await self.channel_layer.group_send(
+            gameName,
+            {"type": "lostConnection"},
+        )
+
     # ------------- All handlers for the broadcast messages sent by the server -------------
     
     async def matchFound(self, event):
@@ -235,6 +249,15 @@ class RemotePlayerConsumer(AsyncWebsocketConsumer):
                     "type": "matchEnded",
                     "leftScore": event["leftScore"],
                     "rightScore": event["rightScore"]
+                }
+            )
+        )
+
+    async def lostConnection(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "lostConnection",
                 }
             )
         )
