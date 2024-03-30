@@ -56,12 +56,8 @@ def homePage(request):
     uid = userData.get('uid', None) if userData else None
     accessToken = getSessionKey(request, 'access_token')
 
-    friendsList = getFriendsList(uid, accessToken)
-
     context = {
         "userData": userData,
-        "friendsList": friendsList['friendsList'],
-        "friendRequests": friendsList['friendRequests'],
         }
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
@@ -123,3 +119,17 @@ def sideBarMobile(request):
         "friendRequests": friendsList['friendRequests'],
         }
     return render(request, 'sideBarMobile.html', context)
+
+def getFriendListEntries(request):
+    userData = request.session.get('userData', None)
+    uid = userData.get('uid', None)
+    accessToken = request.session.get('access_token', None)
+
+    friendsList = getFriendsList(uid, accessToken)
+
+    context = {
+        "userData": userData,
+        "friendsList": friendsList['friendsList'],
+        "friendRequests": friendsList['friendRequests'],
+        }
+    return render(request, 'friendRequestList.html', context)

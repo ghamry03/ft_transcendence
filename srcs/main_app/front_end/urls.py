@@ -21,6 +21,7 @@ urlpatterns = [
     path('cards/', home_views.homeCards, name='home_cards'),
     path('sideBar/', home_views.sideBar, name='sideBar'),
     path('sideBarMobile/', home_views.sideBarMobile, name='sideBarMobile'),
+    path('friendRequestListEntries/', home_views.getFriendListEntries, name='friendRequestListEntries'),
 
     # LOGIN
     path('login/', login_views.loginPage, name='login'),

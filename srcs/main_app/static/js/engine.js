@@ -86,6 +86,7 @@ const injections = [
                 .then(() => fetchMainContent('/cards', 'homeContentArea'))
                 .then(() => {fetchMainContent('/sideBar', 'sideBar')})
                 .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
+                .then(() => {fetchMainContent('/friendRequestListEntries', 'requestUsers')})
                 .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
                 .then(() => injectScript('/static/js/token.js', 'homeContentArea', 'token'))
                 .then(() => updateStatus(1));
@@ -101,6 +102,7 @@ const injections = [
             fetchMainContent('/cards', 'homeContentArea')
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
             .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
+            .then(() => {fetchMainContent('/friendRequestListEntries', 'requestUsers')})
             .then(() => injectScript('/static/js/sideBar.js', 'homeContentArea', 'sideBar'))
                 .then(() => updateStatus(1));
         }
@@ -111,6 +113,7 @@ const injections = [
             fetchMainContent('/offline', 'homeContentArea')
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
             .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
+            .then(() => {fetchMainContent('/friendRequestListEntries', 'requestUsers')})
                 .then(() => injectScript('/static/js/offlinePong.js', 'homeContentArea', 'offline'))
                 .then(() => updateStatus(2));
         }
@@ -121,6 +124,7 @@ const injections = [
             fetchMainContent('/online', 'homeContentArea')
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
             .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
+            .then(() => {fetchMainContent('/friendRequestListEntries', 'requestUsers')})
                 .then(() => injectScript('/static/js/onlinePong.js', 'homeContentArea', 'online'))
                 .then(() => updateStatus(2));
         }
@@ -131,6 +135,7 @@ const injections = [
             fetchMainContent('/tournament', 'homeContentArea')
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
             .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
+            .then(() => {fetchMainContent('/friendRequestListEntries', 'requestUsers')})
                 .then(() => injectScript('/static/js/tournament.js', 'homeContentArea', 'tournament'))
                 .then(() => updateStatus(2));
         }
@@ -139,6 +144,7 @@ const injections = [
         pattern: /^\/tourGame$/,
         handler: () => {
             return fetchMainContent('/online', 'gameBox')
+            .then(() => {fetchMainContent('/friendRequestListEntries', 'requestUsers')})
                 .then(() => updateStatus(2));
         }
     },
@@ -167,6 +173,7 @@ const injections = [
         pattern: /^\/profile\/.*$/,
         handler: (url) => {
             fetchMainContent(url, 'profileContent')
+            .then(() => {fetchMainContent('/friendRequestListEntries', 'requestUsers')})
                 .then(() => updateStatus(1));
         }
     },
@@ -188,7 +195,9 @@ const injections = [
         handler: (url) => {
             fetchMainContent(url)
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
-            .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')});
+            .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
+            .then(() => {fetchMainContent('/friendRequestListEntries', 'requestUsers')})
+            ;
         }
     },
     {
@@ -197,6 +206,7 @@ const injections = [
             fetchMainContent(url)
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
             .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
+            .then(() => {fetchMainContent('/friendRequestListEntries', 'requestUsers')})
             ;
         }
     },
@@ -206,7 +216,6 @@ const injections = [
             fetchMainContent(url)
             .then(() => {fetchMainContent('/sideBar', 'sideBar')})
             .then(() => {fetchMainContent('/sideBarMobile', 'sideBarMobile')})
-            ;
         }
     }
 ];
