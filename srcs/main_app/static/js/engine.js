@@ -25,7 +25,8 @@ function fetchMainContent(pageUrl, container=null) {
             .then(response => {
                 if (!response.ok){
                     return response.json().then(body => {
-                        throw new Error();
+                        console.log('throw');
+                        throw new Error(body.error || 'Network response was not ok');
                     });
                 }
                 return response.text();
@@ -36,12 +37,11 @@ function fetchMainContent(pageUrl, container=null) {
                     var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
                     document.getElementById(container).innerHTML = doc;
                 }
-                    getError();
+                getError();
                 resolve();
             })
             .catch((error) => {
                 getError(error);
-                reject(error);
             })
     });
 }
