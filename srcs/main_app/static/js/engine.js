@@ -267,6 +267,7 @@ function showError(errorMessage, buttonText, buttonOnClickFunction) {
     errorDiv = document.getElementById('main_error');
     errorText = document.getElementById('error_text');
     errorButton = document.getElementById('error_button');
+    closeButton = document.getElementById('close_button');
 
     errorText.textContent = errorMessage;
     errorButton.textContent = buttonText;
@@ -278,6 +279,10 @@ function showError(errorMessage, buttonText, buttonOnClickFunction) {
 
     errorButton.onclick = () => {
         buttonOnClickFunction();
+        hideErrorMessage();
+    }
+
+    closeButton.onclick = () => {
         hideErrorMessage();
     }
 }
