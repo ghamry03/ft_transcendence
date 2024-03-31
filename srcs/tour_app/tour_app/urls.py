@@ -24,3 +24,4 @@ urlpatterns = [
 	path('api/', include(tour)),
     path('tour/', include(tour_urls)),
 ]
+ 
