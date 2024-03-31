@@ -1,4 +1,6 @@
+import json
 import requests
+import logging
 
 from main_app.utils import getSessionKey, setSessionKey, make_request
 from main_app.constants import USER_API_URL
@@ -10,6 +12,7 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseBadRequest, HttpResponseNotFound
 from django.contrib.sessions.models import Session
 
+logger = logging.getLogger(__name__)
 
 @method_decorator(hostname_whitelist(settings.ALLOWED_HOSTNAMES_FOR_API), name='dispatch')
 class SessionDataView(View):
@@ -49,6 +52,11 @@ def getOpponentInfo(request):
 def errors(request):
     error = getSessionKey(request, 'error')
     setSessionKey(request, 'error', None)
+
     if error:
-        JsonResponse(error, status=error.status_code)
-    return JsonResponse({}, status=200)
+        logger.debug(error)
+        error_json = json.loads(error)
+        # return JsonResponse(error_json, status=int( error_json['status_code'] ))
+
+    logger.debug('no error')
+    return JsonResponse({'error': 'no error'}, status=200)

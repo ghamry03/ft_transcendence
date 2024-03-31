@@ -4,7 +4,7 @@ function fetchMainContent(pageUrl, container=null) {
             .then(response => {
                 if (!response.ok){
                     return response.json().then(body => {
-                        throw new Error(body.error || 'Network response was not ok');
+                        throw new Error();
                     });
                 }
                 return response.text();
@@ -18,9 +18,25 @@ function fetchMainContent(pageUrl, container=null) {
                 resolve();
             })
             .catch((error) => {
-                showError(`${error.message}`, 'Retry', () => {
-                    fetchMainContent(pageUrl, container)
-                });
+                fetch('/errors')
+                    .then(error_response =>
+                        error_response.json().then(json => {
+                            if (!error_response.ok) {
+                                console.log(json.error);
+                                showError(
+                                    `${json.error}, ${json.message}`,
+                                    'Retry',
+                                    () => { fetchMainContent(pageUrl, container); }
+                                );
+                            } else {
+                                showError(
+                                    "Couldn't retrive page",
+                                    'Retry',
+                                    () => { fetchMainContent(pageUrl, container); }
+                                );
+                            }
+                        })
+                    ).catch(err => console.error("Fetch error:", err));
                 reject(error);
             })
     });
@@ -39,10 +55,6 @@ function updateStatus(status) {
         })
         .then(() => resolve());
     });
-    // const data = new FormData();
-    // data.append('status', status.toString());
-    // navigator.sendBeacon('/status/', data);
-    // console.log("how many times?");
 }
 
 function updateStatusUnload(e) {
