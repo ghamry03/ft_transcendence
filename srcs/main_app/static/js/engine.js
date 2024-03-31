@@ -35,8 +35,8 @@ function fetchMainContent(pageUrl, container=null) {
                     var parser = new DOMParser();
                     var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
                     document.getElementById(container).innerHTML = doc;
-                    getError();
                 }
+                    getError();
                 resolve();
             })
             .catch((error) => {
