@@ -1,6 +1,6 @@
-import requests, logging
+import logging
 
-from main_app.utils import getSessionKey
+from main_app.utils import getSessionKey, make_request
 from main_app.constants import TOURNAMENT_HISOTRY_URL, MATCH_HISOTRY_URL, FRIEND_API_URL
 
 from django.http import HttpResponse, JsonResponse
@@ -12,39 +12,36 @@ def index(request, status=None):
     context = { 'logged_in': getSessionKey(request, 'logged_in') }
     return render(request, 'base.html', context=context)
 
-def getTournamentHistory(uid):
-    try:
-        response = requests.get(TOURNAMENT_HISOTRY_URL + f'api/tourhistory/{uid}')
-    except:
+def getTournamentHistory(request, uid):
+    response, isError = make_request(request, TOURNAMENT_HISOTRY_URL + f'api/tourhistory/{uid}')
+    if isError:
         return None
 
     if response.status_code == 200:
         return response.json()['data']
     return None
 
-def getMatchHistory(uid):
-    try:
-        response = requests.get(MATCH_HISOTRY_URL + f'game/matchhistory/{uid}')
-    except:
+def getMatchHistory(request, uid):
+    response, isError = make_request(request, MATCH_HISOTRY_URL + f'game/matchhistory/{uid}')
+    if isError:
         return None
 
     if response.status_code == 200:
         return response.json()
     return None
 
-def getFriendsList(uid, accessToken):
+def getFriendsList(request, uid, accessToken):
     headers = { 'Content-Type': 'application/json' }
-    try:
-        response = requests.get(
-            FRIEND_API_URL + "api/friends/",
-            headers=headers,
-            json={
-                "uid": f"{uid}",
-                "ownerUID": f"{uid}",
-                "access_token": accessToken
-                },
-        )
-    except requests.RequestException as e:
+    response, isError = make_request(request,
+        FRIEND_API_URL + "api/friends/",
+        headers=headers,
+        json={
+            "uid": f"{uid}",
+            "ownerUID": f"{uid}",
+            "access_token": accessToken
+            },
+    )
+    if isError:
         return JsonResponse({})
 
     if response.status_code == 200:
@@ -80,8 +77,8 @@ def homeCards(request):
     userData = getSessionKey(request, 'userData')
     uid = userData.get('uid', None) if userData else None
 
-    tournamentHistory = getTournamentHistory(uid)
-    matchHistory = getMatchHistory(uid)
+    tournamentHistory = getTournamentHistory(request, uid)
+    matchHistory = getMatchHistory(request, uid)
 
     logger.debug(f'This is the users match history: {matchHistory}');
     logger.debug(f'This is the users tournament history: {tournamentHistory}');
@@ -97,7 +94,7 @@ def sideBar(request):
     uid = userData.get('uid', None)
     accessToken = request.session.get('access_token', None)
 
-    friendsList = getFriendsList(uid, accessToken)
+    friendsList = getFriendsList(request, uid, accessToken)
 
     context = {
         "userData": userData,
@@ -111,7 +108,7 @@ def sideBarMobile(request):
     uid = userData.get('uid', None)
     accessToken = request.session.get('access_token', None)
 
-    friendsList = getFriendsList(uid, accessToken)
+    friendsList = getFriendsList(request, uid, accessToken)
 
     context = {
         "userData": userData,
@@ -125,7 +122,7 @@ def getFriendListEntries(request):
     uid = userData.get('uid', None)
     accessToken = request.session.get('access_token', None)
 
-    friendsList = getFriendsList(uid, accessToken)
+    friendsList = getFriendsList(request, uid, accessToken)
 
     context = {
         "userData": userData,

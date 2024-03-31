@@ -1,4 +1,4 @@
-import logging
+import requests, logging
 
 from django.db import DatabaseError
 from django.http import JsonResponse

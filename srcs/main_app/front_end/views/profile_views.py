@@ -1,6 +1,4 @@
-import requests
-
-from main_app.utils import getSessionKey
+from main_app.utils import getSessionKey, make_request
 from main_app.constants import USER_API_URL, FRIEND_API_URL
 from .home_views import getTournamentHistory, getMatchHistory
 
@@ -24,11 +22,9 @@ def updateStatus(request, status):
         'X-TOKEN': str(access_token)
     }
     data = {'status': status}
-    try:
-        response = requests.post(f"{USER_API_URL}api/user/{uid}/", headers=headers, data=data)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+    response, isError = make_request(request, f"{USER_API_URL}api/user/{uid}/", headers=headers, data=data)
+    if isError:
+        return JsonResponse({'error': 'Failed to update status'}, status=500)
 
     return JsonResponse({'message': 'Status updated'})
 
@@ -42,18 +38,16 @@ def profile(request, uid):
         'X-UID': str(uid),
         'X-TOKEN': access_token
     }
-    try:
-        response = requests.get(f"{USER_API_URL}api/user/{uid}", headers=headers)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+    response, isError = make_request(request, f"{USER_API_URL}api/user/{uid}", headers=headers)
+    if isError:
+        return JsonResponse({'error': 'Failed to update status'}, status=500)
 
     profile_data = response.json()
 
-    profile_type = get_profile_type(uid, user_data['uid'], access_token)
+    profile_type = get_profile_type(request, uid, user_data['uid'], access_token)
 
-    tournamentHistory = getTournamentHistory(uid)
-    matchHistory = getMatchHistory(uid)
+    tournamentHistory = getTournamentHistory(request, uid)
+    matchHistory = getMatchHistory(request, uid)
 
     context = {
         'uid': uid,
@@ -69,16 +63,15 @@ def profile(request, uid):
     }
     return render(request, 'profileContent.html', context)
 
-def get_profile_type(uid, session_uid, access_token):
+def get_profile_type(request, uid, session_uid, access_token):
     if uid != session_uid:
         data = {
             'ownerUID': session_uid,
             'uid': uid,
             'access_token': access_token
         }
-        try:
-            friends_response = requests.get(f"{FRIEND_API_URL}api/friends/", json=data)
-        except requests.RequestException as e:
+        friends_response, isError = make_request(request, f"{FRIEND_API_URL}api/friends/", json=data)
+        if isError:
             return -1
 
         if friends_response.ok:
@@ -118,13 +111,12 @@ def edit_profile(request):
     data = request.POST.dict()
     files = request.FILES.dict()
 
-    try:
-        response = requests.post(
-            f"{USER_API_URL}api/user/{user_data['uid']}/",
-            headers=headers, data=data, files=files
-        )
-        response.raise_for_status()
-        request.session['userData'] = response.json()
-        return JsonResponse({'message': 'Profile updated successfully'})
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update profile', 'details': str(e)}, status=500)
+    response, isError = make_request(
+        request,
+        f"{USER_API_URL}api/user/{user_data['uid']}/",
+        method='post', headers=headers, data=data, files=files
+    )
+    if isError:
+        return JsonResponse({'error': 'Failed to update profile'}, status=500)
+    request.session['userData'] = response.json()
+    return JsonResponse({'message': 'Profile updated successfully'})

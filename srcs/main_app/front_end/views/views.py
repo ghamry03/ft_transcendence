@@ -34,11 +34,9 @@ def getOpponentInfo(request):
         'X-UID': ownerUid,
         'X-TOKEN': access_token
     }
-    try:
-        response = requests.get(USER_API_URL + 'api/user/' + targetUid, headers=headers)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to get user info', 'details': str(e)}, status=500)
+    response, isError = make_request(request, USER_API_URL + 'api/user/' + targetUid, headers=headers)
+    if isError:
+        return JsonResponse({'error': 'Failed to get user info'}, status=500)
 
     try:
         opponentInfo = response.json()
