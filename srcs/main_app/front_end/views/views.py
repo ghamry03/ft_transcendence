@@ -1,6 +1,6 @@
 import requests
 
-from main_app.utils import getSessionKey
+from main_app.utils import getSessionKey, make_request
 from main_app.constants import USER_API_URL
 from front_end.hostnameAuthentication import hostname_whitelist
 
