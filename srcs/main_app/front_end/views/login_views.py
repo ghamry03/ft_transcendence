@@ -108,6 +108,6 @@ def renew_token(request):
         setSessionKey(request, 'access_token', json_response.get('access_token', None))
         setSessionKey(request, 'refresh_token', json_response.get('refresh_token', None))
         setSessionKey(request, 'token_expiry', int(json_response.get('created_at')) + 7200)
-        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
+        return JsonResponse({'message': 'Token renewed successfully'}, status=200)
     else:
         return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
