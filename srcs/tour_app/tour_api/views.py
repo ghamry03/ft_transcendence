@@ -8,42 +8,48 @@ from rest_framework.views import APIView
 from rest_framework import status
 import logging
 
-from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch, TournamentRank
+from tour_game.models import Tournament, OnlineGame, OnlinePlayermatch, TournamentRank, UserApiUser
 from tour_api.serializer import GameSerializer, UserSerializer
 
 logger = logging.getLogger(__name__)
 
 def calculate_time_passed(game_endtime):
-    def format_time_difference(time_difference):
-        if time_difference.days >= 1:
-            unit = "day"
-            quantity = time_difference.days
-        elif time_difference.seconds >= 3600:
-            unit = "hour"
-            quantity = time_difference.seconds // 3600
-        elif time_difference.seconds >= 60:
-            unit = "minute"
-            quantity = time_difference.seconds // 60
-        else:
-            unit = "second"
-            quantity = time_difference.seconds
-        return f"{quantity} {unit}{'s' if quantity > 1 else ''}"
+	def format_time_difference(time_difference):
+		if time_difference.days >= 1:
+			unit = "day"
+			quantity = time_difference.days
+		elif time_difference.seconds >= 3600:
+			unit = "hour"
+			quantity = time_difference.seconds // 3600
+		elif time_difference.seconds >= 60:
+			unit = "minute"
+			quantity = time_difference.seconds // 60
+		else:
+			unit = "second"
+			quantity = time_difference.seconds
+		return f"{quantity} {unit}{'s' if quantity > 1 else ''}"
 
-    current_time = datetime.now(timezone.utc)
-    time_difference = current_time - game_endtime
-    return format_time_difference(time_difference)
+	current_time = datetime.now(timezone.utc)
+	time_difference = current_time - game_endtime
+	return format_time_difference(time_difference)
 
 def get_rank(user_id, tournament_id):
-    try:
-        tournament = TournamentRank.objects.get(tournament=tournament_id , player=user_id)
+	try:
+		logger.info("getting tour rank")
+		# tour = Tournament.objects.get(id=tournament_id)
+		# user = UserApiUser.objects.get(uid=user_id)
+		# tournamentRank = TournamentRank.objects.get(tournament=tour, player=user)
+		tournamentRank = TournamentRank.objects.get(tournament__pk=tournament_id , player__pk=user_id)
+		logger.info("fetched tour rank");
 
-        if tournament and int(user_id) == int(tournament.player.pk):
-            rank = tournament.rank
-            return rank
-        else:
-            return None
-    except Tournament.DoesNotExist:
-        return None
+		if tournamentRank and int(user_id) == int(tournamentRank.player.pk):
+			rank = tournamentRank.rank
+			return rank
+		else:
+			return None
+	except:
+		logger.info("error getting tour rank object")
+		return None
 
 class TournamentHistoryApiView(APIView):
 	def get(self, request, user_id):
@@ -86,7 +92,7 @@ class TournamentMatchesApiView(APIView):
 		owner_token = request.META.get('HTTP_X_TOKEN')
 		if not games:
 			return Response({"message": "No games found for the given tournament."}, status=status.HTTP_404_NOT_FOUND)
-		
+
 		serializer = GameSerializer(games, many=True)
 
 		game_details = []

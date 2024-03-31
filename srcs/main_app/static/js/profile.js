@@ -21,10 +21,10 @@ function resetFormValidation(form) {
         feedbackElement.textContent = '';
     });
 
-    alert = document.getElementById('generalError');
-    alert.classList.add('fade')
-    alert.classList.remove('show')
-    alert.innerHTML = '';
+    var errorMsg = document.getElementById('generalError');
+    errorMsg.classList.add('fade')
+    errorMsg.classList.remove('show')
+    errorMsg.innerHTML = '';
 }
 
 function cancelFormButton() {
@@ -80,10 +80,10 @@ function handleServerSideErrors(form, errors) {
                 feedback.textContent = message;
             }
         } else {
-            alert = document.getElementById('generalError');
-            alert.classList.remove('fade')
-            alert.classList.add('show')
-            alert.innerHTML = message;
+            var errorMsg = document.getElementById('generalError');
+            errorMsg.classList.remove('fade')
+            errorMsg.classList.add('show')
+            errorMsg.innerHTML = message;
         }
     });
 }
