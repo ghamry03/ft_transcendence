@@ -1,9 +1,8 @@
 import os
 import logging
-import requests
 from time import time
 
-from main_app.utils import getSessionKey, setSessionKey
+from main_app.utils import getSessionKey, setSessionKey, make_request
 from main_app.constants import AUTH_URL, USER_API_URL, REDIRECT_URI
 
 from django.http import JsonResponse
@@ -31,10 +30,9 @@ def authenticate(request):
     }
 
     context = { 'logged_in': False }
-    try:
-        response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
-    except requests.RequestException as e:
-        return render(request, 'base.html', context=context, status=500)
+    response, isError = make_request(request, 'https://api.intra.42.fr/oauth/token', method='post', files=files)
+    if isError:
+        return redirect('/')
 
     if response.status_code == 200:
         json_response = response.json()
@@ -49,12 +47,9 @@ def authenticate(request):
                 'Authorization': 'Bearer ' + access_token,
             }
 
-            try:
-                me_response = requests.get('https://api.intra.42.fr/v2/me', headers=headers)
-                me_response.raise_for_status()
-            except requests.RequestException as e:
-                redirect('/')
-                # return render(request, 'base.html', context=context, status=500)
+            me_response, isError = make_request(request, 'https://api.intra.42.fr/v2/me', headers=headers)
+            if isError:
+                return redirect('/')
 
             UID = str(me_response.json()['id'])
             headers = {
@@ -62,14 +57,11 @@ def authenticate(request):
                 'X-TOKEN': access_token
             }
 
-            try:
-                user_api_response = requests.get(USER_API_URL + 'api/user/' + UID, headers=headers)
-                user_api_response.raise_for_status()
-                setSessionKey(request, 'userData', user_api_response.json())
-                setSessionKey(request, 'logged_in', True)
-            except requests.RequestException as e:
-                redirect('/')
-                # return render(request, 'base.html', context=context, status=500)
+            user_api_response, isError = make_request(request, USER_API_URL + 'api/user/' + UID, headers=headers)
+            if isError:
+                return redirect('/')
+            setSessionKey(request, 'userData', user_api_response.json())
+            setSessionKey(request, 'logged_in', True)
             return redirect('/')
     try:
         request.session.flush()
@@ -106,10 +98,9 @@ def renew_token(request):
         'client_secret': (None, os.environ['INTRA_SECRET'])
     }
 
-    try:
-        response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+    response, isError = make_request(request, 'https://api.intra.42.fr/oauth/token', files=files)
+    if isError:
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
 
     if response.status_code == 200:
@@ -119,5 +110,4 @@ def renew_token(request):
         setSessionKey(request, 'token_expiry', int(json_response.get('created_at')) + 7200)
         return JsonResponse({'message': 'Token renewed successfully'}, status=200)
     else:
-        error_message = response.json().get('error', 'intra issue')
-        return JsonResponse({'error': error_message}, status=response.status_code)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
