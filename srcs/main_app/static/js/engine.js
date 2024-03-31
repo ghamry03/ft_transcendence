@@ -25,7 +25,6 @@ function fetchMainContent(pageUrl, container=null) {
             .then(response => {
                 if (!response.ok){
                     return response.json().then(body => {
-                        console.log('throw');
                         throw new Error(body.error || 'Network response was not ok');
                     });
                 }
