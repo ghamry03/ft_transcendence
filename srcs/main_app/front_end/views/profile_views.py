@@ -1,3 +1,5 @@
+import logging
+
 from main_app.utils import getSessionKey, make_request
 from main_app.constants import USER_API_URL, FRIEND_API_URL
 from .home_views import getTournamentHistory, getMatchHistory
@@ -5,6 +7,7 @@ from .home_views import getTournamentHistory, getMatchHistory
 from django.http import JsonResponse
 from django.shortcuts import render
 
+logger = logging.getLogger(__name__)
 
 def updateStatus(request, status):
     user_data = getSessionKey(request, 'userData')
@@ -22,7 +25,7 @@ def updateStatus(request, status):
         'X-TOKEN': str(access_token)
     }
     data = {'status': status}
-    response, isError = make_request(request, f"{USER_API_URL}api/user/{uid}/", headers=headers, data=data)
+    response, isError = make_request(request, f"{USER_API_URL}api/user/{uid}/", method='post', headers=headers, data=data)
     if isError:
         return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
