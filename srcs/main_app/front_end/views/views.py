@@ -1,6 +1,6 @@
 import requests
 
-from main_app.utils import getSessionKey
+from main_app.utils import getSessionKey, make_request
 from main_app.constants import USER_API_URL
 from front_end.hostnameAuthentication import hostname_whitelist
 
@@ -34,16 +34,6 @@ def getOpponentInfo(request):
         'X-UID': ownerUid,
         'X-TOKEN': access_token
     }
-    try:
-        response = requests.get(USER_API_URL + 'api/user/' + targetUid, headers=headers)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
 
-    try:
-        opponentInfo = response.json()
-    except requests.exceptions.JSONDecodeError as e:
-        return JsonResponse({'error': 'Failed to get user status', 'details': str(e)}, status=400)
-
-    opponentInfo['image'] = opponentInfo['image']
-    return JsonResponse(opponentInfo)
+    response, isError = make_request(USER_API_URL + 'api/user/' + targetUid, headers=headers)
+    return response

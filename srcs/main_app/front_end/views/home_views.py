@@ -1,6 +1,6 @@
 import requests, logging
 
-from main_app.utils import getSessionKey
+from main_app.utils import getSessionKey, make_request
 from main_app.constants import TOURNAMENT_HISOTRY_URL, MATCH_HISOTRY_URL, FRIEND_API_URL
 
 from django.http import HttpResponse, JsonResponse
@@ -13,43 +13,37 @@ def index(request, status=None):
     return render(request, 'base.html', context=context)
 
 def getTournamentHistory(uid):
-    try:
-        response = requests.get(TOURNAMENT_HISOTRY_URL + f'api/tourhistory/{uid}')
-    except:
+    response, isError = make_request(TOURNAMENT_HISOTRY_URL + f'api/tourhistory/{uid}')
+
+    if isError:
         return None
 
-    if response.status_code == 200:
-        return response.json()['data']
-    return None
+    return response.json()['data']
 
 def getMatchHistory(uid):
-    try:
-        response = requests.get(MATCH_HISOTRY_URL + f'game/matchhistory/{uid}')
-    except:
+    response, isError = make_request(MATCH_HISOTRY_URL + f'game/matchhistory/{uid}')
+
+    if isError:
         return None
 
-    if response.status_code == 200:
-        return response.json()
-    return None
+    return response.json()
 
 def getFriendsList(uid, accessToken):
     headers = { 'Content-Type': 'application/json' }
-    try:
-        response = requests.get(
-            FRIEND_API_URL + "api/friends/",
-            headers=headers,
-            json={
-                "uid": f"{uid}",
-                "ownerUID": f"{uid}",
-                "access_token": accessToken
-                },
-        )
-    except requests.RequestException as e:
+    response, isError = make_request(
+        FRIEND_API_URL + "api/friends/",
+        headers=headers,
+        json = {
+            "uid": f"{uid}",
+            "ownerUID": f"{uid}",
+            "access_token": accessToken
+        },
+    )
+
+    if isError:
         return JsonResponse({})
 
-    if response.status_code == 200:
-        return response.json()
-    return JsonResponse({})
+    return response.json()
 
 def homePage(request):
     userData = getSessionKey(request, 'userData')
@@ -62,7 +56,7 @@ def homePage(request):
         "userData": userData,
         "friendsList": friendsList['friendsList'],
         "friendRequests": friendsList['friendRequests'],
-        }
+    }
 
     httpResponse = HttpResponse(render(request, 'home.html', context))
     httpResponse.set_cookie('uid' , uid)

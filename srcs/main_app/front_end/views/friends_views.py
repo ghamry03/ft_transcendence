@@ -1,6 +1,6 @@
 import requests, logging
 
-from main_app.utils import getSessionKey
+from main_app.utils import getSessionKey, make_request
 from main_app.constants import FRIEND_API_URL, USER_API_URL
 
 from django.shortcuts import render
@@ -20,18 +20,16 @@ def searchUsers(request, username):
 
     base_url = USER_API_URL + 'api/search/' + username
 
-    try:
-        response = requests.get(base_url, headers=headers)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+    response, isError = make_request(base_url, headers=headers)
+    if isError:
+        return HttpResponse()
 
     if response.status_code == 200:
         data = {
             'status': response.status_code,
             'data': response.json(),
             'uid': userData.get('uid', None)
-            }
+        }
         logger.debug(data)
         return render(request, 'searchedUser.html', data)
     else:
@@ -46,20 +44,21 @@ def addUser(request, friendUID):
 
     myuid = userData.get('uid', None) if userData else None
 
-    try:
-        response = requests.post(
-            FRIEND_API_URL + "api/friends/",
-            headers=headers,
-            json={
-                "first_id": f'{myuid}',
-                "second_id": f'{friendUID}',
-                "session_id": session_id,
-                "access_token": access_token,
-                },
-        )
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+    response, isError = make_request(
+        FRIEND_API_URL + "api/friends/",
+        headers=headers,
+        method='post',
+        json={
+            "first_id": f'{myuid}',
+            "second_id": f'{friendUID}',
+            "session_id": session_id,
+            "access_token": access_token,
+            },
+    )
+
+    if isError:
+        return response
+
     return JsonResponse(data={})
 
 def acceptFriend(request, friendUID):
@@ -70,21 +69,21 @@ def acceptFriend(request, friendUID):
 
     myuid = userData.get('uid', None) if userData else None
 
-    try:
-        response = requests.put(
-            FRIEND_API_URL + "api/friends/",
-            headers=headers,
-            json={
-                "first_user": f'{myuid}',
-                "second_user": f'{friendUID}',
-                "relationship": 0, 
-                "session_id": session_id, 
-                "access_token": access_token,
-                },
-        )
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+    response, isError = make_request(
+        FRIEND_API_URL + "api/friends/",
+        headers=headers,
+        method='put',
+        json={
+            "first_user": f'{myuid}',
+            "second_user": f'{friendUID}',
+            "relationship": 0, 
+            "session_id": session_id, 
+            "access_token": access_token,
+            },
+    )
+    if isError:
+        return response
+
     return JsonResponse(data={})
 
 
@@ -96,19 +95,18 @@ def rejectFriend(request, friendUID):
 
     myuid = userData.get('uid', None) if userData else None
 
-    try:
-        response = requests.delete(
-                FRIEND_API_URL + "api/friends/",
-                headers=headers,
-                json={
-                    "first_user": f'{myuid}',
-                    "second_user": f'{friendUID}',
-                    "session_id": session_id,
-                    "access_token": access_token,
-                    },
-                )
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+    response, isError = make_request(
+        FRIEND_API_URL + "api/friends/",
+        headers=headers,
+        method='put',
+        json={
+            "first_user": f'{myuid}',
+            "second_user": f'{friendUID}',
+            "session_id": session_id,
+            "access_token": access_token,
+            },
+    )
+    if isError:
+        return response
 
     return JsonResponse(data={})

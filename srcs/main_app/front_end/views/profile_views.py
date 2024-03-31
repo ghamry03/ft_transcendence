@@ -1,6 +1,6 @@
 import requests
 
-from main_app.utils import getSessionKey
+from main_app.utils import getSessionKey, make_request
 from main_app.constants import USER_API_URL, FRIEND_API_URL
 from .home_views import getTournamentHistory, getMatchHistory
 
@@ -11,24 +11,23 @@ from django.shortcuts import render
 def updateStatus(request, status):
     user_data = getSessionKey(request, 'userData')
     if not user_data:
-        return JsonResponse({'error': 'User data not found'}, status=400)
+        return JsonResponse({'error': 'User data not found'}, status=503)
 
     uid = user_data.get('uid', None) if user_data else None
 
     access_token = getSessionKey(request, 'access_token')
     if not all([uid, access_token]):
-        return JsonResponse({'error': 'Missing UID or access token'}, status=400)
+        return JsonResponse({'error': 'Missing UID or access token'}, status=503)
 
     headers = {
         'X-UID': str(uid),
         'X-TOKEN': str(access_token)
     }
-    data = {'status': status}
-    try:
-        response = requests.post(f"{USER_API_URL}api/user/{uid}/", headers=headers, data=data)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+    data = { 'status': status }
+
+    response, isError = make_request(f"{USER_API_URL}api/user/{uid}/", method='post', headers=headers, data=data)
+    if isError:
+        return response
 
     return JsonResponse({'message': 'Status updated'})
 
@@ -44,11 +43,10 @@ def profile(request, uid):
         'X-UID': str(uid),
         'X-TOKEN': access_token
     }
-    try:
-        response = requests.get(f"{USER_API_URL}api/user/{uid}", headers=headers)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+
+    response, isError = make_request(f"{USER_API_URL}api/user/{uid}", headers=headers)
+    if isError:
+        return response
 
     profile_data = response.json()
 
@@ -78,16 +76,15 @@ def get_profile_type(uid, session_uid, access_token):
             'uid': uid,
             'access_token': access_token
         }
-        try:
-            friends_response = requests.get(f"{FRIEND_API_URL}api/friends/", json=data)
-        except requests.RequestException as e:
+
+        friends_response, isError = make_request(f"{FRIEND_API_URL}api/friends/", json=data)
+
+        if isError:
             return -1
 
-        if friends_response.ok:
-            friends_data = friends_response.json()
-            relationship = friends_data.get('relationship', -1)
-            return determine_relationship_type(relationship, friends_data)
-        return -1
+        friends_data = friends_response.json()
+        relationship = friends_data.get('relationship', -1)
+        return determine_relationship_type(relationship, friends_data)
 
     return 0
 
@@ -120,13 +117,13 @@ def edit_profile(request):
     data = request.POST.dict()
     files = request.FILES.dict()
 
-    try:
-        response = requests.post(
-            f"{USER_API_URL}api/user/{user_data['uid']}/",
-            headers=headers, data=data, files=files
-        )
-        response.raise_for_status()
-        request.session['userData'] = response.json()
-        return JsonResponse({'message': 'Profile updated successfully'})
-    except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update profile', 'details': str(e)}, status=500)
+    response, isError = make_request(
+        f"{USER_API_URL}api/user/{user_data['uid']}/",
+        method= 'post', headers=headers, data=data, files=files
+    )
+
+    if isError:
+        return response
+
+    request.session['userData'] = response.json()
+    return JsonResponse({'message': 'Profile updated successfully'})

@@ -3,7 +3,7 @@ import logging
 import requests
 from time import time
 
-from main_app.utils import getSessionKey, setSessionKey
+from main_app.utils import getSessionKey, setSessionKey, make_request
 from main_app.constants import AUTH_URL, USER_API_URL, REDIRECT_URI
 
 from django.http import JsonResponse
@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 def loginPage(request):
     context = {
         'authUrl': AUTH_URL,
-        'error_message': 'Error encountred'
     }
     return render(request, 'login.html', context)
 
@@ -33,8 +32,9 @@ def authenticate(request):
     context = { 'logged_in': False }
     try:
         response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
+        response.raise_for_status()
     except requests.RequestException as e:
-        return render(request, 'base.html', context=context, status=500)
+        return render(request, 'base.html', context=context, status=e.response.status_code)
 
     if response.status_code == 200:
         json_response = response.json()
@@ -108,8 +108,9 @@ def renew_token(request):
 
     try:
         response = requests.post('https://api.intra.42.fr/oauth/token', files=files)
+        response.raise_for_status()
     except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+        return JsonResponse({'error': 'Failed to renew token', 'details': str(e)}, status=e.response.status_code)
 
 
     if response.status_code == 200:
