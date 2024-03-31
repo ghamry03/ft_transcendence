@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 # Create your views here
 def onlineGame(request):
-    response, isError = make_request(request, f"{MATCH_HISOTRY_URL}game/health")
-    if isError:
-        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
+    # response, isError = make_request(request, f"{MATCH_HISOTRY_URL}game/health")
+    # if isError:
+    #     return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     return render(request, 'game.html')
 
@@ -22,9 +22,9 @@ def offlineGame(request):
     return render(request, 'offline.html', context)
 
 def tournament(request):
-    response, isError = make_request(request, f"{TOURNAMENT_HISOTRY_URL}api/health")
-    if isError:
-        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
+    # response, isError = make_request(request, f"{TOURNAMENT_HISOTRY_URL}api/health")
+    # if isError:
+    #     return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     return render(request, 'tournament.html')
 

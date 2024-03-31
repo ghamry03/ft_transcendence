@@ -1,6 +1,6 @@
 import logging
 
-from main_app.utils import getSessionKey, make_request
+from main_app.utils import getSessionKey, setSessionKey, make_request
 from main_app.constants import USER_API_URL, FRIEND_API_URL
 from .home_views import getTournamentHistory, getMatchHistory
 
@@ -129,5 +129,5 @@ def edit_profile(request):
     )
     if isError:
         return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
-    request.session['userData'] = response.json()
+    setSessionKey(request, 'userData', response.json())
     return JsonResponse({'message': 'Profile updated successfully'})

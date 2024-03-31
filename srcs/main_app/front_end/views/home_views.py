@@ -93,43 +93,43 @@ def homeCards(request):
     return render(request, 'homeCards.html', context)
 
 def sideBar(request):
-    userData = request.session.get('userData', None)
-    uid = userData.get('uid', None)
-    accessToken = request.session.get('access_token', None)
+    userData = getSessionKey(request, 'userData')
+    uid = userData.get('uid', None) if userData else None
+    accessToken = getSessionKey(request, 'access_token')
 
     friendsList = getFriendsList(request, uid, accessToken)
 
     context = {
         "userData": userData,
-        "friendsList": friendsList['friendsList'],
-        "friendRequests": friendsList['friendRequests'],
+        "friendsList": friendsList.get('friendsList', None),
+        "friendRequests": friendsList.get('friendRequests', None),
         }
     return render(request, 'sideBar.html', context)
 
 def sideBarMobile(request):
-    userData = request.session.get('userData', None)
-    uid = userData.get('uid', None)
-    accessToken = request.session.get('access_token', None)
+    userData = getSessionKey(request, 'userData')
+    uid = userData.get('uid', None) if userData else None
+    accessToken = getSessionKey(request, 'access_token')
 
     friendsList = getFriendsList(request, uid, accessToken)
 
     context = {
         "userData": userData,
-        "friendsList": friendsList['friendsList'],
-        "friendRequests": friendsList['friendRequests'],
+        "friendsList": friendsList.get('friendsList', None),
+        "friendRequests": friendsList.get('friendRequests', None),
         }
     return render(request, 'sideBarMobile.html', context)
 
 def getFriendListEntries(request):
-    userData = request.session.get('userData', None)
-    uid = userData.get('uid', None)
-    accessToken = request.session.get('access_token', None)
+    userData = getSessionKey(request, 'userData')
+    uid = userData.get('uid', None) if userData else None
+    accessToken = getSessionKey(request, 'access_token')
 
     friendsList = getFriendsList(request, uid, accessToken)
 
     context = {
         "userData": userData,
-        "friendsList": friendsList['friendsList'],
-        "friendRequests": friendsList['friendRequests'],
+        "friendsList": friendsList.get('friendsList', None),
+        "friendRequests": friendsList.get('friendRequests', None),
         }
     return render(request, 'friendRequestList.html', context)
