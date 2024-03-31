@@ -38,12 +38,12 @@ def getOpponentInfo(request):
         response = requests.get(USER_API_URL + 'api/user/' + targetUid, headers=headers)
         response.raise_for_status()
     except requests.RequestException as e:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+        return JsonResponse({'error': 'Failed to get user info', 'details': str(e)}, status=500)
 
     try:
         opponentInfo = response.json()
     except requests.exceptions.JSONDecodeError as e:
-        return JsonResponse({'error': 'Failed to get user status', 'details': str(e)}, status=400)
+        return JsonResponse({'error': 'Failed to parse opponent info', 'details': str(e)}, status=400)
 
     opponentInfo['image'] = opponentInfo['image']
     return JsonResponse(opponentInfo)

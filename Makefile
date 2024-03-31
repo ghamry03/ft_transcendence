@@ -87,6 +87,10 @@ psql-fr				:
 
 ps					:
 						$(DOCKER_CMD) ps
+dbup				:
+						docker start postgres
+dbdown				:
+						docker stop postgres
 
 logs				:
 						$(DOCKER_CMD) logs -f

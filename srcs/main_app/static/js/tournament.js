@@ -91,19 +91,20 @@ tournament = () => {
 	// Checks if a socket is open and ready to send/receive info
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
-	function disconnectInactivePlayer() {
-		if (document.visibilityState == "visible") {
-			console.log("tab is active")
-		  } else {
-			console.log("tab is inactive")
-			  if (isOpen(ws)) {
-				  ws.close();
-				  engine('/cards');
-			  }
-		  }
-	}
+	// function disconnectInactivePlayer() {
+	// 	if (document.visibilityState == "visible") {
+	// 		console.log("tab is active")
+	// 	  } else {
+	// 		console.log("tab is inactive")
+	// 		alert("you left the tab");
+	// 		  if (isOpen(ws)) {
+	// 			  ws.close();
+	// 			  engine('/cards');
+	// 		  }
+	// 	  }
+	// }
 
-	document.addEventListener("visibilitychange", disconnectInactivePlayer);
+	// document.addEventListener("visibilitychange", disconnectInactivePlayer);
 
 	
 	// This function removes the bracket from view and inserts the game canvas, or vice versa
@@ -152,24 +153,44 @@ tournament = () => {
 
 	// This function fetches a player image given their UID
 	async function getImage(targetUid) {
-		try {
-			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
-			const jsonResponse = await response.json();
-			return jsonResponse.image;
-		} catch (error) {
-			console.error("Error fetching image:", error);
-		}
+		const promise = fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid)
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(body => {
+						throw new Error(body.error || 'Fetch image failed');
+					});
+				}
+				else {
+					return response.json().then(body => {
+						return body.image;
+					})
+				}
+			})
+			.catch((error) => {
+				return "";
+			});
+		return promise;
 	}
 
 	// This function fetches the username of a player given their UID
 	async function getUserName(targetUid) {
-		try {
-			const response = await fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid);
-			const jsonResponse = await response.json();
-			return jsonResponse.username;
-		} catch (error) {
-			console.error("Error fetching image:", error);
-		}
+		const promise = fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid)
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(body => {
+						throw new Error(body.error || 'Fetch username failed');
+					});
+				}
+				else {
+					return response.json().then(body => {
+						return body.username;
+					})
+				}
+			})
+			.catch((error) => {
+				return "Player";
+			});
+		return promise;
 	}
 
 	// Adds the image of user to a given image placeholder
@@ -179,8 +200,10 @@ tournament = () => {
 		var playerImg = document.getElementById("player" + imgId);
 		var nameElement = document.getElementById("name" + imgId);
 		if (playerImg) {
-			playerImg.src = imgUrl;
-			playerImg.setAttribute("data-imguid", playerId);
+			if (imgUrl.length > 0) {
+				playerImg.src = imgUrl;
+				playerImg.setAttribute("data-imguid", playerId);
+			}
 		}
 		if (nameElement) {
 			nameElement.innerText = username;
@@ -200,8 +223,10 @@ tournament = () => {
 				var imgElement = document.getElementById("player" + i);
 				if (imgElement) {
 					const imgUrl = await getImage(playerId);
-					imgElement.setAttribute("src", imgUrl);
-					imgElement.setAttribute("data-imguid", playerId);
+					if (imgUrl.length > 0) {
+						imgElement.setAttribute("src", imgUrl);
+						imgElement.setAttribute("data-imguid", playerId);
+					}
 				}
 				var nameElement = document.getElementById("name" + i);
 				if (nameElement) {
@@ -242,9 +267,11 @@ tournament = () => {
 		updateTourStatus("Winner of the tournament - " + userName);
 		var divElement = document.createElement("div");
 		divElement.className = "img-cir round mx-auto";
-
+		
 		var imgElement = document.createElement("img");
-		imgElement.src = imgUrl;
+		if (imgUrl.length > 0) {
+			imgElement.src = imgUrl;
+		}
 		imgElement.alt = "Winner";
 		imgElement.id = "winnerImg";
 
@@ -302,11 +329,13 @@ tournament = () => {
 		var rightImage = document.getElementById("rightImage");
 		getImage(leftPlayerId)
 			.then(imgUrl => {
-				leftImage.src = imgUrl;
+				if (imgUrl.length > 0)
+					leftImage.src = imgUrl;
 			});
 		getImage(rightPlayerId)
 			.then(imgUrl => {
-				rightImage.src = imgUrl;
+				if (imgUrl.length > 0)
+					rightImage.src = imgUrl;
 			});
 			
 		// ----- Setting all game params to starting values -----
@@ -411,11 +440,10 @@ tournament = () => {
 				startMatch(messageData.leftPlayer, messageData.rightPlayer);
 				break;
 			case "gameReady":
-				console.log("both are ready!");
 				gameRunning = false;
 				animateGame();
 				countdown(document.getElementById("readyGo"));
-				console.log("game has started");
+				console.log("Game has started");
 				break;
 			case "tournamentStarted":
 				console.log("Tournament starting...");
@@ -432,7 +460,7 @@ tournament = () => {
 				break;
 			case "newPlayerJoined":
 				var newPlayerId = messageData.newPlayerId;
-				console.log("new player joined: ", newPlayerId);
+				console.log("New player joined: ", newPlayerId);
 				addImage(newPlayerId, messageData.imgId);
 				break;
 			case "inGame":
@@ -446,9 +474,8 @@ tournament = () => {
 				break;
 			case "disconnected":
 				console.log("Opponent has disconnected");
-				// add an modal saying the opponent disconnected and they win by default
 				if (gameRunning || bracketContainer.style.display === "none") {
-					console.log("game was running when op disconnected");
+					console.log("Game was running when op disconnected");
 					if (leftPlayerId == playerId) {
 						leftPlayerScore = WIN_SCORE;
 					}
@@ -461,14 +488,19 @@ tournament = () => {
 					});
 				}
 				else {
-					console.log("game was not running when op disconnected");
+					console.log("Game was not running when op disconnected");
 					updateTourStatus("Round " + roundNo + " complete! Waiting for players...");
 					checkForm.style.display = "none";
 				}
 				break;
 			case "tournamentCanceled":
-				alert("Tournament was canceled, not enough players to continue");
 				ws.close();
+				alert("Tournament was canceled, not enough players to continue. Returning home...");
+				engine('/cards');
+				break;
+			case "lostConnection":
+				ws.close();
+				alert("Tournament was canceled due to a server error. Returning home...");
 				engine('/cards');
 				break;
 			default:
@@ -547,7 +579,6 @@ tournament = () => {
 	// Ends the match and updates UI accordingly
 	function endMatch() {
 		// Checks if the left player or right player wins the match
-		console.log("leftplayerscore = ", leftPlayerScore, "rightplayerscore = ", rightPlayerScore);
 		if ((leftPlayerScore == WIN_SCORE && leftPlayerId == playerId) || 
 			(rightPlayerScore == WIN_SCORE && rightPlayerId == playerId)) {
 			// Display victory message and prepare for next round
@@ -685,7 +716,6 @@ tournament = () => {
 		await lock.acquire()
 		try {
 			if (gameRunning == false) {
-				// console.log("stuck here");
 				return ;
 			}
 			// Left paddle movement
@@ -831,7 +861,7 @@ tournament = () => {
 	tournament.destroy = () => {
 		document.removeEventListener("keydown", keyDownHandler);
 		document.removeEventListener("keyup", keyUpHandler);
-		document.removeEventListener("visibilitychange", disconnectInactivePlayer);
+		// document.removeEventListener("visibilitychange", disconnectInactivePlayer);
 		if (upButton) {
 			upButton.removeEventListener("touchstart", upButtonDownHandler);
 			upButton.removeEventListener("touchend", upButtonUpHandler);

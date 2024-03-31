@@ -55,7 +55,6 @@ onlineGame = () => {
 	const canvasH = canvas.getBoundingClientRect().height;
 	canvas.width = canvasW;
 	canvas.height = canvasH;
-	console.log("canvas w and h = ", canvas.width, canvas.height)
 	
 	// Paddles
 	var paddleHeight = Math.floor(canvasH * paddleHScale);
@@ -91,19 +90,19 @@ onlineGame = () => {
 	// Checks if a socket is open and ready to send/receive info
 	function isOpen(ws) { return ws.readyState === ws.OPEN }
 
-	function disconnectInactivePlayer() {
-		if (document.visibilityState == "visible") {
-			console.log("tab is active")
-		  } else {
-			console.log("tab is inactive")
-			  if (isOpen(ws)) {
-				  ws.close();
-				  engine('/cards');
-			  }
-		  }
-	}
+	// function disconnectInactivePlayer() {
+	// 	if (document.visibilityState == "visible") {
+	// 		console.log("tab is active")
+	// 	  } else {
+	// 		console.log("tab is inactive")
+	// 		  if (isOpen(ws)) {
+	// 			  ws.close();
+	// 			  engine('/cards');
+	// 		  }
+	// 	  }
+	// }
 
-	document.addEventListener("visibilitychange", disconnectInactivePlayer);
+	// document.addEventListener("visibilitychange", disconnectInactivePlayer);
 
 	// This function retrieves the value of a cookie by its name from the browser's cookies
 	function getCookie(cname) {
@@ -124,13 +123,23 @@ onlineGame = () => {
 	
 	// This function fetches a player image given their UID
 	async function getImage(ownerUid, targetUid) {
-		try {
-			const response = await fetch('playerInfo/?ownerUid=' + ownerUid + "&targetUid=" + targetUid);
-			const jsonResponse = await response.json();
-			return jsonResponse.image;
-		} catch (error) {
-			console.error("Error fetching image:", error);
-		}
+		const promise = fetch('playerInfo/?ownerUid=' + playerId + "&targetUid=" + targetUid)
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(body => {
+						throw new Error(body.error || 'Fetch image failed');
+					});
+				}
+				else {
+					return response.json().then(body => {
+						return body.image;
+					})
+				}
+			})
+			.catch((error) => {
+				return "";
+			});
+		return promise;
 	}
 	
 	// Countdown animation that plays before a match starts
@@ -229,11 +238,13 @@ onlineGame = () => {
 			var rightImage = document.getElementById("rightImage");
 			getImage(playerId, leftPlayerId)
 				.then(imgUrl => {
-					leftImage.src = imgUrl;
+					if (imgUrl.length > 0)
+						leftImage.src = imgUrl;
 				});
 			getImage(playerId, rightPlayerId)
 				.then(imgUrl => {
-					rightImage.src = imgUrl;
+					if (imgUrl.length > 0)
+						rightImage.src = imgUrl;
 				});
 		}
 		else if (messageData.type === "disconnected") {
@@ -242,6 +253,11 @@ onlineGame = () => {
 				cancelAnimationFrame(animationId);
 				engine('/cards');
 			});
+		}
+		else if (messageData.type === "lostConnection") {
+			ws.close();
+			alert("Game was canceled due to a server error. Returning home...");
+			engine('/cards');
 		}
 	};
 
@@ -559,7 +575,7 @@ onlineGame = () => {
         upButton.removeEventListener("touchend", upButtonUpHandler);
 		downButton.removeEventListener("touchstart", downButtonDownHandler);
         downButton.removeEventListener("touchend", downButtonUpHandler);
-		document.removeEventListener("visibilitychange", disconnectInactivePlayer);
+		// document.removeEventListener("visibilitychange", disconnectInactivePlayer);
 		if (ws) {
 			ws.close();
 			console.log("Closing connection with server");
