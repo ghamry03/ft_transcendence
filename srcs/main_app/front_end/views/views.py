@@ -76,6 +76,7 @@ def errors(request):
     error = getSessionKey(request, 'error')
     request.session.pop('error', None)
     request.session.save()
+    logger.debug(error)
 
     if error:
         error_json = json.loads(error)

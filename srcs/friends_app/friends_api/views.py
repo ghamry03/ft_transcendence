@@ -24,12 +24,9 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
             'access_token': access_token,
             'requester_uid': first_id,
             })
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            logger.debug(f"Serializer validation failed: {serializer.errors}")
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, *args, **kwargs):
         first_user = request.data.get('first_user', None)

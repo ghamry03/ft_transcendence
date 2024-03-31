@@ -60,7 +60,23 @@ function submitForm() {
                 myCollapse.toggle();
 
             } else {
-                handleServerSideErrors(form, data.body);
+                fetch('/errors')
+                    .then(response => 
+                        response.json().then(data => ({
+                            status: response.status,
+                            ok: response.ok,
+                            body: data
+                        }))
+                    )
+                    .then(result => {
+                        if (!result.ok) {
+                            const errors = {
+                                general: [result.body.details]
+                            };
+                            handleServerSideErrors(form, errors);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
             }
         })
         .catch(error => console.log('error: ' + error));
