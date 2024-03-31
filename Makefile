@@ -2,12 +2,12 @@ NAME				=	ft_transcendence
 
 DOCKER_CMD			=	docker compose -f $(COMPOSE_PATH) -p $(NAME)
 
-prod				=	0
+dev				=	0
 
-ifeq ($(prod), 1)
-	COMPOSE_PATH	=	./docker_srcs/docker-compose.prod.yml
-else
+ifeq ($(dev), 1)
 	COMPOSE_PATH	=	./docker_srcs/docker-compose.yml
+else
+	COMPOSE_PATH	=	./docker_srcs/docker-compose.prod.yml
 endif
 
 $(NAME)				:	build up
@@ -87,10 +87,6 @@ psql-fr				:
 
 ps					:
 						$(DOCKER_CMD) ps
-dbup				:
-						docker start postgres
-dbdown				:
-						docker stop postgres
 
 logs				:
 						$(DOCKER_CMD) logs -f

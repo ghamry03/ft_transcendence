@@ -44,8 +44,7 @@ services:
             userapp:
                 condition: service_healthy
             tourapp:
-                # condition: service_healthy
-                condition: service_started
+                condition: service_healthy
         env_file:
             - ./.env
         networks:
@@ -72,11 +71,11 @@ services:
         networks:
             user_app_network:
                 ipv4_address: $TOUR_IP
-        # healthcheck:
-        #     test: ["CMD", "curl", "--fail", "http://localhost:8004/tour/health"]
-        #     interval: 5s
-        #     timeout: 5s
-        #     retries: 5
+        healthcheck:
+            test: ["CMD", "curl", "--fail", "http://localhost:8004/tour/health"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
             
     userapp:
         build: ./user_app
