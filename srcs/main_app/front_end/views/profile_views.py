@@ -108,13 +108,21 @@ def edit_profile(request):
         'X-TOKEN': access_token
     }
 
-    data = request.POST.dict()
-    files = request.FILES.dict()
+    data = {}
+    files = {}
+
+    username = request.POST.get('username', None)
+    if username:
+        data['username'] = username
+
+    image = request.FILES.get('image', None)
+    if image:
+        files['image'] = image
 
     response, isError = make_request(
-        request,
-        f"{USER_API_URL}api/user/{user_data['uid']}/",
-        method='post', headers=headers, data=data, files=files
+            request,
+            f"{USER_API_URL}api/user/{user_data['uid']}/",
+            method='post', headers=headers, data=data, files=files
     )
     if isError:
         return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
