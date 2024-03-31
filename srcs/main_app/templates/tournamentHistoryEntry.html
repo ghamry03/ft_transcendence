@@ -4,7 +4,7 @@
     </div>
 
     <div class="col-4 d-flex flex-wrap  flex-column justify-content-center ">
-        <span class="tournamentRank">#{{rank}}</span>
+        <span class="tournamentRank">#{% if rank == -1%}sa7 {% else %} {{rank}}</span>
     </div>
 
     <div class="col-4 d-flex flex-wrap  flex-column justify-content-center ">
