@@ -13,6 +13,7 @@ urlpatterns = [
     # views
     path('api/session-data/', views.SessionDataView.as_view(), name='session-data'),
     path('playerInfo/', views.getOpponentInfo, name='getOpponentInfo'),
+    path('errors/', views.errors, name='errors'),
 
     # HOME
     path('', home_views.index, name='index'),

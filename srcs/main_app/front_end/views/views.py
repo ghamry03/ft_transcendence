@@ -1,6 +1,6 @@
 import requests
 
-from main_app.utils import getSessionKey, make_request
+from main_app.utils import getSessionKey, setSessionKey, make_request
 from main_app.constants import USER_API_URL
 from front_end.hostnameAuthentication import hostname_whitelist
 
@@ -36,7 +36,7 @@ def getOpponentInfo(request):
     }
     response, isError = make_request(request, USER_API_URL + 'api/user/' + targetUid, headers=headers)
     if isError:
-        return JsonResponse({'error': 'Failed to get user info'}, status=500)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     try:
         opponentInfo = response.json()
@@ -45,3 +45,10 @@ def getOpponentInfo(request):
 
     opponentInfo['image'] = opponentInfo['image']
     return JsonResponse(opponentInfo)
+
+def errors(request):
+    error = getSessionKey(request, 'error')
+    setSessionKey(request, 'error', None)
+    if error:
+        JsonResponse(error, status=error.status_code)
+    return JsonResponse({}, status=200)

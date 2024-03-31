@@ -9,7 +9,7 @@ from django.shortcuts import render
 def updateStatus(request, status):
     user_data = getSessionKey(request, 'userData')
     if not user_data:
-        return JsonResponse({'error': 'User data not found'}, status=400)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     uid = user_data.get('uid', None) if user_data else None
 
@@ -24,7 +24,7 @@ def updateStatus(request, status):
     data = {'status': status}
     response, isError = make_request(request, f"{USER_API_URL}api/user/{uid}/", headers=headers, data=data)
     if isError:
-        return JsonResponse({'error': 'Failed to update status'}, status=500)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     return JsonResponse({'message': 'Status updated'})
 
@@ -40,7 +40,7 @@ def profile(request, uid):
     }
     response, isError = make_request(request, f"{USER_API_URL}api/user/{uid}", headers=headers)
     if isError:
-        return JsonResponse({'error': 'Failed to update status'}, status=500)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     profile_data = response.json()
 
@@ -96,12 +96,12 @@ def determine_relationship_type(relationship, friends_data):
 
 def edit_profile(request):
     if request.method != 'POST':
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     user_data = getSessionKey(request, 'userData')
     access_token = getSessionKey(request, 'access_token')
     if not user_data or not access_token:
-        return JsonResponse({'error': 'Authentication required'}, status=401)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     headers = {
         'X-UID': str(user_data['uid']),
@@ -117,6 +117,6 @@ def edit_profile(request):
         method='post', headers=headers, data=data, files=files
     )
     if isError:
-        return JsonResponse({'error': 'Failed to update profile'}, status=500)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
     request.session['userData'] = response.json()
     return JsonResponse({'message': 'Profile updated successfully'})

@@ -22,7 +22,7 @@ def searchUsers(request, username):
 
     response, isError = make_request(request, base_url, headers=headers)
     if isError:
-        return JsonResponse({'error': 'Failed to update status'}, status=500)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     if response.status_code == 200:
         data = {
@@ -57,7 +57,7 @@ def addUser(request, friendUID):
             },
     )
     if isError:
-        return JsonResponse({'error': 'request error'}, status=500)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
     return JsonResponse(data={})
 
 def acceptFriend(request, friendUID):
@@ -82,7 +82,7 @@ def acceptFriend(request, friendUID):
             },
     )
     if isError:
-        return JsonResponse({'error': 'check /errors'}, status=500)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
     return JsonResponse(data={}, status=200)
 
 
@@ -108,6 +108,6 @@ def rejectFriend(request, friendUID):
             )
     response.raise_for_status()
     if isError:
-        return JsonResponse({'error': 'Failed to update status', 'details': str(e)}, status=500)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
     return JsonResponse(data={})

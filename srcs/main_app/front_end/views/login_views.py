@@ -103,7 +103,7 @@ def renew_token(request):
 
     response, isError = make_request(request, 'https://api.intra.42.fr/oauth/token', files=files)
     if isError:
-        return JsonResponse({'error': 'Failed to update status'}, status=500)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
 
 
     if response.status_code == 200:
@@ -111,7 +111,6 @@ def renew_token(request):
         setSessionKey(request, 'access_token', json_response.get('access_token', None))
         setSessionKey(request, 'refresh_token', json_response.get('refresh_token', None))
         setSessionKey(request, 'token_expiry', int(json_response.get('created_at')) + 7200)
-        return JsonResponse({'message': 'Token renewed successfully'}, status=200)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
     else:
-        error_message = response.json().get('error', 'intra issue')
-        return JsonResponse({'error': error_message}, status=response.status_code)
+        return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
