@@ -1,7 +1,6 @@
 #!/bin/bash
 echo "------ starting friends app entrypoint ------"
 # python manage.py migrate --database=usermanagement
-python manage.py flush --no-input
 python manage.py makemigrations friends_api
 python manage.py makemigrations
 python manage.py migrate --noinput
