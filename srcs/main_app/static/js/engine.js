@@ -1,3 +1,24 @@
+function getError(error=null) {
+    fetch('/errors')
+        .then(error_response =>
+            error_response.json().then(json => {
+                if (!error_response.ok) {
+                    showError(
+                        `${json.error}, ${json.message} [${json.url}]`,
+                        'Retry',
+                        () => { fetchMainContent(pageUrl, container); }
+                    );
+                } else if (error) {
+                    showError(
+                        "Couldn't retrive page",
+                        'Retry',
+                        () => { fetchMainContent(pageUrl, container); }
+                    );
+                }
+            })
+        ).catch(err => console.error("Fetch error:", err));
+}
+
 function fetchMainContent(pageUrl, container=null) {
     return new Promise((resolve, reject) => {
         fetch(pageUrl)
@@ -15,13 +36,11 @@ function fetchMainContent(pageUrl, container=null) {
                     var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
                     document.getElementById(container).innerHTML = doc;
                 }
+                getError();
                 resolve();
             })
             .catch((error) => {
-                showError(`${error.message}`, 'Retry', () => {
-                    fetchMainContent(pageUrl, container)
-                });
-                reject(error);
+                getError(error);
             })
     });
 }
@@ -39,10 +58,6 @@ function updateStatus(status) {
         })
         .then(() => resolve());
     });
-    // const data = new FormData();
-    // data.append('status', status.toString());
-    // navigator.sendBeacon('/status/', data);
-    // console.log("how many times?");
 }
 
 function updateStatusUnload(e) {
