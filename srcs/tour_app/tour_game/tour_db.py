@@ -61,19 +61,25 @@ def endTournament(tid):
 
 @sync_to_async
 def updateRank(tid, uid, rank):
-	logger.info("tourdb: updating rank")
+	logger.info("tourdb: updating rank for %d %d %d", tid, uid, rank)
 	if not checkDbHealth():
 		return None
 	try:
 		tour = Tournament.objects.get(id=tid)
 		player = UserApiUser.objects.get(uid=uid)
-		tourRank = TournamentRank.objects.create(
-			player=player,
-			rank=rank,
-			tournament=tour
-		)
-		tourRank.save()
-		return tid
+		try:
+			tourRank = TournamentRank.objects.get(tournament=tour, player=player)
+			tourRank.rank = rank
+			tourRank.save()
+			return tid
+		except:
+			tourRank = TournamentRank.objects.create(
+				player=player,
+				rank=rank,
+				tournament=tour
+			)
+			tourRank.save()
+			return tid
 	except:
 		logger.info("updaterank: db failed")
 		return None 

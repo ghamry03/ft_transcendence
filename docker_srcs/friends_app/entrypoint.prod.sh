@@ -1,6 +1,5 @@
 #!/bin/bash
 
-python manage.py flush --no-input
 python manage.py makemigrations friends_api
 python manage.py makemigrations
 python manage.py migrate --noinput

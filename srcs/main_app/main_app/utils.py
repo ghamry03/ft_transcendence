@@ -34,8 +34,8 @@ def make_request(request, url, method='get', **kwargs):
         return (response, False)
     except requests.exceptions.HTTPError as e:
         error_response = {
-            "error": "HTTP Error",
-            "message": str(e),
+            "error": f"HTTP Error",
+            "message": f'{e.response.json().get('non_field_errors', ['Unknown error'])[0]}',
             "status_code": response.status_code,
             "url": url,
             "details": response.text

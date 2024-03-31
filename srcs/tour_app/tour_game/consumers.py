@@ -155,14 +155,18 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 self.logger.info("Player %d disconnected while waiting for next match", self.playerId)
                 waitingPlayer = self.waitingPlayers[self.playerId]
                 tourName = waitingPlayer["tourName"]
-                playerPos = waitingPlayer["bracketPos"]
-                tour = self.activeTournaments.get(waitingPlayer["tourName"], None)
-                if tour:
-                    tour["channels"][playerPos] = None
                 # Remove player from the tournament channel group
                 await self.channel_layer.group_discard(
                     tourName, self.channel_name
                 )
+
+                playerPos = waitingPlayer["bracketPos"]
+                tour = self.activeTournaments.get(waitingPlayer["tourName"], None)
+                if tour:
+                    tour["channels"][playerPos] = None
+                    dbSuccess = await tour_db.updateRank(tour['tid'], waitingPlayer['id'], -1)
+                    if not dbSuccess:
+                        await self.cancelTour(tour["tourName"])
                 del self.waitingPlayers[self.playerId]
 
     async def cancelTour(self, tourName):
@@ -176,7 +180,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     # This function ends a round, closes the tournament if its the last round, does all final db writes 
     async def endRound(self, winner, loser):
-        self.logger.info("Ending round")
+        self.logger.info("Ending round for %d %d %d", winner["id"], loser["id"], winner["tid"])
         
         # Update the rank of the loser in this match
         tour = self.activeTournaments.get(winner["tourName"], None)
@@ -194,11 +198,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             if tour:
                 await self.cancelTour(tour["tourName"])
             return False
-
+        self.logger.info("Updating rank for loser%d %d", loser["id"], loser["tid"])
         dbSuccess = await tour_db.updateRank(loser['tid'], loser['id'], tour['curRank'])
         if not dbSuccess:
             await self.cancelTour(tour["tourName"])
             return False
+        self.logger.info("Updated rank for loser%d %d", loser["id"], loser["tid"])
         tour["curRank"] -= 1
 
         # End the tournament here and cleanup if this is the last round
@@ -212,7 +217,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }
             )
             # Update the rank of the winner in this match
+            self.logger.info("Updating rank for winner %d %d", winner["id"], winner["tid"])
             dbSuccess = await tour_db.updateRank(winner['tid'], winner['id'], tour['curRank'])
+            self.logger.info("Updated rank for winner%d %d", winner["id"], winner["tid"])
             if not dbSuccess:
                 await self.cancelTour(tour["tourName"])
                 return False
@@ -251,6 +258,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         # Remove both players from active player pool
         del self.players[winner["id"]]
         del self.players[loser["id"]]
+        self.logger.info("Ended round for %d %d %d", winner["id"], loser["id"], winner["tid"])
         return True
 
 	# Called when the server receives a message from the WebSocket
