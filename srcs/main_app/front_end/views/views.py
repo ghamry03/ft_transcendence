@@ -56,7 +56,7 @@ def errors(request):
     if error:
         logger.debug(error)
         error_json = json.loads(error)
-        # return JsonResponse(error_json, status=int( error_json['status_code'] ))
+        return JsonResponse(error_json, status=int( error_json['status_code'] ))
 
     logger.debug('no error')
     return JsonResponse({'error': 'no error'}, status=200)

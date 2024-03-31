@@ -30,8 +30,8 @@ def make_request(request, url, method='get', **kwargs):
         error_response = {
             "error": "HTTP Error",
             "message": str(e),
-            "status_code": response.get('status_code', 400),
-            "details": response.get('text', '')
+            "status_code": response.status_code,
+            "details": response.text
         }
     except requests.exceptions.ConnectionError:
         error_response = {
@@ -51,5 +51,15 @@ def make_request(request, url, method='get', **kwargs):
             "message": str(e),
             "status_code": 500
         }
+    except Exception as e:
+        # Handle other exceptions, such as issues with network, or invalid URL
+        error_response = {
+            "error": "Request Failed",
+            "message": str(e),
+            "status_code": 400,  # Indicative of non-HTTP related failures
+            "details": "An error occurred that is not an HTTP error."
+        }
+        return (error_response, True)
+
     setSessionKey(request, 'error', json.dumps(error_response))
     return (response, True)
