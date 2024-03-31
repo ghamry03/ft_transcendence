@@ -1,10 +1,11 @@
+{% load static %}
 <div class="row tournamentEntry mw-100">
     <div class="col-4 d-flex flex-wrap  flex-column justify-content-center">
         <img src="{{img}}" />
     </div>
 
     <div class="col-4 d-flex flex-wrap  flex-column justify-content-center ">
-        <span class="tournamentRank">#{% if rank == -1%}sa7 {% else %} {{rank}} {%endif%}</span>
+        <span class="tournamentRank">#{% if rank == -1 %}<img class="searchButtonFunction" src="{% static 'imgs/pending_button.svg' %}"/>{% else %}{{rank}}{% endif %}</span>
     </div>
 
     <div class="col-4 d-flex flex-wrap  flex-column justify-content-center ">
