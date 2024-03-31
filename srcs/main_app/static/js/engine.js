@@ -1,3 +1,24 @@
+function getError(error=null) {
+    fetch('/errors')
+        .then(error_response =>
+            error_response.json().then(json => {
+                if (!error_response.ok) {
+                    showError(
+                        `${json.error}, ${json.message} [${json.url}]`,
+                        'Retry',
+                        () => { fetchMainContent(pageUrl, container); }
+                    );
+                } else if (error) {
+                    showError(
+                        "Couldn't retrive page",
+                        'Retry',
+                        () => { fetchMainContent(pageUrl, container); }
+                    );
+                }
+            })
+        ).catch(err => console.error("Fetch error:", err));
+}
+
 function fetchMainContent(pageUrl, container=null) {
     return new Promise((resolve, reject) => {
         fetch(pageUrl)
@@ -14,29 +35,12 @@ function fetchMainContent(pageUrl, container=null) {
                     var parser = new DOMParser();
                     var doc = parser.parseFromString(data, "text/html").querySelector("body").innerHTML;
                     document.getElementById(container).innerHTML = doc;
+                    getError();
                 }
                 resolve();
             })
             .catch((error) => {
-                fetch('/errors')
-                    .then(error_response =>
-                        error_response.json().then(json => {
-                            if (!error_response.ok) {
-                                console.log(json.error);
-                                showError(
-                                    `${json.error}, ${json.message}`,
-                                    'Retry',
-                                    () => { fetchMainContent(pageUrl, container); }
-                                );
-                            } else {
-                                showError(
-                                    "Couldn't retrive page",
-                                    'Retry',
-                                    () => { fetchMainContent(pageUrl, container); }
-                                );
-                            }
-                        })
-                    ).catch(err => console.error("Fetch error:", err));
+                getError(error);
                 reject(error);
             })
     });

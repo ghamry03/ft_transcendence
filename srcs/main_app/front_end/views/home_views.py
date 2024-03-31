@@ -9,8 +9,11 @@ from django.shortcuts import render
 logger = logging.getLogger(__name__)
 
 def index(request, status=None):
-    context = { 'logged_in': getSessionKey(request, 'logged_in') }
-    return render(request, 'base.html', context=context)
+    loggedIn = getSessionKey(request, 'logged_in')
+    context = {}
+    if loggedIn:
+        context['logged_in'] = loggedIn
+    return render(request, 'base.html', context=context, status=status)
 
 def getTournamentHistory(request, uid):
     response, isError = make_request(request, TOURNAMENT_HISOTRY_URL + f'api/tourhistory/{uid}')

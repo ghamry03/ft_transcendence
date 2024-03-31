@@ -32,7 +32,7 @@ def authenticate(request):
     context = { 'logged_in': False }
     response, isError = make_request(request, 'https://api.intra.42.fr/oauth/token', method='post', files=files)
     if isError:
-        return render(request, 'base.html', context=context, status=500)
+        return redirect('/')
 
     if response.status_code == 200:
         json_response = response.json()
@@ -49,8 +49,7 @@ def authenticate(request):
 
             me_response, isError = make_request(request, 'https://api.intra.42.fr/v2/me', headers=headers)
             if isError:
-                redirect('/')
-                # return render(request, 'base.html', context=context, status=500)
+                return redirect('/')
 
             UID = str(me_response.json()['id'])
             headers = {
@@ -60,11 +59,9 @@ def authenticate(request):
 
             user_api_response, isError = make_request(request, USER_API_URL + 'api/user/' + UID, headers=headers)
             if isError:
-                redirect('/')
-            user_api_response.raise_for_status()
+                return redirect('/')
             setSessionKey(request, 'userData', user_api_response.json())
             setSessionKey(request, 'logged_in', True)
-                # return render(request, 'base.html', context=context, status=500)
             return redirect('/')
     try:
         request.session.flush()
