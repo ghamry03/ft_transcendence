@@ -5,9 +5,9 @@ DOCKER_CMD			=	docker compose -f $(COMPOSE_PATH) -p $(NAME)
 dev				=	0
 
 ifeq ($(dev), 1)
-	COMPOSE_PATH	=	./docker_srcs/docker-compose.yml
+	COMPOSE_PATH	=	docker-compose.yml
 else
-	COMPOSE_PATH	=	./docker_srcs/docker-compose.prod.yml
+	COMPOSE_PATH	=	docker-compose.prod.yml
 endif
 
 $(NAME)				:	build up
@@ -106,6 +106,7 @@ fclean				:	clean
 						rm -rf srcs/game_app/online/__pycache__/
 						rm -rf srcs/tour_app/tour_game/migrations/
 						rm -rf srcs/tour_app/tour_game/__pycache__/
+						docker system prune -af
 
 re					:	fclean all
 
