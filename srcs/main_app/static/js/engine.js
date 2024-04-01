@@ -250,7 +250,7 @@ function engine(pageUrl, addToHistory=true) {
         } else if (pageUrl == '/tournament') {
 			pageUrl = '/cards';
         }
-        if (pageUrl && !/^(\/edit_profile|\/searchUsers|\/add|\/accept|\/reject|\/profile)$/.test(pageUrl)) {
+        if (pageUrl && pageUrl.match(/^\/(home|cards|offline|online|tournament|tourGame|login|logout)(\/[\w-]+)?$/)) {
             history.pushState({ pageUrl: pageUrl }, '');
         }
     }
