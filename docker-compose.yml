@@ -145,29 +145,6 @@ services:
         networks:
             user_app_network:
                 ipv4_address: $FRIENDS_IP
-
-# volumes:
-#     user_app_data:
-#         driver: local
-#         driver_opts:
-#             o: bind
-#             type: none
-#             device: ../srcs/user_app/
-
-    # friends_app_data:
-    #     driver: local
-    #     driver_opts:
-    #         o: bind
-    #         type: none
-    #         device: ../srcs/friends_app/
-
-    # postgres_data:
-    #     driver: local
-    #     driver_opts:
-    #         o: bind
-    #         type: none
-    #         device: ../srcs/postgres/data
-
 networks:
     user_app_network:
         driver: bridge
