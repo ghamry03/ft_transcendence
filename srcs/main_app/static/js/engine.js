@@ -172,8 +172,6 @@ const injections = [
     {
         pattern: /^\/logout$/,
         handler: () => {
-            // updateStatus(0);
-            // fetchMainContent("/logout", 'mainContainer');
             updateStatus(0)
                 .then(() => fetchMainContent("/logout", 'mainContainer'));
             removeScript('token');
@@ -182,7 +180,6 @@ const injections = [
             removeScript('tournament');
             window.removeEventListener('unload', updateStatusUnload);
         },
-        // window.removeEventListener('unload')
     },
     {
         pattern: /^\/profile\/.*$/,
@@ -252,8 +249,12 @@ function engine(pageUrl, addToHistory=true) {
             pageUrl = '/logout';
         } else if (pageUrl == '/tournament') {
 			pageUrl = '/cards';
-		}
-        history.pushState({ pageUrl: pageUrl }, '');
+        }
+        if (pageUrl != '/profile' && pageUrl != '/edit_profile'
+            && pageUrl != '/searchUsers' && pageUrl != '/add'
+            && pageUrl != '/accept' && pageUrl != '/reject') {
+                history.pushState({ pageUrl: pageUrl }, '');
+        }
     }
     return promise;
 }
