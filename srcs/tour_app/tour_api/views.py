@@ -70,7 +70,7 @@ class TournamentHistoryApiView(APIView):
 			tournament_details.append({
 					"tournament_id": tid,
 					"tournament_time_passed": time_passed,
-					"rank": rank if rank is not None else "Rank not found."
+					"rank": rank if rank is not None else "N/A"
 				})
 			logger.info(f'this is the found game: {time_passed} {rank}')
 		return Response({"data": tournament_details}, status=status.HTTP_200_OK)

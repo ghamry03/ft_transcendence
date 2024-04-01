@@ -30,19 +30,20 @@ def setSessionKey(request, key, value):
 def make_request(request, url, method='get', **kwargs):
     try:
         response = getattr(requests, method)(url, **kwargs)
-        logger.debug('#######################')
-        logger.debug(response.text)
-        logger.debug('#######################')
         response.raise_for_status()
         return (response, False)
     except requests.exceptions.HTTPError as e:
         error_response = {
             "error": f"HTTP Error",
-            "message": f'{e.response.json()}',
-            "status_code": response.status_code,
+            "status_code": e.response.status_code,
             "url": url,
-            "details": response.text
+            "details": e.response.text
         }
+        try:
+            error_response["message"] = f'{e.response.json()}'
+        except:
+            error_response["message"] = "Request error"
+
     except requests.exceptions.ConnectionError:
         error_response = {
             "error": "Connection Error",

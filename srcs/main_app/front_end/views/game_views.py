@@ -25,7 +25,6 @@ def tournament(request):
     response, isError = make_request(request, f"{TOURNAMENT_HISOTRY_URL}api/health")
     if isError:
         return JsonResponse({'error': 'check /errors to retrive error'}, status=400)
-
     return render(request, 'tournament.html')
 
 def getGameUrl(request):
