@@ -6,9 +6,6 @@ from django.db import connections
 from django.db.utils import OperationalError
 
 
-logger = logging.getLogger(__name__)
-
-
 class JSONErrorMiddleware:
     """Without this middleware, APIs would respond with
     html/text whenever there's an error."""
@@ -55,7 +52,6 @@ class HealthCheckMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        logger.debug(f'checking database health [{request.path}]')
 
         response = self.handle_health_check(request)
         if response:
@@ -68,7 +64,6 @@ class HealthCheckMiddleware:
         try:
             db_conn.cursor()
         except OperationalError:
-            logger.debug(f"can't connect to db [{request.path}]")
             return JsonResponse({'error': f'can\'t connect to the db [{request.path}]'}, status=503)
         else:
-            logger.debug(f'db connection is alive [{request.path}]')
+            print(f'db connection is alive [{request.path}]')

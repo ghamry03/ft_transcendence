@@ -7,14 +7,11 @@ from .models import Friend
 from .serializers import FriendSerializer
 import logging
 from . import USER_API_URL
-
-logger = logging.getLogger(__name__)
 class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FriendSerializer
     lookup_field = 'id'
 
     def post(self, request, *args, **kwargs):
-        logger.debug(f"POST Request: {request.body}")
         sessionId = request.data.get('session_id', None)
         access_token = request.data.get('access_token', None)
         first_id = request.data.get('first_id', None)
@@ -77,11 +74,9 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
         return response.json()
 
     def get(self, request, *args, **kwargs):
-        logger.debug(f'This is the request: {request.headers} {request.body}')
         uid = request.data.get('uid', None)
         access_token = request.data.get('access_token', None)
         ownerUID = request.data.get('ownerUID', None)
-        logger.debug(f'This is the request params: {uid} {ownerUID} ')
 
         if not uid or not ownerUID:
             return Response(
@@ -111,7 +106,6 @@ class FriendDetailView(generics.ListCreateAPIView, generics.RetrieveUpdateDestro
                         if friend.relationship == 1:
                             friendRequests += 1
                         resp["initiator"] = 0
-                    logger.debug(f'This is the returned friend: {resp}')
                     friendsList.append(resp)
             data = {"friendsList": friendsList, "friendRequests": friendRequests}
         else:
