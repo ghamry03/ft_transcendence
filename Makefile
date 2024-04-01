@@ -1,3 +1,6 @@
+include .env
+export
+
 NAME				=	ft_transcendence
 
 DOCKER_CMD			=	docker compose -f $(COMPOSE_PATH) -p $(NAME)
@@ -78,6 +81,12 @@ db-logs				:
 
 friends-logs		:
 						docker logs -f friendsapp
+
+psql-us				:
+						$(DOCKER_CMD) exec postgres psql --username=${POSTGRES_USER} --dbname=${POSTGRES_DB}
+
+psql-fr				:
+						$(DOCKER_CMD) exec postgres psql --username=${POSTGRES_USER} --dbname=${FRIEND_DB_NAME}
 
 ps					:
 						$(DOCKER_CMD) ps
