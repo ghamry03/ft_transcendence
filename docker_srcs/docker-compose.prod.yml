@@ -107,7 +107,7 @@ services:
             test: ["CMD", "curl", "--fail", "http://localhost:8004/tour/health"]
             interval: 5s
             timeout: 5s
-            retries: 5
+            retries: 10
 
     userapp:
         build:
@@ -134,7 +134,7 @@ services:
             test: ["CMD", "curl", "--fail", "http://localhost:8001/api/health"]
             interval: 5s
             timeout: 5s
-            retries: 5
+            retries: 10
         environment:
             - DEBUG=0
 
@@ -151,7 +151,7 @@ services:
             test: pg_isready -U postgres
             interval: 5s
             timeout: 5s
-            retries: 5
+            retries: 20
         env_file:
             - ./.env
         networks:
