@@ -47,4 +47,5 @@ urlpatterns = [
     path('tournament/', game_views.tournament, name="tournament"),
     path('gameUrl/', game_views.getGameUrl, name="gameUrl"),
     path('tourUrl/', game_views.getTourUrl, name="tourUrl"),
+    path('mediaUrl/', game_views.getMediaUrl, name="mediaUrl"),
 ]

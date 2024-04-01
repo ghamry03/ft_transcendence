@@ -248,9 +248,17 @@ tournament = () => {
 		try {
 			var disconnectedPlayerImg = document.querySelector('[data-imguid="' + playerId + '"]');
 			var disconnectedPlayerName = document.querySelector('[data-nameuid="' + playerId + '"]');
-			mediaUrl = location.protocol === "https:" ? "https://localhost:8005/" : "http://localhost:8001/";
-			disconnectedPlayerImg.src = mediaUrl + "media/unknownuser.png";
 			disconnectedPlayerName.innerText = "Player"
+			const response = await fetch("mediaUrl/");
+			if (!response.ok) {
+				console.log("cannot fetch media url")
+				disconnectedPlayerImg.src = "";
+			}
+			else {
+				const mediaUrl = await response.text();
+				disconnectedPlayerImg.src = mediaUrl + "media/unknownuser.png";
+			}
+			}
 		} catch(error) {
 			console.log("Unknown user image not found");
 		} finally {
