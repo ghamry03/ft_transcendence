@@ -258,7 +258,6 @@ tournament = () => {
 				const mediaUrl = await response.text();
 				disconnectedPlayerImg.src = mediaUrl + "media/unknownuser.png";
 			}
-			}
 		} catch(error) {
 			console.log("Unknown user image not found");
 		} finally {
