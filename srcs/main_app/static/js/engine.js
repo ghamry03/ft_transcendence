@@ -250,7 +250,9 @@ function engine(pageUrl, addToHistory=true) {
             pageUrl = '/cards';
         } else if (pageUrl == '/login') {
             pageUrl = '/logout';
-        }
+        } else if (pageUrl == '/tournament') {
+			pageUrl = '/cards';
+		}
         history.pushState({ pageUrl: pageUrl }, '');
     }
     return promise;
