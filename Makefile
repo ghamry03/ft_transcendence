@@ -1,5 +1,4 @@
 include .env
-export
 
 NAME				=	ft_transcendence
 
