@@ -247,7 +247,7 @@ function engine(pageUrl, addToHistory=true) {
             pageUrl = '/cards';
         } else if (pageUrl == '/login') {
             pageUrl = '/logout';
-        } else if (pageUrl == '/tournament') {
+        } else if (pageUrl == '/tourGame') {
 			pageUrl = '/cards';
         }
         if (pageUrl && pageUrl.match(/^\/(home|cards|offline|online|tournament|tourGame|login|logout)(\/[\w-]+)?$/)) {
