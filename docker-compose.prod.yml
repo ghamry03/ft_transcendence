@@ -148,7 +148,8 @@ services:
         volumes:
             - ./srcs/postgres/data:/var/lib/postgresql/data
         healthcheck:
-            test: pg_isready
+            # test: pg_isready
+            test: pg_isready -U postgres
             interval: 15s
             timeout: 10s
             retries: 20
