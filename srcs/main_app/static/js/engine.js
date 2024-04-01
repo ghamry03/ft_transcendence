@@ -251,7 +251,7 @@ function engine(pageUrl, addToHistory=true) {
 			pageUrl = '/cards';
         }
         if (pageUrl && !/^(\/edit_profile|\/searchUsers|\/add|\/accept|\/reject|\/profile)$/.test(pageUrl)) {
-                history.pushState({ pageUrl: pageUrl }, '');
+            history.pushState({ pageUrl: pageUrl }, '');
         }
     }
     return promise;
