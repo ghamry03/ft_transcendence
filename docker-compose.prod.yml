@@ -1,15 +1,15 @@
 version: "3"
 services:
     server:
-        build: ./server
+        build: ./docker_srcs/server
         image: nginx
         extra_hosts:
             - "$DB_HOST:$POSTGRES_IP"
         container_name: nginx
         restart: on-failure
         volumes:
-            - ../srcs/main_app/static/:/vol/static
-            - ../srcs/user_app/media/:/vol/media
+            - ./srcs/main_app/static/:/vol/static
+            - ./srcs/user_app/media/:/vol/media
         ports:
             - "80:80"
             - "443:443"
@@ -32,7 +32,7 @@ services:
 
     mainapp:
         build: 
-          context: ../
+          context: ./
           dockerfile: ./docker_srcs/main_app/Dockerfile.prod
         image: mainapp
         extra_hosts:
@@ -62,7 +62,7 @@ services:
  
     gameapp:
         build: 
-          context: ../
+          context: ./
           dockerfile: ./docker_srcs/game_app/Dockerfile.prod
         image: gameapp
         extra_hosts:
@@ -86,7 +86,7 @@ services:
 
     tourapp:
         build: 
-          context: ../
+          context: ./
           dockerfile: ./docker_srcs/tour_app/Dockerfile.prod
         image: tourapp
         extra_hosts:
@@ -111,7 +111,7 @@ services:
 
     userapp:
         build:
-          context: ../
+          context: ./
           dockerfile: ./docker_srcs/user_app/Dockerfile.prod
         image: userapp
         extra_hosts:
@@ -126,7 +126,7 @@ services:
         env_file:
             - ./.env
         volumes:
-            - ../srcs/user_app/media:/home/user_app/media
+            - ./srcs/user_app/media:/home/user_app/media
         networks:
             user_app_network:
                 ipv4_address: $USER_IP
@@ -139,14 +139,14 @@ services:
             - DEBUG=0
 
     postgres:
-        build: ./postgres
+        build: ./docker_srcs/postgres
         image: postgres
         extra_hosts:
             - "$DB_HOST:$POSTGRES_IP"
         container_name: postgres
         restart: on-failure
         volumes:
-            - ../srcs/postgres/data:/var/lib/postgresql/data
+            - ./srcs/postgres/data:/var/lib/postgresql/data
         healthcheck:
             test: pg_isready -U postgres
             interval: 5s
@@ -162,7 +162,7 @@ services:
 
     friendsapp:
         build:
-          context: ../
+          context: ./
           dockerfile: ./docker_srcs/friends_app/Dockerfile.prod
         image: friendsapp
         extra_hosts:

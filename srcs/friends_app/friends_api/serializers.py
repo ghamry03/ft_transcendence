@@ -5,10 +5,6 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError
 from . import USER_API_URL
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 class FriendSerializer(serializers.ModelSerializer):
     # first_id = UserSerializer(many=False)
     # second_id = UserSerializer(many=False)

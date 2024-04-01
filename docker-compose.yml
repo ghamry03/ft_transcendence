@@ -1,7 +1,7 @@
 version: "3"
 services:
     mainapp:
-        build: ./main_app
+        build: ./docker_srcs/main_app
         image: mainapp
         extra_hosts:
             - "$DB_HOST:$POSTGRES_IP"
@@ -13,7 +13,7 @@ services:
             user_app_network:
                 ipv4_address: $MAIN_IP
         volumes:
-            - ../srcs/main_app/:/home/main_app
+            - ./srcs/main_app/:/home/main_app
         depends_on:
             userapp:
                 condition: service_started
@@ -29,7 +29,7 @@ services:
             - ./.env
 
     gameapp:
-        build: ./game_app
+        build: ./docker_srcs/game_app
         image: gameapp
         extra_hosts:
             - "$DB_HOST:$POSTGRES_IP"
@@ -38,8 +38,8 @@ services:
         ports:
             - "8003:8003"
         volumes:
-            - ../srcs/game_app/:/home/game_app
-            - ../srcs/user_app/:/home/user_app
+            - ./srcs/game_app/:/home/game_app
+            - ./srcs/user_app/:/home/user_app
         depends_on:
             userapp:
                 condition: service_healthy
@@ -52,7 +52,7 @@ services:
                 ipv4_address: $GAME_IP
     
     tourapp:
-        build: ./tour_app
+        build: ./docker_srcs/tour_app
         image: tourapp
         extra_hosts:
             - "$DB_HOST:$POSTGRES_IP"
@@ -61,8 +61,8 @@ services:
         ports:
             - "8004:8004"
         volumes:
-            - ../srcs/tour_app/:/home/tour_app
-            - ../srcs/user_app/:/home/user_app
+            - ./srcs/tour_app/:/home/tour_app
+            - ./srcs/user_app/:/home/user_app
         depends_on:
             postgres:
                 condition: service_healthy
@@ -78,7 +78,7 @@ services:
             retries: 10
             
     userapp:
-        build: ./user_app
+        build: ./docker_srcs/user_app
         image: userapp
         extra_hosts:
             - "$DB_HOST:$POSTGRES_IP"
@@ -87,7 +87,7 @@ services:
         ports:
             - "8001:8001"
         volumes:
-            - ../srcs/user_app/:/home/user_app
+            - ./srcs/user_app/:/home/user_app
         depends_on:
             postgres:
                 condition: service_healthy
@@ -103,14 +103,14 @@ services:
             retries: 10
 
     postgres:
-        build: ./postgres
+        build: ./docker_srcs/postgres
         image: postgres
         extra_hosts:
             - "$DB_HOST:$POSTGRES_IP"
         container_name: postgres
         restart: on-failure
         volumes:
-            - ../srcs/postgres/data:/var/lib/postgresql/data
+            - ./srcs/postgres/data:/var/lib/postgresql/data
             # - postgres_data:/var/lib/postgresql/data
         healthcheck:
             test: pg_isready -U postgres
@@ -124,7 +124,7 @@ services:
                 ipv4_address: $POSTGRES_IP
 
     friendsapp:
-        build: ./friends_app
+        build: ./docker_srcs/friends_app
         image: friendsapp
         extra_hosts:
             - "$DB_HOST:$POSTGRES_IP"
@@ -133,8 +133,8 @@ services:
         ports:
             - "8002:8002"
         volumes:
-            - ../srcs/friends_app/:/home/friends_app
-            - ../srcs/user_app/:/home/user_app
+            - ./srcs/friends_app/:/home/friends_app
+            - ./srcs/user_app/:/home/user_app
         depends_on:
             postgres:
                 condition: service_healthy
@@ -145,29 +145,6 @@ services:
         networks:
             user_app_network:
                 ipv4_address: $FRIENDS_IP
-
-# volumes:
-#     user_app_data:
-#         driver: local
-#         driver_opts:
-#             o: bind
-#             type: none
-#             device: ../srcs/user_app/
-
-    # friends_app_data:
-    #     driver: local
-    #     driver_opts:
-    #         o: bind
-    #         type: none
-    #         device: ../srcs/friends_app/
-
-    # postgres_data:
-    #     driver: local
-    #     driver_opts:
-    #         o: bind
-    #         type: none
-    #         device: ../srcs/postgres/data
-
 networks:
     user_app_network:
         driver: bridge

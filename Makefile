@@ -1,3 +1,5 @@
+include .env
+
 NAME				=	ft_transcendence
 
 DOCKER_CMD			=	docker compose -f $(COMPOSE_PATH) -p $(NAME)
@@ -5,9 +7,9 @@ DOCKER_CMD			=	docker compose -f $(COMPOSE_PATH) -p $(NAME)
 dev				=	0
 
 ifeq ($(dev), 1)
-	COMPOSE_PATH	=	./docker_srcs/docker-compose.yml
+	COMPOSE_PATH	=	docker-compose.yml
 else
-	COMPOSE_PATH	=	./docker_srcs/docker-compose.prod.yml
+	COMPOSE_PATH	=	docker-compose.prod.yml
 endif
 
 $(NAME)				:	build up
@@ -80,10 +82,10 @@ friends-logs		:
 						docker logs -f friendsapp
 
 psql-us				:
-						$(DOCKER_CMD) exec postgres psql --username=mehrin --dbname=users
+						$(DOCKER_CMD) exec postgres psql --username=${POSTGRES_USER} --dbname=${POSTGRES_DB}
 
 psql-fr				:
-						$(DOCKER_CMD) exec postgres psql --username=mehrin --dbname=friends
+						$(DOCKER_CMD) exec postgres psql --username=${POSTGRES_USER} --dbname=${FRIEND_DB_NAME}
 
 ps					:
 						$(DOCKER_CMD) ps
@@ -106,6 +108,7 @@ fclean				:	clean
 						rm -rf srcs/game_app/online/__pycache__/
 						rm -rf srcs/tour_app/tour_game/migrations/
 						rm -rf srcs/tour_app/tour_game/__pycache__/
+						docker system prune -af
 
 re					:	fclean all
 
