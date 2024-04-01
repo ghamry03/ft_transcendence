@@ -79,12 +79,6 @@ db-logs				:
 friends-logs		:
 						docker logs -f friendsapp
 
-psql-us				:
-						$(DOCKER_CMD) exec postgres psql --username=mehrin --dbname=usermanagement
-
-psql-fr				:
-						$(DOCKER_CMD) exec postgres psql --username=mehrin --dbname=friends
-
 ps					:
 						$(DOCKER_CMD) ps
 
