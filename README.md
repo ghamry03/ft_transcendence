@@ -81,3 +81,8 @@ This documentation provides an overview of the front-end structure, templates, a
 
 - apps.py
   - Can be used to customize the app specific configuration.
+
+@ommohame
+@mfirdous
+@lde-alen
+@kamin
